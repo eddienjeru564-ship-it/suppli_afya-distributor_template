@@ -17,8 +17,9 @@ with one thumb, on a weak signal.
    said…"), what to expect and when, and what was left out and why.
 5. **Trust is answered where the doubt appears**, not in a FAQ: the privacy line next to the questions,
    "Check before you buy" on every product, "You pay once it's confirmed" under the send button.
-6. **WhatsApp is how you finish, not a fallback.** The page prepares the conversation (the order, the
-   answers, a reference) so neither side starts from zero.
+6. **Finishing never depends on one app.** "Place order" files the order with the distributor, and
+   WhatsApp is one tap away with everything already written (the order, the answers, a reference),
+   so neither side starts from zero.
 7. **Readable before JavaScript.** Entrances and scroll reveals are CSS; the first screen is complete
    in the HTML. Overlays are enhancements on top of a page that already works.
 8. **Nothing invented.** No testimonials, no ratings, no stock photos, no credentials we haven't been
@@ -60,7 +61,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | Section | Job |
 |---|---|
 | Top bar | Name and face always visible; message and order one tap away |
-| Hero | The question customers actually have ("Not sure which product is right for you?"), two doors, and a still life of three products with their prices beside the distributor's calling card |
+| Hero | The question customers actually have ("Not sure which product is right for you?"), two doors, and a still life of three products, named and priced on shelf tags, beside the distributor's calling card. The kicker says where they are and when the prices were checked |
 | Help me choose | Goal tiles: tapping one starts the selector with that goal already chosen. After a result, this section shows the suggestions with prices |
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
 | How ordering works | Four steps, then delivery, payment and prices, answered plainly |
@@ -109,4 +110,7 @@ price: pricing never changes what the engine recommends.
 Designed at 390px, checked at 360px by the end-to-end tests (page, product, results, order, and the
 page with a result on it). A bottom bar appears once you've scrolled past the two doors: "Help me
 choose" plus WhatsApp, or the order total once something's in it, which also confirms each addition.
-It steps aside for sheets and the closing section.
+It steps aside for sheets, at the end of the page, and over the "Help me choose" section until
+something is in the order (the goal tiles are already the next step there).
+
+See `docs/REVIEW.md` for the screen-by-screen review behind these choices.

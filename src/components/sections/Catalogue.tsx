@@ -10,17 +10,12 @@ import { Button } from "@/components/ui/Button";
 import { ArrowRight, Close, Search, WhatsAppIcon } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
+import { dateLabel } from "@/storefront/dates";
 import { askMessage } from "@/storefront/messages";
 import { listings, matchesQuery, servesGoal } from "@/storefront/products";
 
 /** How many products show before "Show all": enough to scan, not a wall. */
 const FIRST_VIEW = 6;
-
-const dateLabel = (iso: string) => {
-  const d = new Date(`${iso}T12:00:00Z`);
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  return Number.isNaN(d.getTime()) ? iso : `${d.getUTCDate()} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
-};
 
 /**
  * For customers who know what they want: find it by name, or narrow by what it's for.

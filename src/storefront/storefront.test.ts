@@ -11,6 +11,7 @@ import { amount, kes } from "./money";
 import {
   ORDER_REF,
   canPlaceOrders,
+  deliveryFeeLabel,
   detailsProblem,
   emptyDetails,
   initials,
@@ -23,6 +24,7 @@ import {
   type OrderDetails,
 } from "./order";
 import { checkNotes, listings, matchesQuery, oneLiner, shortName, supplyLabel } from "./products";
+import { nextShown, partProgress } from "./progress";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
 import { contrast, validateStorefront } from "./validate";
@@ -275,6 +277,36 @@ describe("orders", () => {
     expect(ref).toMatch(ORDER_REF);
     expect(ref.startsWith("KC-")).toBe(true);
     for (let n = 0; n < 200; n++) expect(newOrderRef("Kate Cromuel")).toMatch(ORDER_REF);
+  });
+});
+
+describe("delivery costs", () => {
+  it("says a cost still to agree in two words, and shows known ones as prices", () => {
+    expect(deliveryFeeLabel(null)).toBe("Cost to confirm");
+    expect(deliveryFeeLabel(0)).toBe("Free");
+    expect(deliveryFeeLabel(300)).toBe("KES 300");
+  });
+});
+
+describe("selector progress", () => {
+  const about: Answers = { first_name: "Wanjiru", sex: "female", age: 34, pregnancy: "none", experience: "never" };
+
+  it("starts the goals part empty, even though it's a single question until goals are picked", () => {
+    expect(partProgress(about, "goals")).toEqual([1, 0, 0, 0]);
+  });
+
+  it("never goes backwards when picking goals adds their follow-ups", () => {
+    const withGoals: Answers = { ...about, goals: ["energy", "digestion"] };
+    const next = nextShown("goals", withGoals)!;
+    const [part1, part2, part3] = partProgress(withGoals, next);
+    expect(part1).toBe(1);
+    expect(part2).toBeGreaterThan(0);
+    expect(part2).toBeLessThan(1);
+    expect(part3).toBe(0);
+  });
+
+  it("is full once the suggestions are showing", () => {
+    expect(partProgress(about, "goals", true)).toEqual([1, 1, 1, 1]);
   });
 });
 

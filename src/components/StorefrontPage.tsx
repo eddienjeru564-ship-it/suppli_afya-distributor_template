@@ -13,6 +13,7 @@ import { SelectorOverlay } from "@/components/selector/SelectorOverlay";
 import { PageShell } from "@/components/store/PageShell";
 import { StorefrontProvider } from "@/components/store/StorefrontProvider";
 import { MessageSheet } from "@/components/whatsapp/MessageSheet";
+import { canPlaceOrders } from "@/storefront/order";
 import { themeCss } from "@/storefront/theme";
 import type { Storefront } from "@/storefront/types";
 
@@ -60,7 +61,7 @@ export function storefrontMetadata(sf: Storefront, path: string): Metadata {
   const d = sf.distributor;
   const count = Object.keys(sf.catalogue.offers).length;
   const title = `${d.name} · Help choosing BF Suma products, with prices`;
-  const description = `Not sure which product is right for you? Answer a few questions and see what fits, with prices and the reasons why. Or browse ${count} products and order from ${d.firstName} on WhatsApp.`;
+  const description = `Not sure which product is right for you? Answer a few questions and see what fits, with prices and the reasons why. Or browse ${count} products and order from ${d.firstName}${canPlaceOrders(sf) ? "" : " on WhatsApp"}.`;
   return {
     title,
     description,

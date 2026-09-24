@@ -44,7 +44,7 @@ export function Footer() {
   const { sf } = useStorefront();
   const d = sf.distributor;
   return (
-    <footer className="container-x pb-32 pt-8 text-[0.8rem] leading-relaxed text-ink-3 md:pb-12">
+    <footer className="container-x pb-12 pt-8 text-[0.8rem] leading-relaxed text-ink-3">
       <div className="grid gap-3 border-t border-ink/10 pt-8 md:grid-cols-2 md:gap-10">
         <p>
           General wellness information, not medical advice. Products here aren&apos;t intended to diagnose, treat, cure or

@@ -7,12 +7,10 @@ import {
   QUESTIONS_BY_ID,
   SECTIONS,
   isAnswered,
-  nextQuestionId,
   previousQuestionId,
   resolveText,
   toggleOption,
   visibleOptions,
-  visibleQuestions,
   type Answers,
   type EngineContext,
   type Question,
@@ -22,6 +20,7 @@ import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
 import { Bag, ChevronLeft, Close, Lock, Shield } from "@/components/ui/icons";
 import { Sheet } from "@/components/ui/Sheet";
+import { isFolded, nextShown, partProgress, previousShown } from "@/storefront/progress";
 import { MultiChoice, Scale, SingleChoice, TextField } from "./inputs";
 import { Results } from "./Results";
 import { SoFar } from "./SoFar";
@@ -44,19 +43,6 @@ const FIRST = "disclaimer";
 const LAST = "plan_size";
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const isFolded = (q: Question | undefined) => Boolean(q && q.kind === "section" && q.section !== "intro");
-
-function nextShown(id: string, a: Answers): string | null {
-  let n = nextQuestionId(id, a);
-  while (n && isFolded(QUESTIONS_BY_ID[n])) n = nextQuestionId(n, a);
-  return n;
-}
-
-function previousShown(id: string, a: Answers): string | null {
-  let p = previousQuestionId(id, a);
-  while (p && isFolded(QUESTIONS_BY_ID[p])) p = previousQuestionId(p, a);
-  return p && QUESTIONS_BY_ID[p].id !== "welcome" ? p : null;
-}
 
 /** Goals can be picked on the page before sex is known; drop any the engine wouldn't offer. */
 function tidy(a: Answers): Answers {
@@ -165,29 +151,28 @@ function Selector() {
   };
 
   const sectionProgress = useMemo(() => {
-    const list = visibleQuestions(answers).filter((x) => x.section !== "intro" && !isFolded(x));
+    const fills = partProgress(answers, currentId, showingResult);
     const currentSection = SECTIONS.findIndex((x) => x.id === q?.section);
-    return SECTIONS.map((s, i) => {
-      const inSection = list.filter((x) => x.section === s.id);
-      const idx = inSection.findIndex((x) => x.id === currentId);
-      let fill = 0;
-      if (showingResult) fill = 1;
-      else if (i < currentSection) fill = 1;
-      else if (i === currentSection && idx >= 0) fill = (idx + 1) / Math.max(1, inSection.length);
-      return { ...s, fill, current: !showingResult && i === currentSection };
-    });
+    return SECTIONS.map((s, i) => ({ ...s, fill: fills[i], current: !showingResult && i === currentSection }));
   }, [answers, currentId, q?.section, showingResult]);
 
   const intro = !showingResult && q?.section === "intro";
+  const opening = !showingResult && currentId === FIRST;
   const d = sf.distributor;
 
   const header = (
     <div className="flex h-16 shrink-0 items-center gap-2 px-3 sm:px-5">
+      {/* Nothing to go back to on the opening screen; Close is on the right. */}
       <button
         type="button"
         onClick={back}
         aria-label={showingResult ? "Change my answers" : "Back"}
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink transition-colors hover:bg-ink/[0.06]"
+        aria-hidden={opening || undefined}
+        tabIndex={opening ? -1 : undefined}
+        className={clsx(
+          "grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink transition-colors hover:bg-ink/[0.06]",
+          opening && "invisible",
+        )}
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
@@ -342,26 +327,29 @@ function QuestionView({
   if (q.kind === "section") {
     // Only the privacy and "not medical advice" screen is shown on its own.
     return (
-      <div className="flex flex-1 flex-col justify-center py-6">
-        <span className="kicker">Help me choose</span>
-        <h2 className="display-section mt-4 text-ink">{prompt}</h2>
-        {helper && (
-          <div className="mt-4 grid gap-3 text-[1rem] leading-relaxed text-ink-2">
-            {helper.split("\n\n").map((para) => (
-              <p key={para}>{para}</p>
-            ))}
-          </div>
-        )}
-        <ul className="mt-6 grid gap-2 text-[0.9rem] text-ink-2">
-          <li className="flex items-center gap-2.5">
-            <Shield className="h-4 w-4 shrink-0 text-accent" /> About 3 minutes. Most answers are a single tap.
-          </li>
-          <li className="flex items-center gap-2.5">
-            <Lock className="h-4 w-4 shrink-0 text-accent" /> You can close this at any time; your answers are kept.
-          </li>
-        </ul>
-        <div className="mt-9">
-          <Button variant="accent" size="lg" onClick={onNext} arrow data-autofocus>
+      <div className="flex flex-1 flex-col sm:justify-center">
+        <div className="my-auto py-6 sm:my-0">
+          <span className="kicker">Help me choose</span>
+          <h2 className="display-section mt-4 text-ink">{prompt}</h2>
+          {helper && (
+            <div className="mt-4 grid gap-3 text-[1rem] leading-relaxed text-ink-2">
+              {helper.split("\n\n").map((para) => (
+                <p key={para}>{para}</p>
+              ))}
+            </div>
+          )}
+          <ul className="mt-6 grid gap-2 text-[0.9rem] text-ink-2">
+            <li className="flex items-start gap-2.5">
+              <Shield className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> About 3 minutes. Most answers are a single tap.
+            </li>
+            <li className="flex items-start gap-2.5">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> You can close this at any time; your answers are kept.
+            </li>
+          </ul>
+        </div>
+        {/* Phones: in the same place as every other question's Continue, under the thumb. */}
+        <div className="safe-bottom sticky bottom-0 z-10 -mx-5 bg-gradient-to-t from-canvas from-70% to-canvas/0 px-5 pt-6 sm:static sm:mx-0 sm:bg-none sm:px-0 sm:pt-3">
+          <Button variant="accent" size="lg" className="w-full sm:w-auto sm:min-w-44" onClick={onNext} arrow data-autofocus>
             {q.cta ?? "Continue"}
           </Button>
         </div>

@@ -83,8 +83,9 @@ export function Results({
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-4 sm:px-8 sm:pt-8">
       <Appear i={step++}>
+        {/* The header already says "Your suggestions"; the reference is what's worth quoting to the distributor. */}
         <p className="kicker">
-          Your suggestions · <span className="font-mono tracking-normal">{result.ref}</span>
+          Reference <span className="font-mono tracking-normal">{result.ref}</span>
         </p>
         <h1 className="display-section mt-4 text-ink">{title}</h1>
       </Appear>
@@ -321,7 +322,7 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
           <PackArt
             product={p}
             center
-            className={clsx(lead ? "aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[20rem]" : "aspect-[16/9] w-full sm:aspect-auto sm:h-full")}
+            className={clsx(lead ? "aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[20rem]" : "aspect-[2/1] w-full sm:aspect-auto sm:h-full")}
             packClassName="transition-transform duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1.5"
           />
         </button>

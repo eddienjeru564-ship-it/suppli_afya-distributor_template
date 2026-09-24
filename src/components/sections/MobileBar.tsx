@@ -13,31 +13,45 @@ import { kes } from "@/storefront/money";
 /**
  * On phones, the next step is always under the thumb: once you've scrolled past the two
  * paths, the bar offers them again; once something is in your order, it shows the total.
- * It steps aside for the closing section and whenever a sheet is open.
+ * It steps aside whenever a sheet is open, at the end of the page, and (until there's an
+ * order) over the "Help me choose" section, whose goals are already the next step.
  */
 export function MobileBar() {
   const { sf, priced, overlays, message, openOrder, openSelector, toast } = useStorefront();
   const justAdded = toast?.kind === "order" ? toast : null;
   const [pastHero, setPastHero] = useState(false);
   const [atEnd, setAtEnd] = useState(false);
+  const [inChoose, setInChoose] = useState(false);
 
   useEffect(() => {
     const hero = document.getElementById("top");
-    const end = document.getElementById("closing");
+    const ends = [document.getElementById("closing"), document.querySelector("footer")].filter((x): x is HTMLElement => Boolean(x));
+    const choose = document.getElementById("choose");
+    const seen = new Set<Element>();
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.target === hero) setPastHero(!e.isIntersecting);
-        if (e.target === end) setAtEnd(e.isIntersecting);
+        if (ends.includes(e.target as HTMLElement)) {
+          if (e.isIntersecting) seen.add(e.target);
+          else seen.delete(e.target);
+          setAtEnd(seen.size > 0);
+        }
       }
     });
+    // Only while the section fills the middle of the screen, so the bar doesn't flicker at its edges.
+    const middle = new IntersectionObserver(([e]) => setInChoose(e.isIntersecting), { rootMargin: "-35% 0px -35% 0px" });
     if (hero) io.observe(hero);
-    if (end) io.observe(end);
-    return () => io.disconnect();
+    ends.forEach((el) => io.observe(el));
+    if (choose) middle.observe(choose);
+    return () => {
+      io.disconnect();
+      middle.disconnect();
+    };
   }, []);
 
   const busy = overlays.selector || overlays.order || Boolean(overlays.product) || Boolean(message);
   const hasOrder = priced.count > 0;
-  const show = !busy && !atEnd && (pastHero || hasOrder);
+  const show = !busy && !atEnd && (hasOrder || (pastHero && !inChoose));
 
   return (
     <AnimatePresence>

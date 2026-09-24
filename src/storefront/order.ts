@@ -40,6 +40,11 @@ export function normalisePhone(input: string): string | null {
  * Suppli Afya portal) rather than only through WhatsApp. Previews show the whole flow and
  * send nothing.
  */
+/** A delivery area's cost as customers see it. An unknown cost is agreed before anyone pays. */
+export function deliveryFeeLabel(fee: number | null): string {
+  return fee === null ? "Cost to confirm" : fee === 0 ? "Free" : kes(fee);
+}
+
 export function canPlaceOrders(sf: Storefront): boolean {
   return sf.status === "preview" || Boolean(sf.suppliSlug);
 }

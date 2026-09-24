@@ -30,7 +30,7 @@ export function ChooseSection() {
 
   return (
     <section id="choose" aria-labelledby="choose-title" className="container-x scroll-mt-20 py-6 md:py-10">
-      <div className="grain relative overflow-hidden rounded-panel bg-night px-5 py-12 text-white sm:px-8 md:px-12 md:py-16">
+      <div className="grain relative overflow-hidden rounded-panel bg-night px-5 py-10 text-white sm:px-8 sm:py-12 md:px-12 md:py-16">
         {/* Phones: heading, then the goals straight away, then how it works. Large screens: two columns. */}
         <div className="grid grid-cols-1 gap-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14 lg:gap-y-10">
           <Reveal className="min-w-0">
@@ -75,17 +75,21 @@ export function ChooseSection() {
 
           <div className="min-w-0">
             {!result && (
-              <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                {SECTIONS.map((s, i) => (
-                  <li key={s.id} className="flex gap-4">
-                    <span className="font-display text-[1.3rem] leading-none text-white/40">{String(i + 1).padStart(2, "0")}</span>
-                    <span>
-                      <span className="block font-semibold">{s.label}</span>
-                      <span className="mt-0.5 block text-[0.88rem] leading-snug text-white/55">{PARTS[s.id]}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+              <>
+                <h3 className="mb-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white/45 sm:sr-only">Four short parts</h3>
+                {/* Phones: the four parts as names only; the goals above are what matters there. */}
+                <ol className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-4 lg:grid-cols-1">
+                  {SECTIONS.map((s, i) => (
+                    <li key={s.id} className="flex items-baseline gap-3 sm:gap-4">
+                      <span className="font-display text-[1.1rem] leading-none text-white/40 sm:text-[1.3rem]">{String(i + 1).padStart(2, "0")}</span>
+                      <span>
+                        <span className="block font-semibold">{s.label}</span>
+                        <span className="mt-0.5 hidden text-[0.88rem] leading-snug text-white/55 sm:block">{PARTS[s.id]}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </>
             )}
             <p className={clsx("flex items-start gap-2 text-[0.84rem] leading-snug text-white/55", !result && "mt-8")}>
               <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
@@ -103,9 +107,9 @@ export function ChooseSection() {
 
 function GoalGrid({ onPick, onStart, resuming }: { onPick: (g: GoalId) => void; onStart: () => void; resuming: boolean }) {
   const tile =
-    "group flex h-full w-full items-start justify-between gap-2 rounded-card p-4 text-left transition-[background-color,box-shadow] duration-300";
+    "group flex h-full w-full items-start justify-between gap-2 rounded-card px-3.5 py-3 text-left transition-[background-color,box-shadow] duration-300 sm:p-4";
   return (
-    <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5">
       {GOALS.map((g) => (
         <li key={g.id}>
           <button
@@ -114,21 +118,26 @@ function GoalGrid({ onPick, onStart, resuming }: { onPick: (g: GoalId) => void; 
             className={clsx(tile, "bg-white/[0.045] ring-1 ring-white/10 hover:bg-white/[0.08] hover:ring-white/30")}
           >
             <span className="min-w-0">
-              <span className="block text-[0.98rem] font-semibold leading-snug">{g.label}</span>
-              <span className="mt-1 block text-[0.8rem] leading-snug text-white/55">{g.hint}</span>
+              <span className="block text-[0.95rem] font-semibold leading-snug sm:text-[0.98rem]">{g.label}</span>
+              <span className="mt-0.5 line-clamp-2 text-[0.78rem] leading-snug text-white/55 sm:mt-1 sm:text-[0.8rem]">{g.hint}</span>
             </span>
-            <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-white/35 transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-white" />
+            <ArrowRight className="mt-1 hidden h-3.5 w-3.5 shrink-0 text-white/35 transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-white sm:block" />
           </button>
         </li>
       ))}
       {/* Fills the grid's last row, and gives the unsure a way in. */}
       <li className="col-span-1 sm:col-span-2">
         <button type="button" onClick={onStart} className={clsx(tile, "items-center bg-canvas text-ink hover:bg-white")}>
-          <span>
-            <span className="block text-[0.98rem] font-semibold leading-snug">{resuming ? "Carry on where I left off" : "Not sure? Start without choosing"}</span>
-            <span className="mt-1 block text-[0.8rem] leading-snug text-ink-3">About 3 minutes. Most answers are one tap.</span>
+          <span className="min-w-0">
+            <span className="block text-[0.95rem] font-semibold leading-snug sm:text-[0.98rem]">
+              {resuming ? "Carry on where I left off" : "Not sure? Start without choosing"}
+            </span>
+            <span className="mt-0.5 block text-[0.78rem] leading-snug text-ink-3 sm:mt-1 sm:text-[0.8rem]">
+              About 3 minutes<span className="hidden sm:inline">. Most answers are one tap.</span>
+            </span>
           </span>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-canvas transition-transform duration-300 group-hover:translate-x-0.5">
+          {/* Phones: half a row is too narrow for text and a button; the whole tile is the button. */}
+          <span className="hidden h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-canvas transition-transform duration-300 group-hover:translate-x-0.5 sm:grid">
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
         </button>
@@ -147,7 +156,7 @@ function Suggestions() {
   const allIn = priced.orderableCore.length > 0 && priced.orderableCore.every((s) => qtyOf(s.rec.product.id) > 0);
 
   return (
-    <div className="rounded-card bg-white/[0.05] p-5 ring-1 ring-white/10 sm:p-6">
+    <div className="sm:rounded-card sm:bg-white/[0.05] sm:p-6 sm:ring-1 sm:ring-white/10">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white/50">Your suggestions</span>
         <span className="font-mono text-[0.78rem] text-white/45">{result.ref}</span>
@@ -172,13 +181,17 @@ function Suggestions() {
       ) : (
         <ul className="mt-5 grid grid-cols-1 gap-2.5">
           {priced.core.map((s) => (
-            <li key={s.rec.product.id} className="flex items-center gap-3.5 rounded-xl bg-white/[0.04] p-2.5 pr-3">
+            <li key={s.rec.product.id} className="flex items-center gap-3.5 rounded-xl bg-white/[0.06] p-2.5 pr-3 sm:bg-white/[0.04]">
               <PackArt product={s.rec.product} thumb className="aspect-square w-14 shrink-0 rounded-lg" />
               <div className="min-w-0 flex-1">
                 <div className="font-semibold leading-snug">{s.rec.product.name}</div>
                 <div className="hidden truncate text-[0.82rem] text-white/55 sm:block">{s.rec.reasons[0]}</div>
+                {/* Phones: the price under the name, so the name gets the full width. */}
+                <div className="price mt-0.5 text-[0.88rem] text-white/70 sm:hidden">
+                  {s.listing ? kes(s.listing.offer.price) : `Ask ${sf.distributor.firstName}`}
+                </div>
               </div>
-              <div className="price shrink-0 text-right text-[0.92rem] font-semibold">
+              <div className="price hidden shrink-0 text-right text-[0.92rem] font-semibold sm:block">
                 {s.listing ? kes(s.listing.offer.price) : <span className="text-white/55">Ask</span>}
               </div>
             </li>

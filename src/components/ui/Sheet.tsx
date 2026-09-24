@@ -108,6 +108,13 @@ export function Sheet({
   const mobileSheet = !desktop && kind !== "screen";
   const top = useTopSheet();
   const covered = open && top !== null && top !== titleId;
+  // Callers pass a fresh onClose on every render. Keep the latest in a ref so the effect
+  // below runs only when the sheet opens or closes: re-running it would release and retake
+  // the scroll lock (shifting the page behind) and pull focus back to the top of the sheet.
+  const closeRef = useRef(onClose);
+  useEffect(() => {
+    closeRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -132,7 +139,7 @@ export function Sheet({
       if (stack[stack.length - 1] !== titleId) return;
       if (e.key === "Escape") {
         e.stopPropagation();
-        onClose();
+        closeRef.current();
       }
       if (e.key === "Tab") {
         const items = [...el.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((n) => n.offsetParent !== null);
@@ -156,7 +163,7 @@ export function Sheet({
       // Give focus back to whatever opened the sheet, if it's still on the page.
       if (before && document.contains(before)) before.focus({ preventScroll: true });
     };
-  }, [open, onClose, titleId]);
+  }, [open, titleId]);
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 110 || info.velocity.y > 600) onClose();

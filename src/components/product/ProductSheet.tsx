@@ -201,7 +201,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
   if (desktop) {
     return (
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <PackArt product={p} className="h-full min-h-[34rem]" />
+        <PackArt product={p} center className="h-full min-h-[34rem]" />
         <div className="flex min-h-0 flex-col">
           <SheetHeader className="pb-0">
             <div className="flex justify-end">{shareButton}</div>

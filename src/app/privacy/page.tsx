@@ -13,10 +13,14 @@ export const metadata: Metadata = { title: "Privacy", robots: { index: false } }
 export default function PrivacyPage() {
   return (
     <main className="container-x max-w-2xl py-16 md:py-24">
-      <Link href="/" className="text-[0.9rem] font-semibold text-ink-2 underline-offset-4 hover:text-ink hover:underline">
-        ← Back to the shop
-      </Link>
-      <p className="kicker mt-10">Privacy</p>
+      <p>
+        <Link href="/" className="text-[0.9rem] font-semibold text-ink-2 underline-offset-4 hover:text-ink hover:underline">
+          ← Back to the shop
+        </Link>
+      </p>
+      <p className="mt-10">
+        <span className="kicker">Privacy</span>
+      </p>
       <h1 className="display-section mt-4 text-ink">How your information is handled</h1>
       <div className="mt-8 grid gap-7 text-[1.02rem] leading-relaxed text-ink-2">
         <p>
@@ -34,17 +38,22 @@ export default function PrivacyPage() {
         <section>
           <h2 className="font-display text-[1.5rem] text-ink">Orders</h2>
           <p className="mt-2">
-            When you send an order, it opens in WhatsApp with the products, your name and the delivery details you entered, and
-            the distributor receives it when you press send. The distributor may keep a record of it to deliver and to follow
-            up. This page remembers what&apos;s in your order, your name and your delivery choice on this device, so you
-            don&apos;t have to type them again. Clearing your browser&apos;s data removes them.
+            You can place an order on the page or send it on WhatsApp. When you place it on the page, the products, your name,
+            phone number, delivery choice and any note you add go to the distributor&apos;s Suppli Afya workspace, so they can
+            confirm the order with you. When you send it on WhatsApp, it opens with the same details written, and the
+            distributor receives it when you press send.
+          </p>
+          <p className="mt-3">
+            The distributor may keep a record of your order to deliver it and to follow up. This page remembers what&apos;s in
+            your order, your name, phone number and delivery choice on this device, so you don&apos;t have to type them again.
+            Clearing your browser&apos;s data removes them.
           </p>
         </section>
         <section>
           <h2 className="font-display text-[1.5rem] text-ink">Payments</h2>
           <p className="mt-2">
-            You pay the distributor directly. This page never asks for card numbers or M-Pesa PINs, and doesn&apos;t take
-            payments.
+            You pay the distributor directly. This page never asks for card numbers or <span className="whitespace-nowrap">M-Pesa</span>{" "}
+            PINs, and doesn&apos;t take payments.
           </p>
         </section>
         <section>

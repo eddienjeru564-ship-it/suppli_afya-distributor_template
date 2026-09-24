@@ -53,7 +53,7 @@ test("browsing: find a product, read about it and send the order to the distribu
   await expect(sheet(page).getByText("Probio3")).toBeVisible();
 });
 
-test("ordering without WhatsApp: place the order on the page and it goes to the distributor", async ({ page }) => {
+test("ordering without WhatsApp: place the order on the page and it goes to the distributor", async ({ page }, info) => {
   await page.goto("/?p=arthroxtra");
   await sheet(page).getByRole("button", { name: /Add to order · KES 4,700/ }).click();
   await page.goto("/?order");
@@ -69,6 +69,10 @@ test("ordering without WhatsApp: place the order on the page and it goes to the 
   await expect(sheet(page).getByText(/call or message you on 0712 345 678/)).toBeVisible();
   // This page is a preview, and says so.
   await expect(sheet(page).getByText("This page is a preview, so the order wasn't sent to anyone.")).toBeVisible();
+  // The page behind the confirmation stays put (no scroll-lock padding appearing on a phone).
+  if (info.project.name === "mobile") expect(await page.evaluate(() => document.documentElement.style.paddingRight)).toBe("");
+  await sheet(page).getByRole("button", { name: "Done" }).click();
+  await expect(page.locator("[data-sheet]")).toHaveCount(0);
 });
 
 test("help me choose: suggestions come with the reason, the price and a way to order", async ({ page }) => {

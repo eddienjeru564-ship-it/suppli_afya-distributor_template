@@ -15,6 +15,7 @@ import { kes } from "@/storefront/money";
 import {
   LIMITS,
   canPlaceOrders,
+  deliveryFeeLabel,
   detailsProblem,
   emptyDetails,
   newOrderRef,
@@ -385,9 +386,7 @@ function Details({
                   <Choice key={a.id} selected={details.areaId === a.id} onSelect={() => set({ areaId: a.id })}>
                     <span className="flex w-full items-baseline justify-between gap-3">
                       <span>{a.label}</span>
-                      <span className="price text-[0.84rem] font-normal text-ink-3">
-                        {a.fee === null ? "Cost confirmed with you" : a.fee === 0 ? "Free" : kes(a.fee)}
-                      </span>
+                      <span className="price shrink-0 text-[0.84rem] font-normal text-ink-3">{deliveryFeeLabel(a.fee)}</span>
                     </span>
                   </Choice>
                 ))}
@@ -543,33 +542,48 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
           </p>
         </>
       )}
-      <div className="mt-6 rounded-card bg-surface p-4 ring-1 ring-ink/[0.07]">
+      <dl className="mt-6 grid gap-1.5 rounded-card bg-surface p-4 ring-1 ring-ink/[0.07]">
         <Row label="Order reference" value={<span className="font-mono">{order.ref}</span>} />
-        <div className="mt-1.5">
-          <Row label={order.totalConfirmed ? "Total" : "Total before delivery"} value={kes(order.total)} strong />
-        </div>
-      </div>
+        <Row label={order.totalConfirmed ? "Total" : "Total before delivery"} value={kes(order.total)} strong />
+      </dl>
       {m && (
         <p className="mt-4 text-[0.92rem] leading-relaxed text-ink-2">
-          When {first} confirms, pay by M-Pesa to {m.kind === "till" ? "Till" : "Paybill"}{" "}
+          When {first} confirms, pay by <span className="whitespace-nowrap">M-Pesa</span> to {m.kind === "till" ? "Till" : "Paybill"}{" "}
           <span className="font-semibold text-ink">{m.number}</span>
           {m.account ? `, account ${m.account}` : ""}
           {m.name ? ` (${m.name})` : ""}.
         </p>
       )}
-      <div className="mt-6 grid gap-2.5">
-        <Button variant={order.via === "placed" ? "outline" : "whatsapp"} onClick={onAgain}>
-          <WhatsAppIcon /> {order.via === "placed" ? `Message ${first} about it` : "Open WhatsApp again"}
-        </Button>
-        <div className="grid grid-cols-2 gap-2.5">
-          <Button variant="outline" onClick={copy}>
-            {copied ? <Check /> : <Copy />} {copied ? "Copied" : "Copy order"}
-          </Button>
-          <Button variant="outline" onClick={() => close("order")}>
+      {order.via === "placed" ? (
+        // Placed: nothing left to do, so Done leads. A question is still one tap away.
+        <div className="mt-6 grid gap-2.5">
+          <Button variant="primary" onClick={() => close("order")}>
             Done
           </Button>
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button variant="outline" onClick={onAgain}>
+              <WhatsAppIcon className="h-4 w-4 text-[#1faa59]" /> Message {first}
+            </Button>
+            <Button variant="outline" onClick={copy}>
+              {copied ? <Check /> : <Copy />} {copied ? "Copied" : "Copy order"}
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-6 grid gap-2.5">
+          <Button variant="whatsapp" onClick={onAgain}>
+            <WhatsAppIcon /> Open WhatsApp again
+          </Button>
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button variant="outline" onClick={copy}>
+              {copied ? <Check /> : <Copy />} {copied ? "Copied" : "Copy order"}
+            </Button>
+            <Button variant="outline" onClick={() => close("order")}>
+              Done
+            </Button>
+          </div>
+        </div>
+      )}
     </SheetBody>
   );
 }

@@ -7,9 +7,10 @@ import { PackArt } from "@/components/product/PackArt";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { ArrowRight, Pin, WhatsAppIcon } from "@/components/ui/icons";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
+import { dateLabel } from "@/storefront/dates";
 import { askMessage } from "@/storefront/messages";
 import { kes } from "@/storefront/money";
-import { listings } from "@/storefront/products";
+import { listings, shortName } from "@/storefront/products";
 
 /**
  * First screen. It answers three questions in a few seconds: whose page is this, can I get
@@ -26,8 +27,9 @@ export function Hero() {
     <section id="top" aria-labelledby="hero-title" className="relative">
       <div className="container-x grid grid-cols-1 gap-10 pb-14 pt-7 md:pt-12 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:items-center lg:gap-16 lg:pb-20 lg:pt-14">
         <div>
+          {/* The top bar already says who this is; the kicker says where, and how fresh the prices are. */}
           <p {...rise(0)}>
-            <span className="kicker">{[d.role, d.area].filter(Boolean).join(" · ")}</span>
+            <span className="kicker">{[d.area, `Prices checked ${dateLabel(sf.catalogue.updated, true)}`].filter(Boolean).join(" · ")}</span>
           </p>
           <h1 {...rise(1)} id="hero-title">
             <span className="display-hero mt-5 block text-ink sm:max-w-[14ch]">
@@ -36,8 +38,8 @@ export function Hero() {
           </h1>
           <p {...rise(2)}>
             <span className="lede mt-6 block max-w-[33rem]">
-              Answer a few quick questions and see what fits what you&apos;re looking for, with prices and the reasons why.
-              Already know what you want? Go straight to the products.
+              Answer a few quick questions and see what fits you, with prices and the reasons why. Already know what you want?
+              Go straight to the products.
             </span>
           </p>
 
@@ -130,8 +132,10 @@ function StillLife() {
                 className="h-full w-full"
                 packClassName="transition-transform duration-500 ease-[var(--ease-out)] group-hover:-translate-y-2"
               />
-              <span className="price absolute -bottom-[0.9rem] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-surface px-2.5 py-1 text-[0.74rem] font-semibold text-ink shadow-lift transition-colors group-hover:bg-ink group-hover:text-canvas sm:text-[0.8rem]">
-                {kes(l!.offer.price)}
+              {/* The drawn packs carry no words, so the name sits on the shelf tag with the price. */}
+              <span className="absolute -bottom-[1.6rem] left-1/2 flex max-w-[112%] -translate-x-1/2 flex-col items-center rounded-xl bg-surface px-2.5 py-1 text-center leading-tight text-ink shadow-lift transition-colors group-hover:bg-ink group-hover:text-canvas">
+                <span className="max-w-full truncate text-[0.66rem] font-medium opacity-70 sm:text-[0.72rem]">{shortName(l!.product)}</span>
+                <span className="price whitespace-nowrap text-[0.76rem] font-semibold sm:text-[0.82rem]">{kes(l!.offer.price)}</span>
               </span>
             </span>
           </button>
@@ -143,14 +147,12 @@ function StillLife() {
         <Portrait distributor={d} size="md" />
         <div className="min-w-0 flex-1 leading-tight">
           <div className="truncate font-semibold text-ink">{d.name}</div>
-          <div className="mt-1 text-[0.8rem] leading-snug text-ink-3">
-            {d.area && (
-              <span className="mr-1 inline-flex items-center gap-1 whitespace-nowrap">
-                <Pin className="h-3.5 w-3.5 shrink-0" /> {d.area} ·
-              </span>
-            )}
-            Orders and questions on WhatsApp
-          </div>
+          {d.area && (
+            <div className="mt-1 flex items-center gap-1 text-[0.8rem] text-ink-3">
+              <Pin className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{d.area}</span>
+            </div>
+          )}
+          <div className="mt-0.5 text-[0.8rem] text-ink-3">Questions? Ask on WhatsApp</div>
         </div>
         <ContactAction
           text={askMessage(sf)}
