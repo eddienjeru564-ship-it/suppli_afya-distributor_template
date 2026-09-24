@@ -23,7 +23,8 @@ else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`,
 | One or two sentences in her own words | `distributor.intro` | About the customer, not about her. No credentials we can't check |
 | Languages, reply hours (optional) | `distributor.languages`, `distributor.hours` | |
 | Her colour (optional) | `theme` | Tests check white text is readable on it |
-| Her Suppli Afya link name | `suppliSlug` | Once she has a workspace, so sent results reach her portal |
+| Her Suppli Afya link name | `suppliSlug` | Once she has a workspace, so sent results and placed orders reach her portal. Needs `SUPPLI_AFYA_URL` and `STOREFRONT_SECRET` set in both apps |
+| Official product photos (optional) | `assets/products/` + `sources.json` | Only official photos of the exact pack, with permission to use them. Then `npm run photos` |
 
 Then set `pending: []` and `status: "live"`, and run `npm test` (a live storefront without a WhatsApp
 number, or with anything still pending, fails validation).
@@ -39,7 +40,7 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
 - **Legal review** of `/privacy` and the disclaimers, and ODPC registration. The storefront stores
   nothing on a server unless `SUPPLI_AFYA_URL` or `ORDER_WEBHOOK_URL` is set; with them, sent results
   and orders leave the browser.
-- **BF Suma's distributor policy** on online price lists and product names.
+- **BF Suma's distributor policy** on online price lists, product names and product photos.
 
 ## Deploying
 

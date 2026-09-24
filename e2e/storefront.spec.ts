@@ -29,12 +29,12 @@ test("browsing: find a product, read about it and send the order to the distribu
 
   await page.getByRole("button", { name: "Your order: 1 item" }).click();
   await next(page, /Continue · KES 3,900/);
-  await next(page, /Send order to Kate/);
+  await next(page, /Or send it to Kate on WhatsApp/);
   await expect(sheet(page).getByRole("alert")).toHaveText("Add your name so Kate knows who the order is from.");
   await sheet(page).getByLabel("Your name").fill("Wanjiru");
   await pick(page, /^Within Nairobi/);
   await pick(page, "M-Pesa");
-  await next(page, /Send order to Kate/);
+  await next(page, /Or send it to Kate on WhatsApp/);
 
   // A preview page shows the exact WhatsApp message instead of opening a chat.
   const message = sheet(page);
@@ -51,6 +51,24 @@ test("browsing: find a product, read about it and send the order to the distribu
   await expect(sheet(page).getByText("Your order is empty.")).toBeVisible();
   await sheet(page).getByRole("button", { name: "Order the same again" }).click();
   await expect(sheet(page).getByText("Probio3")).toBeVisible();
+});
+
+test("ordering without WhatsApp: place the order on the page and it goes to the distributor", async ({ page }) => {
+  await page.goto("/?p=arthroxtra");
+  await sheet(page).getByRole("button", { name: /Add to order · KES 4,700/ }).click();
+  await page.goto("/?order");
+  await next(page, /Continue · KES 4,700/);
+  await sheet(page).getByLabel("Your name").fill("Wanjiru");
+  await pick(page, /^Within Nairobi/);
+  await pick(page, "Cash on delivery");
+  await next(page, /Place order · KES 4,700/);
+  await expect(sheet(page).getByRole("alert")).toHaveText("Add your phone number so Kate can confirm with you.");
+  await sheet(page).getByLabel("Phone number").fill("0712 345 678");
+  await next(page, /Place order · KES 4,700/);
+  await expect(sheet(page).getByRole("heading", { name: "Kate has your order." })).toBeVisible();
+  await expect(sheet(page).getByText(/call or message you on 0712 345 678/)).toBeVisible();
+  // This page is a preview, and says so.
+  await expect(sheet(page).getByText("This page is a preview, so the order wasn't sent to anyone.")).toBeVisible();
 });
 
 test("help me choose: suggestions come with the reason, the price and a way to order", async ({ page }) => {
@@ -197,6 +215,13 @@ test.describe("order API", () => {
     expect((await post({ slug: "kate", ref: "nope", items: [{ id: "probio3", qty: 1 }], details })).status()).toBe(400);
     expect((await post({ slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 1 }], details: { ...details, name: "" } })).status()).toBe(422);
     expect((await post({ slug: "kate", ref: "KC-AB23", items: [{ id: "not-sold", qty: 1 }], details })).status()).toBe(422);
+  });
+
+  test("placing on the page needs a phone number, and a preview never sends it anywhere", async ({ request }) => {
+    const place = (d: object) => request.post("/api/orders", { data: { slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 1 }], details: d, place: true } });
+    expect((await place(details)).status()).toBe(422);
+    const res = await place({ ...details, phone: "0712345678" });
+    expect(await res.json()).toMatchObject({ ok: true, placed: true, preview: true, total: 3900 });
   });
 
   test("leads are only passed on from a live, connected storefront", async ({ request }) => {

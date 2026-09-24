@@ -11,6 +11,8 @@ import type { DeliveryArea, PaymentMethod, Storefront } from "./types";
 
 export interface OrderDetails {
   name: string;
+  /** Needed when the order is placed on the page (the distributor calls or messages back). WhatsApp brings its own. */
+  phone: string;
   receive: "delivery" | "pickup";
   areaId: string | null;
   /** Street, building or landmark. */
@@ -24,7 +26,23 @@ export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   cash: "Cash",
 };
 
-export const LIMITS = { name: 40, address: 160, note: 280 } as const;
+export const LIMITS = { name: 40, phone: 20, address: 160, note: 280 } as const;
+
+/** 07XX / 01XX / +2547XX → 2547XXXXXXXX, or null if it isn't a Kenyan mobile number. */
+export function normalisePhone(input: string): string | null {
+  const d = input.replace(/[^\d+]/g, "").replace(/^\+/, "");
+  const m = d.match(/^(?:254|0)?([17]\d{8})$/);
+  return m ? `254${m[1]}` : null;
+}
+
+/**
+ * Whether this storefront can take an order on the page (straight into the distributor's
+ * Suppli Afya portal) rather than only through WhatsApp. Previews show the whole flow and
+ * send nothing.
+ */
+export function canPlaceOrders(sf: Storefront): boolean {
+  return sf.status === "preview" || Boolean(sf.suppliSlug);
+}
 
 export function receiveModes(sf: Storefront): OrderDetails["receive"][] {
   const modes: OrderDetails["receive"][] = [];
@@ -38,12 +56,21 @@ export function emptyDetails(sf: Storefront): OrderDetails {
   const areas = sf.fulfilment.delivery?.areas ?? [];
   return {
     name: "",
+    phone: "",
     receive: modes[0] ?? "delivery",
     areaId: areas.length === 1 ? areas[0].id : null,
     address: "",
     payment: sf.payment.methods.length === 1 ? sf.payment.methods[0] : null,
     note: "",
   };
+}
+
+/** Placing on the page also needs a number to reach the customer on. */
+export function placeProblem(sf: Storefront, d: OrderDetails): string | null {
+  const issue = detailsProblem(sf, d);
+  if (issue) return issue;
+  if (!normalisePhone(d.phone)) return `Add your phone number so ${sf.distributor.firstName} can confirm with you.`;
+  return null;
 }
 
 /** The first thing stopping this order from being sent, in words for the customer. */
@@ -146,6 +173,7 @@ export function parseDetails(raw: unknown): OrderDetails {
   const str = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max) : "");
   return {
     name: str(r.name, LIMITS.name + 10),
+    phone: str(r.phone, LIMITS.phone + 10),
     receive: r.receive === "pickup" ? "pickup" : "delivery",
     areaId: typeof r.areaId === "string" ? r.areaId.slice(0, 40) : null,
     address: str(r.address, LIMITS.address + 10),
@@ -161,7 +189,7 @@ export function orderRecord(sf: Storefront, order: PricedOrder, d: OrderDetails,
     distributor: sf.distributor.name,
     ref: refs.order,
     selectorRef: refs.selector ?? null,
-    customer: { name: d.name.trim() },
+    customer: { name: d.name.trim(), phone: normalisePhone(d.phone) },
     receive: d.receive,
     deliverTo: d.receive === "delivery" ? { area: order.delivery?.label ?? null, address: oneLine(d.address) || null } : null,
     payment: d.payment,

@@ -1,13 +1,17 @@
 import clsx from "clsx";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { Product, ProductLine } from "@/engine";
-import { FORMAT_LABEL, shortName } from "@/storefront/products";
+import photos from "@/storefront/product-photos.json";
 
 /**
- * Pack illustrations, one shape per format, tinted by product line, with the product's
- * name set on a paper label. Suppli Afya never uses BF Suma's product photography or logos
- * (the page must never look like BF Suma's own site), so these stand in for photos: the
- * product stays the visual focus without pretending to be the real packaging.
+ * How a product appears: its official photo when we have one (see assets/products/README.md),
+ * otherwise a pack illustration, one shape per format, tinted by product line.
+ *
+ * Illustrations carry no name, range or logo on their label: a drawn pack with printed words
+ * would be a made-up label. The product's name is always right next to it in the interface.
+ * Photos are pre-cut to the same height, so they stand on the same floor as the drawings and
+ * a mixed catalogue still reads as one set.
  *
  * Everything is sized in container units of the stage's shorter side (cqmin), so one
  * component works as a 64px thumbnail, a tall card and a wide banner without cropping.
@@ -51,7 +55,7 @@ export function PackArt({
   packClassName?: string;
   /** Tinted backdrop behind the pack. */
   stage?: boolean;
-  /** Print the name on the pack. Defaults to on, except for thumbnails. */
+  /** Show the label panel on drawn packs. Defaults to on, except for thumbnails. */
   label?: boolean;
   /** Small list thumbnail: a closer crop, no printed name. */
   thumb?: boolean;
@@ -60,6 +64,7 @@ export function PackArt({
 }) {
   const printed = label ?? !thumb;
   const tone = LINE_TONE[product.line];
+  const photo = PHOTOS[product.id];
   const shape = SHAPE[product.format];
   const style = { "--tone": tone } as CSSProperties;
   return (
@@ -89,33 +94,44 @@ export function PackArt({
           packClassName,
         )}
       >
-        {shape === "bottle" && <Bottle product={product} label={printed} />}
-        {shape === "box" && <Box product={product} label={printed} />}
-        {shape === "pump" && <Pump product={product} label={printed} />}
-        {shape === "jar" && <Jar product={product} label={printed} />}
+        {photo ? (
+          <Image
+            src={thumb ? photo.small : photo.src}
+            alt=""
+            width={photo.width}
+            height={photo.height}
+            sizes={thumb ? "96px" : "(min-width: 1024px) 30vw, 60vw"}
+            className="h-[64cqmin] w-auto max-w-[86cqw] object-contain"
+          />
+        ) : (
+          <>
+            {shape === "bottle" && <Bottle product={product} label={printed} />}
+            {shape === "box" && <Box product={product} label={printed} />}
+            {shape === "pump" && <Pump product={product} label={printed} />}
+            {shape === "jar" && <Jar product={product} label={printed} />}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function Label({ product, compact }: { product: Product; compact?: boolean }) {
-  const name = shortName(product);
-  // Long names get smaller type so they always sit inside the label.
-  const size = name.length > 22 ? "text-[4.4cqmin]" : name.length > 13 ? (compact ? "text-[4.6cqmin]" : "text-[5.2cqmin]") : compact ? "text-[5.2cqmin]" : "text-[6.4cqmin]";
+type Photo = { src: string; small: string; width: number; height: number; source: string };
+const PHOTOS = photos as Record<string, Photo>;
+
+export function hasPhoto(id: string) {
+  return Boolean(PHOTOS[id]);
+}
+
+/** The label panel's mark: the product line's colour and a fine rule, and no words. */
+function Label({ compact }: { product: Product; compact?: boolean }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center px-[3cqmin] text-center">
-      <span className="text-[2.9cqmin] font-semibold uppercase leading-none tracking-[0.14em] text-[var(--tone)] opacity-80">
-        {product.line}
+    <div className="flex h-full flex-col items-center justify-center gap-[2.2cqmin]">
+      <span className={clsx("rounded-full border-[0.5cqmin] border-[var(--tone)] opacity-70", compact ? "h-[7cqmin] w-[7cqmin]" : "h-[8.5cqmin] w-[8.5cqmin]")}>
+        <span className="block h-full w-full scale-[0.42] rounded-full bg-[var(--tone)]" />
       </span>
-      <span
-        className={clsx("mt-[1.6cqmin] font-display leading-[0.98] tracking-[-0.02em] text-[#231f1b] [text-wrap:balance]", size)}
-      >
-        {name}
-      </span>
-      <span className="mt-[1.6cqmin] h-px w-[8cqmin] bg-[var(--tone)] opacity-40" />
-      <span className="mt-[1.4cqmin] text-[2.7cqmin] leading-none tracking-[0.06em] text-[#5d564d]">
-        {FORMAT_LABEL[product.format].toLowerCase()}
-      </span>
+      <span className="h-px w-[12cqmin] bg-[var(--tone)] opacity-40" />
+      <span className="h-px w-[7cqmin] bg-[var(--tone)] opacity-25" />
     </div>
   );
 }

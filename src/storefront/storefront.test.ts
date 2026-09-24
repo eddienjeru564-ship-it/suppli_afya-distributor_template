@@ -10,11 +10,15 @@ import { askMessage, whatsappHref } from "./messages";
 import { amount, kes } from "./money";
 import {
   ORDER_REF,
+  canPlaceOrders,
   detailsProblem,
   emptyDetails,
   initials,
   newOrderRef,
+  normalisePhone,
   orderMessage,
+  orderRecord,
+  placeProblem,
   priceOrder,
   type OrderDetails,
 } from "./order";
@@ -81,6 +85,14 @@ describe("storefront configuration", () => {
     const preview = { ...live, status: "preview" as const };
     expect(whatsappHref(preview, "hi")).toBeNull();
     expect(whatsappHref(live, "hi")).toBe("https://wa.me/254700000001?text=hi");
+  });
+});
+
+describe("product illustrations", () => {
+  it("never print words on a drawn pack (that would be a made-up label)", () => {
+    const src = readFileSync(join(__dirname, "../components/product/PackArt.tsx"), "utf8");
+    const label = src.slice(src.indexOf("function Label("), src.indexOf("const paper ="));
+    expect(label).not.toMatch(/product\.(name|line)|shortName|FORMAT_LABEL/);
   });
 });
 
@@ -235,6 +247,24 @@ describe("orders", () => {
     expect(vague).toContain("(delivery cost to confirm)");
     expect(vague).not.toContain("*Total:*");
     expect(vague).toContain("Could you confirm the total");
+  });
+
+  it("placing on the page also needs a number to confirm on; WhatsApp doesn't", () => {
+    expect(placeProblem(live, details)).toMatch(/Add your phone number so Amani can confirm/);
+    expect(placeProblem(live, { ...details, phone: "0712 345" })).toMatch(/phone number/);
+    expect(placeProblem(live, { ...details, phone: "0712 345 678" })).toBeNull();
+    expect(detailsProblem(live, details)).toBeNull();
+    expect(normalisePhone("+254 712 345 678")).toBe("254712345678");
+    expect(normalisePhone("0112345678")).toBe("254112345678");
+    expect(normalisePhone("12345")).toBeNull();
+    const record = orderRecord(live, priceOrder(live, cart, details), { ...details, phone: "0712 345 678" }, { order: "AO-7QX2" });
+    expect(record.customer).toEqual({ name: "Wanjiru", phone: "254712345678" });
+  });
+
+  it("offers placing on the page only where it can reach the distributor", () => {
+    expect(canPlaceOrders(kate)).toBe(true); // a preview shows the flow and sends nothing
+    expect(canPlaceOrders({ ...live, suppliSlug: null })).toBe(false); // live but not linked: WhatsApp only
+    expect(canPlaceOrders({ ...live, suppliSlug: "amani-otieno" })).toBe(true);
   });
 
   it("makes short references the customer can quote", () => {

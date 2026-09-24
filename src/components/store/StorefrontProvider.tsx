@@ -34,6 +34,12 @@ export interface SentOrder {
   /** What was ordered, so the customer can order the same again next time. */
   items: CartItem[];
   at: number;
+  /** Placed on the page (filed with the distributor), or written into WhatsApp. */
+  via?: "placed" | "whatsapp";
+  /** A preview storefront: the order went nowhere. */
+  preview?: boolean;
+  /** The number the distributor will reach them on, when placed. */
+  phone?: string;
 }
 export interface MessageRequest {
   title: string;

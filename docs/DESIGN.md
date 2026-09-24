@@ -44,10 +44,12 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 - **Shape.** Buttons 14px radius, cards 20px, panels 28px; pills only for chips and tags.
 - **Depth.** Hairline rings instead of borders; one soft shadow for lifted things (the calling card,
   the lead suggestion, sheets). No glass.
-- **Product imagery.** BF Suma photography and logos are off-limits (independence has to be visible),
-  so each product gets a pack illustration: bottle, carton, pump or jar by format, tinted by product
-  line, with the name on a paper label. Sized in container units of the stage's shorter side, so one
-  component works as a thumbnail, a card and a banner.
+- **Product imagery.** An official photo of the exact pack when we have one (`npm run photos` trims,
+  normalises and sizes them, and only takes files whose source is recorded). Otherwise a pack
+  illustration: bottle, carton, pump or jar by format, tinted by product line, with a word-free emblem
+  where a label would be. A drawing that printed a name would look like a real label we made up. Logos
+  stay off-limits (independence has to be visible). Sized in container units of the stage's shorter
+  side, so one component works as a thumbnail, a card and a banner.
 - **The distributor's face.** A real photo when there is one. Until then, a monogram in their colour,
   and the About section becomes a letter rather than an empty picture frame.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when

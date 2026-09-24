@@ -10,7 +10,7 @@ is, that they can get help choosing, that they can simply browse, what things co
 Kate's identity  →  two ways in: "Help me choose" or "Browse products"
                  →  the selector (the Suppli Afya recommendation engine) → suggestions, with the reason and the price
                  →  the catalogue → product details → order
-                 →  the order, written into WhatsApp for Kate to confirm
+                 →  the order, placed with Kate or written into WhatsApp for her to confirm
 ```
 
 It is part of Suppli Afya ([suppli_afya](https://github.com/eddienjeru564-ship-it/suppli_afya)): the
@@ -42,7 +42,7 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 | `src/components/whatsapp/` | Every chat with the distributor goes through here |
 | `src/components/store/` | Page state: the order, overlays (kept in the URL), selector session, toasts |
 | `src/components/ui/` | Buttons, icons, the sheet primitive |
-| `src/app/api/` | `leads` (forwards selector results to the Suppli Afya app) and `orders` (re-prices, optional webhook) |
+| `src/app/api/` | `leads` (forwards selector results to the Suppli Afya app) and `orders` (re-prices, files placed orders in the Suppli Afya portal, optional webhook) |
 | `e2e/` | Playwright: both customer paths, safety, links and the back button, small phones, the order API |
 | `docs/DESIGN.md` | The design system and why each screen looks the way it does |
 | `docs/LAUNCH.md` | What Kate needs to give us before her page goes live |
@@ -95,9 +95,24 @@ of search engines, and never opens a chat: every WhatsApp button shows the exact
 
 Suppli Afya doesn't take customers' money (the main repo's `docs/BRAIN.md`: collecting payments on
 behalf of distributors raises licensing questions; per-distributor M-Pesa requests are Phase 3). So an
-order is complete and priced on the page, then written into WhatsApp with a reference (`KC-7QX2`); the
-distributor confirms stock, delivery and the total, and the customer pays them directly. The order sheet
-remembers the customer's details on their phone and offers "Order the same again" next time.
+order is complete and priced on the page, and the customer chooses how to send it:
+
+- **Place order** (the main button): the server re-prices it and files it in the distributor's Suppli
+  Afya portal (`POST <SUPPLI_AFYA_URL>/api/storefront/orders`, signed with `STOREFRONT_SECRET`,
+  idempotent on the reference). It appears on their Today list as "<name> ordered from your page", with
+  a confirmation message ready to send. The customer adds a phone number so the distributor can reach
+  them. Needs a live storefront with `suppliSlug`; a preview shows the confirmation and files nothing.
+- **Send it on WhatsApp**: the same order, written into a chat with a reference (`KC-7QX2`).
+
+Either way the distributor confirms stock, delivery and the total, and the customer pays them directly.
+The order sheet remembers the customer's details on their phone and offers "Order the same again" next
+time.
+
+## Product photos
+
+Put official BF Suma photos of the exact pack in `assets/products/<product-id>.<ext>`, record where each
+came from in `assets/products/sources.json`, and run `npm run photos`. See `assets/products/README.md`.
+Products without a photo keep their drawn pack.
 
 ## Configuration
 
@@ -108,4 +123,5 @@ See `.env.example`.
 | `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links |
 | `NEXT_PUBLIC_DEFAULT_STOREFRONT` | Which storefront `/` shows (default: the first) |
 | `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results the customer sends are filed as prospects via its `/api/leads` (live storefronts with `suppliSlug` only) |
+| `STOREFRONT_SECRET` | Shared with the Suppli Afya app. Signs orders filed into the distributor's portal |
 | `ORDER_WEBHOOK_URL` | Each order, re-priced on the server, is POSTed here as JSON (a sheet, a channel, or the portal later) |

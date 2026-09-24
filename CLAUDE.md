@@ -20,7 +20,9 @@ Read before working here:
 - Safety wins over sales: never hide a caution or an exclusion to make a sale easier.
 - Never invent facts about a distributor (credentials, experience, delivery promises). Unknown means
   placeholder, listed in the storefront's `pending`.
-- No BF Suma logos or product photos. No fake testimonials, ratings, scarcity or countdowns.
+- No BF Suma logos. Product photos only when official and of the exact pack, with their source in
+  `assets/products/sources.json`; never generated, redrawn or approximated. Drawn packs carry no words.
+  No fake testimonials, ratings, scarcity or countdowns.
 - No "AI", "smart", "quiz" or SaaS language in anything a customer reads. The customer voice is calm,
   warm and plain (`suppli_afya/docs/VOICE.md`).
 - Components never name a distributor; everything comes from `src/storefronts/`. A test enforces it.

@@ -14,10 +14,12 @@ import { useOpenChat } from "@/components/whatsapp/useOpenChat";
 import { kes } from "@/storefront/money";
 import {
   LIMITS,
+  canPlaceOrders,
   detailsProblem,
   emptyDetails,
   newOrderRef,
   orderMessage,
+  placeProblem,
   priceOrder,
   receiveModes,
   type OrderDetails,
@@ -28,9 +30,10 @@ type Step = "review" | "details" | "sent";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
- * The order: review → your details → send. Three short screens rather than one long form,
- * so each one has a single job. Sending writes the complete order into WhatsApp; the
- * distributor confirms and the customer pays them directly.
+ * The order: review → your details → done. Three short screens rather than one long form,
+ * so each one has a single job. Where the storefront is connected to the distributor's Suppli
+ * Afya portal, "Place order" files it there and nobody has to open WhatsApp; sending it on
+ * WhatsApp instead is always one tap away. The distributor confirms and the customer pays them.
  */
 export function OrderSheet() {
   const { overlays, close } = useStorefront();
@@ -70,18 +73,42 @@ function OrderFlow() {
   const order = useMemo(() => priceOrder(sf, cart, details), [sf, cart, details]);
   const selectorRef = result && cart.some((i) => i.from === "selector") ? result.ref : null;
 
-  const send = () => {
-    const issue = detailsProblem(sf, details);
-    setProblem(issue);
-    if (issue) return;
-    const message = orderMessage(sf, order, details, { order: ref, selector: selectorRef });
+  const remember = () => {
     try {
       localStorage.setItem(detailsKey(sf), JSON.stringify({ ...details, note: "" }));
     } catch {
       /* ignore */
     }
+  };
+  const [placing, setPlacing] = useState(false);
+
+  const finish = (via: "placed" | "whatsapp", extra: Partial<SentOrder> = {}) => {
+    const message = orderMessage(sf, order, details, { order: ref, selector: selectorRef });
+    const sent: SentOrder = {
+      ref,
+      message,
+      total: order.total,
+      totalConfirmed: order.totalConfirmed,
+      count: order.count,
+      items: cart,
+      at: Date.now(),
+      via,
+      ...extra,
+    };
+    setSentOrder(sent);
+    clearOrder();
+    setStep("sent");
+    return message;
+  };
+
+  /** Written into WhatsApp for the customer to send. */
+  const send = () => {
+    const issue = detailsProblem(sf, details);
+    setProblem(issue);
+    if (issue) return;
+    remember();
     if (sf.status === "live") {
-      // Also record it (webhook / portal), if the deploy is set up for it. Never blocks WhatsApp.
+      // Also record it (webhook), if the deploy is set up for it. Never blocks WhatsApp.
       try {
         fetch("/api/orders", {
           method: "POST",
@@ -93,22 +120,41 @@ function OrderFlow() {
         /* ignore */
       }
     }
-    const sent: SentOrder = {
-      ref,
-      message,
-      total: order.total,
-      totalConfirmed: order.totalConfirmed,
-      count: order.count,
-      items: cart,
-      at: Date.now(),
-    };
-    setSentOrder(sent);
-    clearOrder();
-    setStep("sent");
+    const message = finish("whatsapp");
     openChat(message, `Your order to ${first}`);
   };
 
-  const titles: Record<Step, string> = { review: "Your order", details: "Your details", sent: "Order written" };
+  /** Placed on the page: filed with the distributor, no WhatsApp needed. */
+  const place = async () => {
+    const issue = placeProblem(sf, details);
+    setProblem(issue);
+    if (issue) return;
+    setPlacing(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: sf.slug, ref, items: cart, details, selectorRef, place: true }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; preview?: boolean };
+      if (!res.ok || !body.ok) {
+        setProblem(body.error ?? `That didn't go through. Send the order on WhatsApp instead; it's all written for you.`);
+        return;
+      }
+      remember();
+      finish("placed", { preview: Boolean(body.preview), phone: details.phone.trim() });
+    } catch {
+      setProblem(`You seem to be offline. Try again, or send the order on WhatsApp.`);
+    } finally {
+      setPlacing(false);
+    }
+  };
+
+  const titles: Record<Step, string> = {
+    review: "Your order",
+    details: "Your details",
+    sent: sentOrder?.via === "placed" ? "Order placed" : "Order written",
+  };
   const slide = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : { initial: { opacity: 0, x: 24 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -24 } };
@@ -145,7 +191,7 @@ function OrderFlow() {
         <motion.div key={step} {...slide} transition={{ duration: 0.25, ease }} className="flex min-h-0 flex-1 flex-col">
           {step === "review" && <Review onNext={() => setStep("details")} />}
           {step === "details" && (
-            <Details details={details} setDetails={setDetails} order={order} problem={problem} onSend={send} />
+            <Details details={details} setDetails={setDetails} order={order} problem={problem} onSend={send} onPlace={place} placing={placing} />
           )}
           {step === "sent" && sentOrder && <Sent order={sentOrder} onAgain={() => openChat(sentOrder.message, `Your order to ${first}`)} />}
         </motion.div>
@@ -261,14 +307,19 @@ function Details({
   order,
   problem,
   onSend,
+  onPlace,
+  placing,
 }: {
   details: OrderDetails;
   setDetails: (fn: (d: OrderDetails) => OrderDetails) => void;
   order: ReturnType<typeof priceOrder>;
   problem: string | null;
   onSend: () => void;
+  onPlace: () => void;
+  placing: boolean;
 }) {
   const { sf } = useStorefront();
+  const direct = canPlaceOrders(sf);
   const first = sf.distributor.firstName;
   const modes = receiveModes(sf);
   const set = (patch: Partial<OrderDetails>) => setDetails((d) => ({ ...d, ...patch }));
@@ -282,7 +333,8 @@ function Details({
           className="grid gap-6"
           onSubmit={(e) => {
             e.preventDefault();
-            onSend();
+            if (direct) onPlace();
+            else onSend();
           }}
         >
           <Field label="Your name" htmlFor={`${id}-name`}>
@@ -296,6 +348,23 @@ function Details({
               className={inputClass}
             />
           </Field>
+
+          {direct && (
+            <Field label="Phone number" htmlFor={`${id}-phone`}>
+              <input
+                id={`${id}-phone`}
+                value={details.phone}
+                onChange={(e) => set({ phone: e.target.value })}
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                maxLength={LIMITS.phone}
+                placeholder="07XX XXX XXX"
+                className={inputClass}
+              />
+              <p className="mt-1.5 text-[0.8rem] text-ink-3">{first} calls or messages you on this number to confirm.</p>
+            </Field>
+          )}
 
           {modes.length > 1 && (
             <Field label="How would you like to get it?">
@@ -396,12 +465,32 @@ function Details({
             </motion.p>
           )}
         </AnimatePresence>
-        <Button variant="whatsapp" size="lg" className="w-full" onClick={onSend}>
-          <WhatsAppIcon /> Send order to {first}
-        </Button>
-        <p className="mt-2 flex items-center justify-center gap-1.5 pb-1 text-center text-[0.78rem] text-ink-3">
-          <Lock className="h-3 w-3" /> Opens WhatsApp with your order written. You pay once {first} confirms.
-        </p>
+        {direct ? (
+          <>
+            <Button variant="accent" size="lg" className="w-full" onClick={onPlace} disabled={placing}>
+              {placing ? "Placing your order…" : <>Place order · <span className="price">{kes(order.total)}</span></>}
+            </Button>
+            <button
+              type="button"
+              onClick={onSend}
+              className="mt-1.5 flex h-11 w-full items-center justify-center gap-2 rounded-control text-[0.9rem] font-semibold text-ink-2 hover:bg-ink/[0.05]"
+            >
+              <WhatsAppIcon className="h-4 w-4 text-[#1faa59]" /> Or send it to {first} on WhatsApp
+            </button>
+            <p className="flex items-center justify-center gap-1.5 pb-1 text-center text-[0.78rem] text-ink-3">
+              <Lock className="h-3 w-3" /> Nothing is charged here. You pay once {first} confirms.
+            </p>
+          </>
+        ) : (
+          <>
+            <Button variant="whatsapp" size="lg" className="w-full" onClick={onSend}>
+              <WhatsAppIcon /> Send order to {first}
+            </Button>
+            <p className="mt-2 flex items-center justify-center gap-1.5 pb-1 text-center text-[0.78rem] text-ink-3">
+              <Lock className="h-3 w-3" /> Opens WhatsApp with your order written. You pay once {first} confirms.
+            </p>
+          </>
+        )}
       </SheetFooter>
     </>
   );
@@ -432,11 +521,28 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
       >
         <Check className="h-6 w-6" />
       </motion.div>
-      <h2 className="display-card mt-5 text-ink">Now press send in WhatsApp.</h2>
-      <p className="mt-3 text-[0.98rem] leading-relaxed text-ink-2">
-        Your order is written and waiting in your chat with {first}. Once {first} has it, {first} confirms stock, delivery
-        and the total. Then you pay.
-      </p>
+      {order.via === "placed" ? (
+        <>
+          <h2 className="display-card mt-5 text-ink">{first} has your order.</h2>
+          <p className="mt-3 text-[0.98rem] leading-relaxed text-ink-2">
+            {first} will call or message you{order.phone ? ` on ${order.phone}` : ""} to confirm stock, delivery and the
+            total. Then you pay. You don&apos;t need to do anything else.
+          </p>
+          {order.preview && (
+            <p className="mt-3 rounded-xl bg-caution-soft px-3.5 py-2.5 text-[0.85rem] leading-snug text-ink">
+              This page is a preview, so the order wasn&apos;t sent to anyone.
+            </p>
+          )}
+        </>
+      ) : (
+        <>
+          <h2 className="display-card mt-5 text-ink">Now press send in WhatsApp.</h2>
+          <p className="mt-3 text-[0.98rem] leading-relaxed text-ink-2">
+            Your order is written and waiting in your chat with {first}. Once {first} has it, {first} confirms stock, delivery
+            and the total. Then you pay.
+          </p>
+        </>
+      )}
       <div className="mt-6 rounded-card bg-surface p-4 ring-1 ring-ink/[0.07]">
         <Row label="Order reference" value={<span className="font-mono">{order.ref}</span>} />
         <div className="mt-1.5">
@@ -452,8 +558,8 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
         </p>
       )}
       <div className="mt-6 grid gap-2.5">
-        <Button variant="whatsapp" onClick={onAgain}>
-          <WhatsAppIcon /> Open WhatsApp again
+        <Button variant={order.via === "placed" ? "outline" : "whatsapp"} onClick={onAgain}>
+          <WhatsAppIcon /> {order.via === "placed" ? `Message ${first} about it` : "Open WhatsApp again"}
         </Button>
         <div className="grid grid-cols-2 gap-2.5">
           <Button variant="outline" onClick={copy}>
