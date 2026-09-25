@@ -62,14 +62,14 @@ function cap(s: string) {
 export function whatsappMessage(r: EngineResult, ctx: EngineContext): string {
   const p = r.profile;
   const lines: string[] = [];
-  lines.push(`Hi ${ctx.distributorFirstName}, I've just done the health check.`);
+  lines.push(`Hi ${ctx.distributorFirstName}, I've just done the assessment on your page.`);
   lines.push("");
   const about = [p.name || "Me", p.age ? String(p.age) : null].filter(Boolean).join(", ");
   lines.push(`*About me:* ${about}`);
   if (p.goals.length) lines.push(`*My goals:* ${p.goals.map((g, i) => `${i + 1}. ${GOALS_BY_ID[g].short}`).join("  ")}`);
 
   if (r.status === "clinic-first") {
-    lines.push(`*Note:* I'm ${p.pregnancy === "trying" ? "trying for a baby" : p.pregnancy}, so the check suggested I speak to my clinic first.`);
+    lines.push(`*Note:* I'm ${p.pregnancy === "trying" ? "trying for a baby" : p.pregnancy}, so the assessment suggested I speak to my clinic first.`);
   } else if (r.core.length) {
     lines.push(`*Suggested plan:* ${r.core.map((c) => c.product.name).join(", ")}`);
     if (r.addons.length) lines.push(`*Maybe later:* ${r.addons.map((c) => c.product.name).join(", ")}`);
@@ -145,8 +145,8 @@ export function distributorBrief(r: EngineResult): DistributorBrief {
     }[p.planSize],
     flags,
     opener: first
-      ? `Hi ${p.name || "there"}, thanks for doing the health check. I saw ${OPENERS[first]}. Can I ask you a couple of quick questions before we decide what to start with?`
-      : `Hi ${p.name || "there"}, thanks for doing the health check. Can I ask you a couple of quick questions?`,
+      ? `Hi ${p.name || "there"}, thanks for doing the assessment. I saw ${OPENERS[first]}. Can I ask you a couple of quick questions before we decide what to start with?`
+      : `Hi ${p.name || "there"}, thanks for doing the assessment. Can I ask you a couple of quick questions?`,
     tips,
     priority: p.planSize === "complete" || (r.status === "ready" && r.core.length >= 2) ? "high" : "normal",
   };
