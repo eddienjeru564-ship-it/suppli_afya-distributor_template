@@ -120,8 +120,9 @@ See `.env.example`.
 
 | Variable | Purpose |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links |
+| `NEXT_PUBLIC_SITE_URL` | Public URL, for link previews and share links. On Vercel it defaults to the deploy's own address |
 | `NEXT_PUBLIC_DEFAULT_STOREFRONT` | Which storefront `/` shows (default: the first) |
+| `NEXT_PUBLIC_SUPPLI_AFYA_SITE` | Where "Powered by Suppli Afya" links (default `https://suppliafya.co.ke`) |
 | `SUPPLI_AFYA_URL` | The Suppli Afya app. Selector results the customer sends are filed as prospects via its `/api/leads` (live storefronts with `suppliSlug` only) |
 | `STOREFRONT_SECRET` | Shared with the Suppli Afya app. Signs orders filed into the distributor's portal |
 | `ORDER_WEBHOOK_URL` | Each order, re-priced on the server, is POSTed here as JSON (a sheet, a channel, or the portal later) |
