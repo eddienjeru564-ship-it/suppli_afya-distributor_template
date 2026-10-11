@@ -1,11 +1,14 @@
 import { CATALOGUE, GOALS_BY_ID, PRODUCTS_BY_ID, type GoalId, type Product } from "@/engine";
 import type { GoalMeta } from "@/engine/goals";
+import { LABEL_FORMAT, LABEL_PACK, SUPPLY_DISAGREES } from "./labels";
+import photos from "./product-photos.json";
 import type { Offer, Storefront } from "./types";
 
 /**
  * How products are presented on a storefront. Every fact here comes from the engine's
- * catalogue (name, summary, ingredients, traits, supply) or the distributor's offer (price,
- * pack). Nothing is added: no claims, no dose instructions the label doesn't give.
+ * catalogue (name, summary, ingredients, traits, supply), the pack labels (./labels) or the
+ * distributor's offer (price, pack). Nothing is added: no claims, no dose instructions the
+ * label doesn't give.
  */
 
 export interface Listing {
@@ -23,12 +26,31 @@ export const FORMAT_LABEL: Record<Product["format"], string> = {
   skincare: "Skincare",
 };
 
-/** Everything the distributor sells: their featured products first, then the catalogue's order. */
+/** The product's form as its pack shows it ("Tablets"), which wins over the catalogue's. */
+export function formatLabel(p: Product): string {
+  return FORMAT_LABEL[LABEL_FORMAT[p.id] ?? p.format];
+}
+
+/** What's in one pack, e.g. "60 capsules", or null when it hasn't been read off a label. */
+export function packOf(p: Product, offer?: Offer | null): string | null {
+  return offer?.pack ?? LABEL_PACK[p.id] ?? null;
+}
+
+/** How long one pack lasts at the usual dose, or null when the label says otherwise. */
+export function supplyOf(p: Product): string | null {
+  return SUPPLY_DISAGREES.has(p.id) ? null : supplyLabel(p.supplyDays);
+}
+
+/**
+ * Everything the distributor sells: their featured products first, then the products with an
+ * official photo, then the rest, each group in the catalogue's order. Real photos lead because
+ * that's what a customer trusts; drawn packs fill in until their photo arrives.
+ */
 export function listings(sf: Storefront): Listing[] {
   const sold = CATALOGUE.filter((p) => sf.catalogue.offers[p.id]);
   const rank = (id: string) => {
     const i = sf.catalogue.featured.indexOf(id);
-    return i < 0 ? Infinity : i;
+    return i >= 0 ? i : id in photos ? 1000 : 2000;
   };
   return sold
     .map((product, order) => ({ product, offer: sf.catalogue.offers[product.id], order }))
@@ -80,7 +102,7 @@ export function matchesQuery(p: Product, query: string): boolean {
   const words = normalise(query).split(" ").filter(Boolean);
   if (!words.length) return true;
   const haystack = normalise(
-    [p.name, p.line, FORMAT_LABEL[p.format], p.keyIngredients.join(" "), goalsOf(p).map((g) => `${g.label} ${g.hint}`).join(" ")].join(" "),
+    [p.name, p.line, formatLabel(p), packOf(p) ?? "", p.keyIngredients.join(" "), goalsOf(p).map((g) => `${g.label} ${g.hint}`).join(" ")].join(" "),
   );
   return words.every((w) => haystack.includes(w));
 }

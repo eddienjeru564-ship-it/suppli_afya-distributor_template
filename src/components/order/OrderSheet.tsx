@@ -12,6 +12,7 @@ import { Check, ChevronLeft, Copy, Lock, WhatsAppIcon } from "@/components/ui/ic
 import { Sheet, SheetBody, SheetFooter, SheetHandle, SheetHeader, SheetTitle } from "@/components/ui/Sheet";
 import { useOpenChat } from "@/components/whatsapp/useOpenChat";
 import { kes } from "@/storefront/money";
+import { packOf } from "@/storefront/products";
 import {
   LIMITS,
   canPlaceOrders,
@@ -263,12 +264,14 @@ function Review({ onNext }: { onNext: () => void }) {
                 transition={{ duration: 0.25, ease }}
                 className="flex gap-3.5 overflow-hidden rounded-card bg-surface p-3 ring-1 ring-ink/[0.07]"
               >
-                <PackArt product={l.product} thumb className="aspect-[4/5] w-16 shrink-0 rounded-xl" />
+                <PackArt product={l.product} thumb className="aspect-[4/5] w-16 shrink-0 rounded-xl ring-1 ring-ink/[0.06]" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="font-semibold leading-snug text-ink">{l.product.name}</div>
-                      <div className="price text-[0.84rem] text-ink-3">{kes(l.unitPrice)} each</div>
+                      <div className="price text-[0.84rem] text-ink-3">
+                        {[`${kes(l.unitPrice)} each`, packOf(l.product, sf.catalogue.offers[l.id])].filter(Boolean).join(" · ")}
+                      </div>
                       {l.from === "selector" && <div className="mt-1 text-[0.76rem] font-semibold text-accent">Suggested for you</div>}
                     </div>
                   </div>

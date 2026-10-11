@@ -9,7 +9,7 @@ import { useIsDesktop } from "@/components/ui/useMediaQuery";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { askMessage } from "@/storefront/messages";
 import { kes } from "@/storefront/money";
-import { ALWAYS_CHECK, FORMAT_LABEL, checkNotes, findListing, goalsOf, supplyLabel, type Listing } from "@/storefront/products";
+import { ALWAYS_CHECK, checkNotes, findListing, formatLabel, goalsOf, packOf, supplyOf, type Listing } from "@/storefront/products";
 import { PackArt } from "./PackArt";
 import { QtyStepper } from "./QtyStepper";
 
@@ -42,6 +42,8 @@ function ProductDetail({ listing }: { listing: Listing }) {
   const out = offer.inStock === false;
   const notes = checkNotes(p, sf.distributor.firstName);
   const first = sf.distributor.firstName;
+  const pack = packOf(p, offer);
+  const supply = supplyOf(p);
 
   const share = async () => {
     const url = `${window.location.origin}${window.location.pathname}?p=${p.id}`;
@@ -85,8 +87,8 @@ function ProductDetail({ listing }: { listing: Listing }) {
       </Block>
       <Block title="How it's taken">
         <p>
-          {FORMAT_LABEL[p.format]}. Follow the dose on the label, or as {first} advises. {supplyLabel(p.supplyDays)} at the
-          usual dose{offer.pack ? ` (${offer.pack})` : ""}.
+          {formatLabel(p)}.{pack && ` One pack holds ${pack}.`} Follow the dose on the label, or as {first} advises.
+          {supply && ` ${supply} at the usual dose.`}
         </p>
       </Block>
       <Block title="What to expect">
@@ -143,14 +145,14 @@ function ProductDetail({ listing }: { listing: Listing }) {
   const header = (
     <div>
       <div className="meta">
-        {p.line} · {FORMAT_LABEL[p.format]}
+        {p.line} · {formatLabel(p)}
       </div>
       <h2 id={sheet?.titleId} className="display-card mt-1.5 text-ink">
         {p.name}
       </h2>
       <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="price text-[1.35rem] font-semibold text-ink">{kes(offer.price)}</span>
-        <span className="text-[0.88rem] text-ink-3">{offer.pack ?? supplyLabel(p.supplyDays)}</span>
+        <span className="text-[0.88rem] text-ink-3">{[pack, supply].filter(Boolean).join(" · ")}</span>
       </div>
       {out && <p className="mt-1 text-[0.88rem] font-medium text-caution">Out of stock right now. Ask {first} when it&apos;s back.</p>}
       <p className="mt-4 text-[1rem] leading-relaxed text-ink-2">{p.summary}</p>
@@ -201,7 +203,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
   if (desktop) {
     return (
       <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <PackArt product={p} center className="h-full min-h-[34rem]" />
+        <PackArt product={p} center className="h-full min-h-[34rem]" sizes="(min-width: 1024px) 30rem, 45vw" />
         <div className="flex min-h-0 flex-col">
           <SheetHeader className="pb-0">
             <div className="flex justify-end">{shareButton}</div>
@@ -224,7 +226,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
       <SheetHandle />
       <SheetBody>
         <div className="relative">
-          <PackArt product={p} className="mx-5 aspect-[16/11] rounded-card" />
+          <PackArt product={p} className="mx-5 aspect-[16/11] rounded-card ring-1 ring-ink/[0.06]" sizes="100vw" />
           <div className="absolute right-7 top-2 flex gap-1">
             <span className="rounded-full bg-canvas/80 backdrop-blur">{shareButton}</span>
             <button

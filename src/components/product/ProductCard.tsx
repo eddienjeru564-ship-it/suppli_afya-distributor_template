@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { kes } from "@/storefront/money";
-import { FORMAT_LABEL, goalsOf, oneLiner, type Listing } from "@/storefront/products";
+import { formatLabel, goalsOf, oneLiner, packOf, type Listing } from "@/storefront/products";
 import { AddButton } from "./AddButton";
 import { PackArt } from "./PackArt";
 
@@ -15,6 +15,7 @@ export function ProductCard({ listing, className }: { listing: Listing; classNam
   const { openProduct } = useStorefront();
   const { product, offer } = listing;
   const goals = goalsOf(product);
+  const pack = packOf(product, offer);
   const out = offer.inStock === false;
   return (
     <article
@@ -27,16 +28,17 @@ export function ProductCard({ listing, className }: { listing: Listing; classNam
         type="button"
         onClick={() => openProduct(product.id)}
         className="absolute inset-0 z-[1] rounded-card"
-        aria-label={`${product.name}, ${kes(offer.price)}. See details`}
+        aria-label={`${product.name}, ${kes(offer.price)}${pack ? ` for ${pack}` : ""}. See details`}
       />
       <PackArt
         product={product}
-        className="aspect-[4/5] w-[5.75rem] shrink-0 rounded-[0.9rem] md:aspect-[5/4] md:w-full md:rounded-none"
-        packClassName="max-md:origin-bottom max-md:scale-[1.3] transition-transform duration-500 ease-[var(--ease-out)] md:group-hover:-translate-y-1.5"
+        className="aspect-[4/5] w-[5.75rem] shrink-0 rounded-[0.9rem] ring-1 ring-ink/[0.06] md:aspect-[5/4] md:w-full md:rounded-b-none md:rounded-t-card md:ring-0"
+        packClassName="transition-transform duration-500 ease-[var(--ease-out)] md:group-hover:-translate-y-1.5"
+        sizes="(min-width: 1024px) 24rem, (min-width: 768px) 45vw, 96px"
       />
       <div className="flex min-w-0 flex-1 flex-col py-0.5 md:px-5 md:pb-4 md:pt-4">
         <div className="meta truncate">
-          {FORMAT_LABEL[product.format]}
+          {formatLabel(product)}
           {goals[0] && <> · {goals.map((g) => g.short).join(", ")}</>}
         </div>
         <h3 className="mt-0.5 text-[1.02rem] font-semibold leading-snug text-ink md:mt-1 md:font-display md:text-[1.4rem] md:font-normal md:leading-[1.1] md:tracking-[-0.015em]">
@@ -44,8 +46,9 @@ export function ProductCard({ listing, className }: { listing: Listing; classNam
         </h3>
         <p className="mt-1 line-clamp-2 text-[0.86rem] leading-snug text-ink-2 md:mt-2 md:text-[0.9rem]">{oneLiner(product)}</p>
         <div className="mt-auto flex items-end justify-between gap-3 pt-2 md:pt-4">
-          <div>
+          <div className="min-w-0">
             <div className="price text-[1.02rem] font-semibold text-ink">{kes(offer.price)}</div>
+            {pack && <div className="text-[0.8rem] text-ink-3">{pack}</div>}
             {out && <div className="text-[0.78rem] font-medium text-caution">Out of stock right now</div>}
           </div>
           {!out && <AddButton product={product} />}

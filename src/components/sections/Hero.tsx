@@ -96,46 +96,45 @@ function PathCard({
 }
 
 /**
- * The distributor's calling card in front of three of their products, prices on the shelf.
- * It says "a real person, real products, real prices" before a word is read.
+ * The distributor's calling card in front of three of their products, each on its own white
+ * tile with its name and price, like the front table of a small shop. It says "a real person,
+ * real products, real prices" before a word is read.
  */
 function StillLife() {
   const { sf, openProduct } = useStorefront();
   const d = sf.distributor;
   const [center, left, right] = listings(sf);
-  const shelf = [
-    { l: left, cls: "left-[2%] w-[36%]", i: 6 },
-    { l: center, cls: "left-1/2 w-[50%] -translate-x-1/2", i: 5 },
-    { l: right, cls: "right-[2%] w-[38%]", i: 7 },
+  const table = [
+    { l: left, cls: "bottom-[17%] left-[3%] w-[35%] -rotate-[4deg]", i: 6 },
+    { l: right, cls: "bottom-[21%] right-[3%] w-[35%] rotate-[3deg]", i: 7 },
+    { l: center, cls: "bottom-[25%] left-1/2 z-10 w-[41%] -translate-x-1/2", i: 5 },
   ].filter((s) => s.l);
 
   return (
     <div className="relative mx-auto max-w-[36rem]">
-      <div className="relative aspect-[1/0.92] overflow-hidden rounded-panel bg-accent-soft sm:aspect-[1/0.8] lg:aspect-[1/1.02]">
-        {/* An arch behind the products, like a shop window. */}
-        <div className="absolute bottom-[32%] left-1/2 h-[60%] w-[58%] -translate-x-1/2 rounded-t-full bg-white/55" />
-        <div className="absolute inset-x-0 bottom-0 h-[32%] bg-[color-mix(in_oklab,var(--color-accent)_14%,white)]" />
-        <div className="absolute inset-x-0 bottom-[32%] h-px bg-accent/20" />
+      <div className="relative aspect-[1/0.92] overflow-hidden rounded-panel bg-accent-soft sm:aspect-[1/0.8] lg:aspect-[1/0.96]">
+        {/* Soft light behind the products, like a lit shop window. */}
+        <div className="absolute inset-0 bg-[radial-gradient(55%_50%_at_50%_42%,rgb(255_255_255/0.75),transparent)]" />
 
-        {shelf.map(({ l, cls, i }) => (
+        {table.map(({ l, cls, i }) => (
           <button
             key={l!.product.id}
             type="button"
             onClick={() => openProduct(l!.product.id)}
             aria-label={`${l!.product.name}, ${kes(l!.offer.price)}`}
-            className={clsx("group absolute bottom-[22%] aspect-[4/5]", cls)}
+            className={clsx("group absolute", cls)}
           >
-            <span className="rise absolute inset-0" style={{ "--i": i } as CSSProperties}>
-              <PackArt
-                product={l!.product}
-                stage={false}
-                className="h-full w-full"
-                packClassName="transition-transform duration-500 ease-[var(--ease-out)] group-hover:-translate-y-2"
-              />
-              {/* The drawn packs carry no words, so the name sits on the shelf tag with the price. */}
-              <span className="absolute -bottom-[1.6rem] left-1/2 flex max-w-[112%] -translate-x-1/2 flex-col items-center rounded-xl bg-surface px-2.5 py-1 text-center leading-tight text-ink shadow-lift transition-colors group-hover:bg-ink group-hover:text-canvas">
-                <span className="max-w-full truncate text-[0.66rem] font-medium opacity-70 sm:text-[0.72rem]">{shortName(l!.product)}</span>
-                <span className="price whitespace-nowrap text-[0.76rem] font-semibold sm:text-[0.82rem]">{kes(l!.offer.price)}</span>
+            <span className="rise block" style={{ "--i": i } as CSSProperties}>
+              <span className="block overflow-hidden rounded-[1.1rem] bg-white shadow-lift ring-1 ring-ink/[0.05] transition-[translate,box-shadow] duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1.5 group-hover:shadow-float">
+                <PackArt product={l!.product} className="aspect-[4/5] w-full" sizes="(min-width: 1024px) 15rem, 42vw" />
+                <span className="flex flex-col items-center px-2 pb-2.5 text-center leading-tight sm:pb-3">
+                  <span className="line-clamp-2 max-w-full text-balance text-[0.68rem] font-medium text-ink-3 sm:text-[0.78rem]">
+                    {shortName(l!.product)}
+                  </span>
+                  <span className="price mt-0.5 whitespace-nowrap text-[0.8rem] font-semibold text-ink sm:text-[0.92rem]">
+                    {kes(l!.offer.price)}
+                  </span>
+                </span>
               </span>
             </span>
           </button>

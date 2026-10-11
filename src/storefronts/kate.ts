@@ -45,10 +45,12 @@ export const kate: Storefront = {
   catalogue: {
     currency: "KES",
     updated: "2026-09-24", // PLACEHOLDER: the date Kate last confirmed her prices
-    // PLACEHOLDER: the products Kate is asked about most. Shown first when browsing.
-    featured: ["refined-yunzhi", "probio3", "arthroxtra", "cordyceps-coffee", "veggie-veggie", "gymeffect"],
+    // PLACEHOLDER: the products Kate is asked about most. Shown first when browsing; the first
+    // three stand in the hero. Products with an official photo make the strongest first impression.
+    featured: ["refined-yunzhi", "probio3", "arthroxtra", "gymeffect", "ganoderma-spores", "nmn-coffee"],
     // PLACEHOLDER PRICES. Rough retail levels for illustration only: replace every price with
-    // Kate's own price list. Pack sizes are left out until checked against the label.
+    // Kate's own price list. Pack sizes come from the labels (src/storefront/labels.ts); set
+    // `pack` on an offer only if Kate sells a different pack.
     offers: {
       "refined-yunzhi": { price: 7100 },
       "ganoderma-spores": { price: 10900 },

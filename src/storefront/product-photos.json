@@ -1,1 +1,154 @@
-{}
+{
+  "arthroxtra": {
+    "src": "/products/arthroxtra.webp",
+    "small": "/products/arthroxtra-sm.webp",
+    "card": "/products/arthroxtra-card.jpg",
+    "width": 295,
+    "height": 538,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 03_Arthro_Xtra.png"
+  },
+  "cerebrain": {
+    "src": "/products/cerebrain.webp",
+    "small": "/products/cerebrain-sm.webp",
+    "card": "/products/cerebrain-card.jpg",
+    "width": 320,
+    "height": 502,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 06_CereBrain.jpg"
+  },
+  "detoxilive": {
+    "src": "/products/detoxilive.webp",
+    "small": "/products/detoxilive-sm.webp",
+    "card": "/products/detoxilive-card.jpg",
+    "width": 300,
+    "height": 513,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 07_Detoxilive_Capsules.jpg"
+  },
+  "ez-xlim": {
+    "src": "/products/ez-xlim.webp",
+    "small": "/products/ez-xlim-sm.webp",
+    "card": "/products/ez-xlim-card.jpg",
+    "width": 323,
+    "height": 486,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 14_Ez-Xlim.jpg"
+  },
+  "femicare": {
+    "src": "/products/femicare.webp",
+    "small": "/products/femicare-sm.webp",
+    "card": "/products/femicare-card.jpg",
+    "width": 456,
+    "height": 449,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 26_Femicare.png"
+  },
+  "feminergy": {
+    "src": "/products/feminergy.webp",
+    "small": "/products/feminergy-sm.webp",
+    "card": "/products/feminergy-card.jpg",
+    "width": 277,
+    "height": 494,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 01_Feminergy.png"
+  },
+  "ganoderma-spores": {
+    "src": "/products/ganoderma-spores.webp",
+    "small": "/products/ganoderma-spores-sm.webp",
+    "card": "/products/ganoderma-spores-card.jpg",
+    "width": 400,
+    "height": 389,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 19_Pure_and_Broken_Ganoderma_Spores.png"
+  },
+  "gluzojoint-f": {
+    "src": "/products/gluzojoint-f.webp",
+    "small": "/products/gluzojoint-f-sm.webp",
+    "card": "/products/gluzojoint-f-card.jpg",
+    "width": 320,
+    "height": 503,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 04_GluzoJoint_F.jpg"
+  },
+  "gymeffect": {
+    "src": "/products/gymeffect.webp",
+    "small": "/products/gymeffect-sm.webp",
+    "card": "/products/gymeffect-card.jpg",
+    "width": 893,
+    "height": 1600,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 09_Gym_Effect_Capsules.png"
+  },
+  "micro2-cycle": {
+    "src": "/products/micro2-cycle.webp",
+    "small": "/products/micro2-cycle-sm.webp",
+    "card": "/products/micro2-cycle-card.jpg",
+    "width": 450,
+    "height": 415,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 10_Micro02_Cycle_Tablets.jpg"
+  },
+  "nmn-coffee": {
+    "src": "/products/nmn-coffee.webp",
+    "small": "/products/nmn-coffee-sm.webp",
+    "card": "/products/nmn-coffee-card.jpg",
+    "width": 328,
+    "height": 358,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 17_NMN_Coffee.png"
+  },
+  "probio3": {
+    "src": "/products/probio3.webp",
+    "small": "/products/probio3-sm.webp",
+    "card": "/products/probio3-card.jpg",
+    "width": 324,
+    "height": 461,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 16_Probio_3.png"
+  },
+  "prostatrelax": {
+    "src": "/products/prostatrelax.webp",
+    "small": "/products/prostatrelax-sm.webp",
+    "card": "/products/prostatrelax-card.jpg",
+    "width": 341,
+    "height": 552,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 22_Prostate_Relax_Capsules.jpg"
+  },
+  "refined-yunzhi": {
+    "src": "/products/refined-yunzhi.webp",
+    "small": "/products/refined-yunzhi-sm.webp",
+    "card": "/products/refined-yunzhi-card.jpg",
+    "width": 340,
+    "height": 524,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 20_Yunzhi_Essence.jpg"
+  },
+  "relivin-tea": {
+    "src": "/products/relivin-tea.webp",
+    "small": "/products/relivin-tea-sm.webp",
+    "card": "/products/relivin-tea-card.jpg",
+    "width": 1460,
+    "height": 1066,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 11_Pressure_Free_Reliving_Tea.png"
+  },
+  "xpower-coffee": {
+    "src": "/products/xpower-coffee.webp",
+    "small": "/products/xpower-coffee-sm.webp",
+    "card": "/products/xpower-coffee-card.jpg",
+    "width": 1600,
+    "height": 715,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 24_X-Power_Man_Coffee.jpg"
+  },
+  "xpower-man-plus": {
+    "src": "/products/xpower-man-plus.webp",
+    "small": "/products/xpower-man-plus-sm.webp",
+    "card": "/products/xpower-man-plus-card.jpg",
+    "width": 481,
+    "height": 444,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 23_X-Power_Man.png"
+  },
+  "youth-ever": {
+    "src": "/products/youth-ever.webp",
+    "small": "/products/youth-ever-sm.webp",
+    "card": "/products/youth-ever-card.jpg",
+    "width": 1378,
+    "height": 847,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 02_Youthever.jpg"
+  },
+  "zaminocal-plus": {
+    "src": "/products/zaminocal-plus.webp",
+    "small": "/products/zaminocal-plus-sm.webp",
+    "card": "/products/zaminocal-plus-card.jpg",
+    "width": 318,
+    "height": 496,
+    "source": "Supplied by Suppli Afya as official BF Suma pack images (BF_Suma_Final_Use_Images.zip, 11 October 2026), file 05_Zaminocal_Capsules.jpg"
+  }
+}

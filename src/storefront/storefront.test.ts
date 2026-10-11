@@ -6,6 +6,7 @@ import { STOREFRONTS, storefrontBySlug } from "@/storefronts";
 import { kate } from "@/storefronts/kate";
 import { engineDrift } from "../../scripts/engine.mjs";
 import { cartReducer, priceCart, sanitiseCart, MAX_QTY, type CartItem } from "./cart";
+import { LABEL_FORMAT, LABEL_PACK, SUPPLY_DISAGREES } from "./labels";
 import { askMessage, whatsappHref } from "./messages";
 import { amount, kes } from "./money";
 import {
@@ -23,7 +24,8 @@ import {
   priceOrder,
   type OrderDetails,
 } from "./order";
-import { checkNotes, listings, matchesQuery, oneLiner, shortName, supplyLabel } from "./products";
+import photos from "./product-photos.json";
+import { checkNotes, formatLabel, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel, supplyOf } from "./products";
 import { nextShown, partProgress } from "./progress";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
@@ -129,6 +131,27 @@ describe("products", () => {
     expect(l.map((x) => x.product.id)).toEqual(["veggie-veggie", "probio3", "constirelax"]);
     expect(listings(kate).length).toBe(Object.keys(kate.catalogue.offers).length);
     expect(listings(kate).slice(0, kate.catalogue.featured.length).map((x) => x.product.id)).toEqual(kate.catalogue.featured);
+  });
+
+  it("puts products with an official photo before drawn packs, after the featured ones", () => {
+    const rest = listings(kate).slice(kate.catalogue.featured.length);
+    const photo = rest.map((x) => x.product.id in photos);
+    expect(photo.indexOf(false)).toBeGreaterThan(0);
+    expect(photo.slice(photo.indexOf(false))).not.toContain(true);
+  });
+
+  it("reads pack sizes off the label, and never contradicts the label on how long a pack lasts", () => {
+    expect(packOf(PRODUCTS_BY_ID["arthroxtra"])).toBe("60 tablets");
+    expect(packOf(PRODUCTS_BY_ID["arthroxtra"], { price: 1, pack: "30 tablets" })).toBe("30 tablets");
+    expect(packOf(PRODUCTS_BY_ID["veggie-veggie"])).toBeNull();
+    expect(supplyOf(PRODUCTS_BY_ID["probio3"])).toBeNull();
+    expect(supplyOf(PRODUCTS_BY_ID["arthroxtra"])).toBe("About a month per pack");
+    expect(formatLabel(PRODUCTS_BY_ID["ez-xlim"])).toBe("Tablets");
+    // Every label fact is for a product in the catalogue that has a photo to read it from.
+    for (const id of [...Object.keys(LABEL_PACK), ...Object.keys(LABEL_FORMAT), ...SUPPLY_DISAGREES]) {
+      expect(PRODUCTS_BY_ID[id], id).toBeTruthy();
+      expect(id in photos, id).toBe(true);
+    }
   });
 
   it("searches names, ingredients, formats and goals", () => {

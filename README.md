@@ -37,7 +37,7 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 | `src/components/StorefrontPage.tsx` | The page, in story order |
 | `src/components/sections/` | Top bar, hero, "Help me choose", catalogue, ordering, about, closing, mobile bar |
 | `src/components/selector/` | The selector overlay (drives the engine), the live "What you've told us" panel, results |
-| `src/components/product/` | Pack illustrations, product card, product sheet, quantity controls |
+| `src/components/product/` | Product photos and pack illustrations (`PackArt`), product card, product sheet, quantity controls |
 | `src/components/order/` | The order sheet: review → your details → send |
 | `src/components/whatsapp/` | Every chat with the distributor goes through here |
 | `src/components/store/` | Page state: the order, overlays (kept in the URL), selector session, toasts |
@@ -112,7 +112,13 @@ time.
 
 Put official BF Suma photos of the exact pack in `assets/products/<product-id>.<ext>`, record where each
 came from in `assets/products/sources.json`, and run `npm run photos`. See `assets/products/README.md`.
-Products without a photo keep their drawn pack.
+19 of the 29 products have one; the rest keep their drawn pack. Every product, photo or drawing, stands
+on the same white stage: in the catalogue, the product sheet, suggestions, the order and the hero.
+Products with a photo are listed right after the featured ones, and the link preview shows the first
+three.
+
+What each pack holds ("60 capsules") is read off the photos into `src/storefront/labels.ts` and shown
+under every price. A storefront's `offer.pack` overrides it.
 
 ## Configuration
 

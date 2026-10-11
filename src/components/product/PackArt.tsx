@@ -8,13 +8,16 @@ import photos from "@/storefront/product-photos.json";
  * How a product appears: its official photo when we have one (see assets/products/README.md),
  * otherwise a pack illustration, one shape per format, tinted by product line.
  *
+ * Every product stands on the same white stage, the e-commerce standard: the photos' own
+ * backgrounds are pure white (scripts/product-photos.mjs), so a pack photo and a drawn pack
+ * sit side by side as one set. Photos are centred in the frame with the same margin on every
+ * product, whatever the pack's shape.
+ *
  * Illustrations carry no name, range or logo on their label: a drawn pack with printed words
  * would be a made-up label. The product's name is always right next to it in the interface.
- * Photos are pre-cut to the same height, so they stand on the same floor as the drawings and
- * a mixed catalogue still reads as one set.
  *
  * Everything is sized in container units of the stage's shorter side (cqmin), so one
- * component works as a 64px thumbnail, a tall card and a wide banner without cropping.
+ * component works as a 56px thumbnail, a tall card and a wide banner without cropping.
  */
 export const LINE_TONE: Record<ProductLine, string> = {
   "Immune Booster": "#5b4636",
@@ -48,19 +51,22 @@ export function PackArt({
   label,
   thumb,
   center,
+  sizes,
 }: {
   product: Product;
   className?: string;
   /** Extra classes on the pack itself, e.g. a hover lift driven by a parent `group`. */
   packClassName?: string;
-  /** Tinted backdrop behind the pack. */
+  /** The white stage behind the pack. Off when a parent already provides one. */
   stage?: boolean;
   /** Show the label panel on drawn packs. Defaults to on, except for thumbnails. */
   label?: boolean;
-  /** Small list thumbnail: a closer crop, no printed name. */
+  /** Small list thumbnail: the small photo, and no label panel on drawn packs. */
   thumb?: boolean;
-  /** Stand the pack in the middle of a tall stage instead of near its foot. */
+  /** Stand a drawn pack in the middle of a tall stage instead of near its foot. */
   center?: boolean;
+  /** How wide the stage is drawn, for picking the photo's resolution (`next/image` sizes). */
+  sizes?: string;
 }) {
   const printed = label ?? !thumb;
   const tone = LINE_TONE[product.line];
@@ -71,52 +77,47 @@ export function PackArt({
     <div
       aria-hidden
       style={style}
-      className={clsx(
-        "relative isolate overflow-hidden [container-type:size]",
-        stage && "bg-[color-mix(in_oklab,var(--tone)_9%,#ebe8e1)]",
-        className,
-      )}
+      className={clsx("relative isolate overflow-hidden [container-type:size]", stage && "bg-white", className)}
     >
-      {stage && (
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_80%_at_50%_15%,rgb(255_255_255/0.55),transparent_60%)]" />
-      )}
-      <div
-        className={clsx(
-          "absolute inset-x-0 mx-auto h-[5cqmin] w-[62cqmin] rounded-[50%] bg-[radial-gradient(closest-side,rgb(28_26_23/0.28),transparent)] blur-[1px]",
-          center ? "bottom-[calc(50%-34cqmin)]" : "bottom-[10%]",
-        )}
-      />
-      <div
-        className={clsx(
-          "absolute inset-x-0 flex justify-center",
-          center ? "bottom-[calc(50%-31.5cqmin)]" : "bottom-[12.5%]",
-          thumb && "origin-bottom scale-[1.3]",
-          packClassName,
-        )}
-      >
-        {photo ? (
+      {photo ? (
+        // The margin is a share of the stage, a little tighter on thumbnails so small packs stay legible.
+        <div className={clsx("absolute inset-[7%] @max-[9rem]:inset-[5%]", packClassName)}>
           <Image
             src={thumb ? photo.small : photo.src}
             alt=""
-            width={photo.width}
-            height={photo.height}
-            sizes={thumb ? "96px" : "(min-width: 1024px) 30vw, 60vw"}
-            className="h-[64cqmin] w-auto max-w-[86cqw] object-contain"
+            fill
+            sizes={sizes ?? (thumb ? "96px" : "(min-width: 1024px) 32rem, 90vw")}
+            className="object-contain"
           />
-        ) : (
-          <>
+        </div>
+      ) : (
+        <>
+          <div
+            className={clsx(
+              "absolute inset-x-0 mx-auto h-[5cqmin] w-[62cqmin] rounded-[50%] bg-[radial-gradient(closest-side,rgb(28_26_23/0.22),transparent)] blur-[1px]",
+              center ? "bottom-[calc(50%-34cqmin)]" : "bottom-[10%]",
+            )}
+          />
+          {/* Drawn packs fill small stages a little more, so a thumbnail isn't mostly white. */}
+          <div
+            className={clsx(
+              "absolute inset-x-0 flex justify-center @max-[9rem]:origin-bottom @max-[9rem]:scale-[1.3]",
+              center ? "bottom-[calc(50%-31.5cqmin)]" : "bottom-[12.5%]",
+              packClassName,
+            )}
+          >
             {shape === "bottle" && <Bottle product={product} label={printed} />}
             {shape === "box" && <Box product={product} label={printed} />}
             {shape === "pump" && <Pump product={product} label={printed} />}
             {shape === "jar" && <Jar product={product} label={printed} />}
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-type Photo = { src: string; small: string; width: number; height: number; source: string };
+type Photo = { src: string; small: string; card: string; width: number; height: number; source: string };
 const PHOTOS = photos as Record<string, Photo>;
 
 export function hasPhoto(id: string) {

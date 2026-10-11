@@ -14,7 +14,7 @@ import { ChatPreview } from "@/components/whatsapp/ChatPreview";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { askMessage } from "@/storefront/messages";
 import { kes } from "@/storefront/money";
-import { FORMAT_LABEL, supplyLabel } from "@/storefront/products";
+import { formatLabel, packOf, supplyOf } from "@/storefront/products";
 import { priceSuggestions, type Suggestion } from "@/storefront/suggestions";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -184,7 +184,7 @@ export function Results({
           <ul className="grid gap-2">
             {s.addons.map((x) => (
               <li key={x.rec.product.id} className="flex items-center gap-3.5 rounded-card bg-surface p-3 ring-1 ring-ink/[0.07]">
-                <PackArt product={x.rec.product} thumb className="aspect-square w-14 shrink-0 rounded-xl" />
+                <PackArt product={x.rec.product} thumb className="aspect-square w-14 shrink-0 rounded-xl ring-1 ring-ink/[0.06]" />
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold leading-snug text-ink">{x.rec.product.name}</div>
                   <p className="text-[0.86rem] leading-snug text-ink-2">{x.rec.reasons[0]}</p>
@@ -323,6 +323,7 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
             product={p}
             center
             className={clsx(lead ? "aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[20rem]" : "aspect-[2/1] w-full sm:aspect-auto sm:h-full")}
+            sizes={lead ? "(min-width: 768px) 15rem, 100vw" : "(min-width: 640px) 10rem, 100vw"}
             packClassName="transition-transform duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1.5"
           />
         </button>
@@ -341,7 +342,7 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
           )}
           <h4 className={clsx("mt-3 text-ink", lead ? "display-card" : "font-display text-[1.35rem] leading-tight")}>{p.name}</h4>
           <div className="meta mt-1">
-            {FORMAT_LABEL[p.format]} · {supplyLabel(p.supplyDays)}
+            {[packOf(p, listing?.offer) ?? formatLabel(p), supplyOf(p)].filter(Boolean).join(" · ")}
           </div>
 
           <div className="mt-5">

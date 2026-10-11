@@ -33,7 +33,8 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 |---|---|---|
 | canvas | `#f5f3ee` warm porcelain | Page background |
 | surface | `#fdfcfa` | Cards, inputs |
-| sunken | `#ebe8e1` | Pack stages, quiet fills |
+| sunken | `#ebe8e1` | Quiet fills |
+| white | `#ffffff` | Product stages: every pack, photo or drawing, stands on white |
 | ink / ink-2 / ink-3 | `#1c1a17` / `#48443d` / `#6b655c` | Text, all at 4.5:1 or better on canvas |
 | night | `#171614` | The selector's panel, order bar, handoff: the "instrument" surfaces |
 | accent | per distributor | Kate: jacaranda `#4b3a8c` (Nairobi's October trees). Guided actions, selection, progress |
@@ -45,12 +46,19 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 - **Shape.** Buttons 14px radius, cards 20px, panels 28px; pills only for chips and tags.
 - **Depth.** Hairline rings instead of borders; one soft shadow for lifted things (the calling card,
   the lead suggestion, sheets). No glass.
-- **Product imagery.** An official photo of the exact pack when we have one (`npm run photos` trims,
-  normalises and sizes them, and only takes files whose source is recorded). Otherwise a pack
+- **Product imagery.** Every product stands on the same white stage, the e-commerce standard, so a
+  grid reads as one set and nothing distracts from the pack. An official photo of the exact pack when
+  we have one: `npm run photos` makes its background pure white, eases the soft shadow under the pack
+  into it, trims to the pack with the same margin on every product, and never enlarges a small original.
+  Photos are centred in the frame whatever their shape; thumbnails use a small copy. Otherwise a pack
   illustration: bottle, carton, pump or jar by format, tinted by product line, with a word-free emblem
   where a label would be. A drawing that printed a name would look like a real label we made up. Logos
-  stay off-limits (independence has to be visible). Sized in container units of the stage's shorter
-  side, so one component works as a thumbnail, a card and a banner.
+  stay off-limits outside the official pack photos (independence has to be visible). Sized in container
+  units of the stage's shorter side, so one component works as a thumbnail, a card and a banner.
+- **Pack size next to the price.** What one pack holds ("60 capsules", "20 sachets") sits under every
+  price, read off the pack photos (`src/storefront/labels.ts`). A price means little without it. Where
+  the label disagrees with how long the catalogue says a pack lasts, the page doesn't say how long it
+  lasts until the catalogue is corrected.
 - **The distributor's face.** A real photo when there is one. Until then, a monogram in their colour,
   and the About section becomes a letter rather than an empty picture frame.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when
@@ -61,7 +69,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | Section | Job |
 |---|---|
 | Top bar | Name and face always visible; message and order one tap away |
-| Hero | The question customers actually have ("Not sure which product is right for you?"), two doors, and a still life of three products, named and priced on shelf tags, beside the distributor's calling card. The kicker says where they are and when the prices were checked |
+| Hero | The question customers actually have ("Not sure which product is right for you?"), two doors, and three of their products on white tiles, each with its name and price, like the front table of a small shop, beside the distributor's calling card. The link preview shows the same three. The kicker says where they are and when the prices were checked |
 | Help me choose | Goal tiles: tapping one starts the selector with that goal already chosen. After a result, this section shows the suggestions with prices |
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
 | How ordering works | Four steps, then delivery, payment and prices, answered plainly |

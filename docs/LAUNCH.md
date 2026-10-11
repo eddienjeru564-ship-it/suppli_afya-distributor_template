@@ -11,9 +11,9 @@ else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`,
 | WhatsApp number | `distributor.whatsapp` | International format, `2547XXXXXXXX` |
 | Phone number for calls (optional) | `distributor.phone` | Adds a "Call" button |
 | Her price list | `catalogue.offers` | One price per product she sells, whole KES. Remove any she doesn't sell |
-| Pack sizes (optional) | `catalogue.offers[id].pack` | From the label, e.g. "60 capsules". Shown as "how much is included" |
+| Pack sizes (only if different) | `catalogue.offers[id].pack` | Read off the official pack photos already (`src/storefront/labels.ts`). Set one only if Kate sells a different pack |
 | Date prices were checked | `catalogue.updated` | Shown to customers |
-| Her most-asked-about products | `catalogue.featured` | Shown first, and the first three stand in the hero |
+| Her most-asked-about products | `catalogue.featured` | Shown first; the first three stand in the hero and the link preview. Prefer products with a photo |
 | Where she's based | `distributor.area` | |
 | Delivery areas, fees and times | `fulfilment.delivery.areas` | `fee: null` means she confirms it with the customer |
 | Pickup point, if any | `fulfilment.pickup` | |
@@ -24,7 +24,7 @@ else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`,
 | Languages, reply hours (optional) | `distributor.languages`, `distributor.hours` | |
 | Her colour (optional) | `theme` | Tests check white text is readable on it |
 | Her Suppli Afya link name | `suppliSlug` | Once she has a workspace, so sent results and placed orders reach her portal. Needs `SUPPLI_AFYA_URL` and `STOREFRONT_SECRET` set in both apps |
-| Official product photos (optional) | `assets/products/` + `sources.json` | Only official photos of the exact pack, with permission to use them. Then `npm run photos` |
+| Official product photos | `assets/products/` + `sources.json` | 19 are in. Still missing: Quad Reishi, 4 in 1 Cordyceps Coffee, Reishi Coffee, Veggie Veggie, ConstiRelax, Novel Depile, GluGoGone, NMN Duo Release, FemiCalcium D3, Youth Essence. Most of the 19 are small (about 500px); larger originals (1000px+) would look sharper on big screens. Then `npm run photos` |
 
 Then set `pending: []` and `status: "live"`, and run `npm test` (a live storefront without a WhatsApp
 number, or with anything still pending, fails validation).
@@ -41,6 +41,10 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
   nothing on a server unless `SUPPLI_AFYA_URL` or `ORDER_WEBHOOK_URL` is set; with them, sent results
   and orders leave the browser.
 - **BF Suma's distributor policy** on online price lists, product names and product photos.
+- **Catalogue corrections from the pack labels.** Reading the official pack photos turned up facts the
+  engine's catalogue gets wrong or leaves out (pack sizes and doses that change how long a pack lasts,
+  green tea in Relivin Tea, YouthEver being a drink, label cautions for pregnancy). Listed in
+  `assets/products/README.md`; they need fixing upstream, then `npm run engine:sync`.
 
 ## Deploying
 
