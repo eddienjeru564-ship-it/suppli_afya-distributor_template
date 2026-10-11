@@ -218,6 +218,8 @@ export interface Product {
   group?: string;
   /** Rough days one pack lasts at the usual label dose. Used for reorder timing. Verify against pack. */
   supplyDays: number;
+  /** What one pack holds, read off the pack, e.g. "60 capsules". Left out until someone has read it. */
+  pack?: string;
   /** True once checked line-by-line against the official BF Suma Kenya catalogue. */
   verified: boolean;
 }

@@ -11,7 +11,7 @@ else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`,
 | WhatsApp number | `distributor.whatsapp` | International format, `2547XXXXXXXX` |
 | Phone number for calls (optional) | `distributor.phone` | Adds a "Call" button |
 | Her price list | `catalogue.offers` | One price per product she sells, whole KES. Remove any she doesn't sell |
-| Pack sizes (only if different) | `catalogue.offers[id].pack` | Read off the official pack photos already (`src/storefront/labels.ts`). Set one only if Kate sells a different pack |
+| Pack sizes (only if different) | `catalogue.offers[id].pack` | The catalogue already has them for the 19 products with a photo. Set one only if Kate sells a different pack |
 | Date prices were checked | `catalogue.updated` | Shown to customers |
 | Her most-asked-about products | `catalogue.featured` | Shown first; the first three stand in the hero and the link preview. Prefer products with a photo |
 | Where she's based | `distributor.area` | |
@@ -41,10 +41,9 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
   nothing on a server unless `SUPPLI_AFYA_URL` or `ORDER_WEBHOOK_URL` is set; with them, sent results
   and orders leave the browser.
 - **BF Suma's distributor policy** on online price lists, product names and product photos.
-- **Catalogue corrections from the pack labels.** Reading the official pack photos turned up facts the
-  engine's catalogue gets wrong or leaves out (pack sizes and doses that change how long a pack lasts,
-  green tea in Relivin Tea, YouthEver being a drink, label cautions for pregnancy). Listed in
-  `assets/products/README.md`; they need fixing upstream, then `npm run engine:sync`.
+- **Catalogue questions the labels couldn't answer.** The pack photos corrected pack sizes, doses,
+  forms and label warnings upstream (see `assets/products/README.md`). Still open: the gelatin in
+  capsule shells, the exact doses of Probio3 and XPower Man Coffee, and a sleep and stress product.
 
 ## Deploying
 

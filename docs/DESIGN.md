@@ -56,9 +56,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
   stay off-limits outside the official pack photos (independence has to be visible). Sized in container
   units of the stage's shorter side, so one component works as a thumbnail, a card and a banner.
 - **Pack size next to the price.** What one pack holds ("60 capsules", "20 sachets") sits under every
-  price, read off the pack photos (`src/storefront/labels.ts`). A price means little without it. Where
-  the label disagrees with how long the catalogue says a pack lasts, the page doesn't say how long it
-  lasts until the catalogue is corrected.
+  price, from the catalogue's `pack`, read off the pack photos. A price means little without it.
 - **The distributor's face.** A real photo when there is one. Until then, a monogram in their colour,
   and the About section becomes a letter rather than an empty picture frame.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when

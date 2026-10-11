@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { kes } from "@/storefront/money";
-import { formatLabel, goalsOf, oneLiner, packOf, type Listing } from "@/storefront/products";
+import { FORMAT_LABEL, goalsOf, oneLiner, packOf, type Listing } from "@/storefront/products";
 import { AddButton } from "./AddButton";
 import { PackArt } from "./PackArt";
 
@@ -38,7 +38,7 @@ export function ProductCard({ listing, className }: { listing: Listing; classNam
       />
       <div className="flex min-w-0 flex-1 flex-col py-0.5 md:px-5 md:pb-4 md:pt-4">
         <div className="meta truncate">
-          {formatLabel(product)}
+          {FORMAT_LABEL[product.format]}
           {goals[0] && <> · {goals.map((g) => g.short).join(", ")}</>}
         </div>
         <h3 className="mt-0.5 text-[1.02rem] font-semibold leading-snug text-ink md:mt-1 md:font-display md:text-[1.4rem] md:font-normal md:leading-[1.1] md:tracking-[-0.015em]">

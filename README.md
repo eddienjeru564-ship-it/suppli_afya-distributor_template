@@ -117,8 +117,8 @@ on the same white stage: in the catalogue, the product sheet, suggestions, the o
 Products with a photo are listed right after the featured ones, and the link preview shows the first
 three.
 
-What each pack holds ("60 capsules") is read off the photos into `src/storefront/labels.ts` and shown
-under every price. A storefront's `offer.pack` overrides it.
+What each pack holds ("60 capsules") comes from the engine's catalogue (`pack`, read off these
+photos) and is shown under every price. A storefront's `offer.pack` overrides it.
 
 ## Configuration
 

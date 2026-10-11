@@ -9,7 +9,7 @@ import { useIsDesktop } from "@/components/ui/useMediaQuery";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { askMessage } from "@/storefront/messages";
 import { kes } from "@/storefront/money";
-import { ALWAYS_CHECK, checkNotes, findListing, formatLabel, goalsOf, packOf, supplyOf, type Listing } from "@/storefront/products";
+import { ALWAYS_CHECK, FORMAT_LABEL, checkNotes, findListing, goalsOf, packOf, supplyLabel, type Listing } from "@/storefront/products";
 import { PackArt } from "./PackArt";
 import { QtyStepper } from "./QtyStepper";
 
@@ -43,7 +43,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
   const notes = checkNotes(p, sf.distributor.firstName);
   const first = sf.distributor.firstName;
   const pack = packOf(p, offer);
-  const supply = supplyOf(p);
+  const supply = supplyLabel(p.supplyDays);
 
   const share = async () => {
     const url = `${window.location.origin}${window.location.pathname}?p=${p.id}`;
@@ -87,8 +87,8 @@ function ProductDetail({ listing }: { listing: Listing }) {
       </Block>
       <Block title="How it's taken">
         <p>
-          {formatLabel(p)}.{pack && ` One pack holds ${pack}.`} Follow the dose on the label, or as {first} advises.
-          {supply && ` ${supply} at the usual dose.`}
+          {FORMAT_LABEL[p.format]}.{pack && ` One pack holds ${pack}.`} Follow the dose on the label, or as {first} advises.{" "}
+          {supply} at the usual dose.
         </p>
       </Block>
       <Block title="What to expect">
@@ -145,7 +145,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
   const header = (
     <div>
       <div className="meta">
-        {p.line} · {formatLabel(p)}
+        {p.line} · {FORMAT_LABEL[p.format]}
       </div>
       <h2 id={sheet?.titleId} className="display-card mt-1.5 text-ink">
         {p.name}

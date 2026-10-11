@@ -7,7 +7,12 @@ import type { Product } from "./types";
  * Names, product lines and key ingredients were compiled in September 2026
  * from BF Suma's public shop listings and Kenyan retailer pages. None of it has
  * yet been checked line by line against the official BF Suma Kenya catalogue,
- * so every entry is `verified: false`. Before launch, confirm for each product:
+ * so every entry is `verified: false`.
+ *
+ * In October 2026 the official pack photos (in the storefront repo,
+ * suppli_afya-distributor_template/assets/products) were read for 19 products:
+ * their `pack`, form, label doses and label cautions, and the ingredients printed
+ * on the box, are from those labels. Before launch, confirm for each product:
  *   - exact name and pack size
  *   - full ingredient list (especially shellfish, pork, soy, sugar, caffeine)
  *   - label dose, which sets `supplyDays` for reorder reminders
@@ -40,6 +45,7 @@ export const CATALOGUE: Product[] = [
     traits: { immuneActive: true },
     group: "immune-mushroom",
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -61,6 +67,7 @@ export const CATALOGUE: Product[] = [
     traits: { immuneActive: true, clotting: "mild" },
     group: "immune-mushroom",
     supplyDays: 30,
+    pack: "30 capsules",
     verified: false,
   },
   {
@@ -129,8 +136,8 @@ export const CATALOGUE: Product[] = [
     line: "Immune Booster",
     format: "coffee",
     summary:
-      "Instant coffee with added NMN, a compound the body uses to make NAD+, which falls as we age. There's a sugar-free café latte version.",
-    keyIngredients: ["NMN (nicotinamide mononucleotide)", "Coffee"],
+      "An instant coffee latte with added NMN, a compound the body uses to make NAD+, which falls as we age. The box says no sugar added.",
+    keyIngredients: ["NMN (nicotinamide mononucleotide)", "Coffee latte"],
     goals: ["energy", "skin_ageing"],
     supports: { energy_low: 0.6, energy_morning: 0.6, ageing: 0.5 },
     reasons: {
@@ -140,6 +147,7 @@ export const CATALOGUE: Product[] = [
     traits: { caffeine: true },
     group: "coffee",
     supplyDays: 15,
+    pack: "15 sachets",
     verified: false,
   },
 
@@ -164,7 +172,9 @@ export const CATALOGUE: Product[] = [
       "It supports circulation over weeks. It does not replace blood pressure or heart medicine, and you shouldn't stop any medicine to take it.",
     note: "The manufacturer advises against taking it with aspirin, or during pregnancy or breastfeeding.",
     traits: { clotting: "strong", notInPregnancy: true },
-    supplyDays: 30,
+    // Label dose: 3 tablets, 3 times a day.
+    supplyDays: 11,
+    pack: "100 tablets",
     verified: false,
   },
   {
@@ -173,17 +183,19 @@ export const CATALOGUE: Product[] = [
     line: "Heart & Blood Fit",
     format: "tea",
     summary:
-      "A herbal tea blend made to help you unwind, often used as part of a routine for healthy blood pressure.",
-    keyIngredients: ["Luobuma (dogbane) leaf and herbal blend — confirm against label"],
-    goals: ["heart", "sleep_stress"],
-    supports: { stress: 0.7, bp: 0.6, sleep_poor: 0.3 },
+      "Tea bags of luobuma leaf and green tea, often used as part of a routine for healthy blood pressure.",
+    keyIngredients: ["Luobuma leaf (Apocynum venetum)", "Green tea"],
+    // Not a sleep or stress pick: it's made with green tea, so it contains caffeine.
+    goals: ["heart"],
+    supports: { bp: 0.6 },
     reasons: {
-      stress: "A cup in the evening is a simple wind-down ritual, which fits how stressed you've been.",
       bp: "It's commonly used as part of a routine for healthy blood pressure, alongside less salt and more movement.",
     },
     expectation: "Most people use it daily as part of a routine. It won't replace blood pressure medicine.",
-    traits: { mayLowerBp: true },
+    note: "The label says it isn't for children, or during pregnancy or breastfeeding.",
+    traits: { mayLowerBp: true, caffeine: true, notInPregnancy: true },
     supplyDays: 20,
+    pack: "20 tea bags",
     verified: false,
   },
   {
@@ -202,6 +214,7 @@ export const CATALOGUE: Product[] = [
     expectation: "Ginkgo takes time. Give it six to eight weeks before deciding whether it's helping.",
     traits: { clotting: "strong", moodMedInteraction: true },
     supplyDays: 20,
+    pack: "60 tablets",
     verified: false,
   },
   {
@@ -220,6 +233,7 @@ export const CATALOGUE: Product[] = [
     expectation: "A long-term support. It works best alongside drinking less, not instead of it.",
     traits: { soy: true },
     supplyDays: 30,
+    pack: "60 soft gels",
     verified: false,
   },
 
@@ -243,6 +257,7 @@ export const CATALOGUE: Product[] = [
     traits: { shellfish: true, porkUnconfirmed: true },
     group: "glucosamine",
     supplyDays: 30,
+    pack: "60 tablets",
     verified: false,
   },
   {
@@ -264,6 +279,7 @@ export const CATALOGUE: Product[] = [
     traits: { shellfish: true, pork: true },
     group: "glucosamine",
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -284,6 +300,7 @@ export const CATALOGUE: Product[] = [
     traits: {},
     group: "calcium",
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -344,7 +361,9 @@ export const CATALOGUE: Product[] = [
     },
     expectation: "Give it two to four weeks. Take it daily for the best chance of it helping.",
     traits: {},
-    supplyDays: 30,
+    // 20 sachets; one a day. Confirm the label dose.
+    supplyDays: 20,
+    pack: "20 sachets",
     verified: false,
   },
   {
@@ -386,7 +405,7 @@ export const CATALOGUE: Product[] = [
     id: "ez-xlim",
     name: "Ez-Xlim",
     line: "Suma Fit",
-    format: "capsules",
+    format: "tablets",
     summary:
       "Gymnema, white kidney bean extract, chitosan and bitter orange, used to help manage appetite and how much fat and sugar the body takes in from food.",
     keyIngredients: ["Gymnema", "White kidney bean extract", "Chitosan", "Bitter orange (Citrus aurantium)"],
@@ -400,6 +419,7 @@ export const CATALOGUE: Product[] = [
       "Realistic weight loss is about half a kilo to a kilo a week, and only alongside changes to what you eat.",
     traits: { shellfish: true, stimulant: true, lowersBloodSugar: true },
     supplyDays: 30,
+    pack: "90 tablets",
     verified: false,
   },
 
@@ -423,6 +443,7 @@ export const CATALOGUE: Product[] = [
     traits: { lowersBloodSugar: true },
     group: "glucose",
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -466,21 +487,23 @@ export const CATALOGUE: Product[] = [
   },
   {
     id: "youth-ever",
-    name: "Youth Ever",
+    name: "YouthEver",
     line: "Women's Beauty",
-    format: "capsules",
-    summary: "Antioxidants from berries with resveratrol and NMN, for skin and healthy ageing.",
-    keyIngredients: ["Berry antioxidants", "Resveratrol", "NMN"],
+    format: "drink",
+    summary: "A drink of fruit essences with resveratrol and NMN, in single pouches, for skin and healthy ageing.",
+    keyIngredients: ["NMN", "Resveratrol", "Fruit essences"],
     goals: ["skin_ageing"],
     supports: { skin: 0.8, ageing: 0.8 },
     reasons: {
-      skin: "Antioxidants from berries help protect skin, which fits what you'd like to improve.",
+      skin: "Antioxidants from fruit help protect skin, which fits what you'd like to improve.",
       ageing: "Resveratrol and NMN are both used for healthy ageing.",
     },
     expectation: "Skin renews itself roughly every four to six weeks, so give it at least that long.",
-    traits: {},
+    note: "The label says it isn't for children or during pregnancy.",
+    traits: { notInPregnancy: true },
     group: "nmn",
     supplyDays: 30,
+    pack: "30 pouches",
     verified: false,
   },
   {
@@ -503,6 +526,7 @@ export const CATALOGUE: Product[] = [
     traits: {},
     audience: { sex: "female" },
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -522,6 +546,7 @@ export const CATALOGUE: Product[] = [
     traits: { topical: true },
     audience: { sex: "female" },
     supplyDays: 45,
+    pack: "180 ml",
     verified: false,
   },
   {
@@ -548,8 +573,8 @@ export const CATALOGUE: Product[] = [
     name: "ProstatRelax Capsules",
     line: "Men's Power",
     format: "capsules",
-    summary: "A patented plant extract to support prostate health and urinary comfort.",
-    keyIngredients: ["Patented plant extract — confirm against label"],
+    summary: "Capsules of epimedium extract, to support prostate health and urinary comfort.",
+    keyIngredients: ["Epimedium extract"],
     goals: ["mens_health"],
     supports: { prostate: 1 },
     reasons: {
@@ -560,6 +585,7 @@ export const CATALOGUE: Product[] = [
     traits: {},
     audience: { sex: "male" },
     supplyDays: 30,
+    pack: "60 capsules",
     verified: false,
   },
   {
@@ -567,8 +593,8 @@ export const CATALOGUE: Product[] = [
     name: "XPower Man Plus Capsules",
     line: "Men's Power",
     format: "capsules",
-    summary: "A herbal formula for men's energy, drive and performance.",
-    keyIngredients: ["Herbal blend — confirm against label"],
+    summary: "Epimedium and black ginger extracts with maca, taurine and L-arginine, for men's energy, drive and performance.",
+    keyIngredients: ["Epimedium and black ginger extract", "Fresh maca", "Taurine", "L-arginine"],
     goals: ["mens_health"],
     supports: { performance: 1, male_vitality: 0.8 },
     reasons: {
@@ -580,6 +606,7 @@ export const CATALOGUE: Product[] = [
     audience: { sex: "male" },
     group: "xpower",
     supplyDays: 30,
+    pack: "30 capsules",
     verified: false,
   },
   {
@@ -588,7 +615,7 @@ export const CATALOGUE: Product[] = [
     line: "Men's Power",
     format: "coffee",
     summary: "The coffee version of XPower Man, for men who'd rather take it in their morning cup.",
-    keyIngredients: ["Coffee", "Herbal blend — confirm against label"],
+    keyIngredients: ["Coffee latte", "Ginseng extract", "Tongkat ali extract", "Maca extract", "Epimedium extract"],
     goals: ["mens_health"],
     supports: { male_vitality: 0.7, performance: 0.6, energy_morning: 0.3 },
     reasons: {
@@ -598,7 +625,9 @@ export const CATALOGUE: Product[] = [
     traits: { sexualHealth: true, caffeine: true, mayContainSugar: true },
     audience: { sex: "male" },
     group: "xpower",
-    supplyDays: 20,
+    // 8 sachets; one a day. Confirm the label dose.
+    supplyDays: 8,
+    pack: "8 sachets",
     verified: false,
   },
 ];

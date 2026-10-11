@@ -29,8 +29,7 @@ the storefront shows every product on a white stage anyway, so the photo's white
 ## The current set
 
 19 photos supplied by Suppli Afya on 11 October 2026 (`BF_Suma_Final_Use_Images.zip`). Each file's
-original name is in `sources.json`. What each pack holds was read off these photos into
-`src/storefront/labels.ts`.
+original name is in `sources.json`.
 
 Products in the catalogue without a photo yet: Quad Reishi, 4 in 1 Cordyceps Coffee, Reishi Coffee,
 Veggie Veggie, ConstiRelax, Novel Depile, GluGoGone, NMN Duo Release, FemiCalcium D3, Youth Essence.
@@ -38,26 +37,20 @@ Veggie Veggie, ConstiRelax, Novel Depile, GluGoGone, NMN Duo Release, FemiCalciu
 `pending/` holds the photos from the same set for products that aren't in the engine's catalogue
 (see `pending/README.md`). They're not shown anywhere until the product is added upstream.
 
-## What the labels say that the catalogue doesn't
+## What the labels changed in the catalogue
 
-Reading the packs turned up facts the engine's catalogue (`suppli_afya/src/engine/catalogue.ts`)
-should take on. The storefront can't change the engine, so these need fixing upstream:
+Reading the packs turned up facts the engine's catalogue had wrong or missing. They were corrected
+upstream in Suppli Afya (`src/engine/catalogue.ts`, commit 404d25e) and synced here:
 
-- **MicrO2 Cycle**: 100 tablets, and the label dose is 3 tablets 3 times a day, so a pack lasts about
-  11 days, not 30. The label also says it isn't recommended for pregnant women (the catalogue already
-  marks it `notInPregnancy`).
-- **Probio3**: 20 sachets a box, not 30 days' worth.
-- **XPower Man Coffee**: 8 sachets a box, not 20 days' worth. Ingredients on the box: ginseng,
-  tongkat ali, maca and epimedium extracts, coffee latte.
-- **Relivin Tea**: the box says Folium Apocyni Veneti (luobuma) **and green tea**, so it contains
-  caffeine (no `caffeine` trait today). The label says it's not for children or pregnant or
-  breastfeeding women.
-- **YouthEver**: a drink in 30 pouches (900 ml), not capsules. The box side says it's not for children
-  or pregnant women.
-- **Ez-Xlim**: tablets (90), not capsules.
-- **NMN Coffee**: the box says "no sugar added".
-- **Ingredients now known**: ProstatRelax (epimedium extract); XPower Man Plus (epimedium and black
-  ginger extract, fresh maca, taurine, L-arginine).
+- **Pack sizes** for these 19 products (the catalogue's `pack`), shown under every price.
+- **Relivin Tea** is luobuma **and green tea**, so it contains caffeine. Its label says it's not for
+  children, pregnancy or breastfeeding. It's no longer suggested for sleep and stress.
+- **YouthEver** is a drink in 30 pouches, not capsules; its label says it's not for pregnancy.
+- **Ez-Xlim** is tablets.
+- **MicrO2 Cycle**: the label dose is 3 tablets 3 times a day, so 100 tablets last about 11 days.
+- **Probio3** (20 sachets) and **XPower Man Coffee** (8 sachets) last at most 20 and 8 days at one a
+  day. The exact dose still needs confirming.
+- **Ingredients** from the boxes for ProstatRelax, XPower Man Plus, XPower Man Coffee and NMN Coffee.
 
-Until then, the storefront shows what the pack says for pack size and form, and says nothing about how
-long a pack lasts where the label contradicts the catalogue.
+Still open, in `suppli_afya/docs/DECISIONS.md`: the gelatin in capsule shells (ProstatRelax's label
+lists it), and the pharmacist's view on epimedium and ginseng.

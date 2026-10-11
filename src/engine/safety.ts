@@ -33,7 +33,7 @@ export function checkProduct(product: Product, p: Profile): SafetyVerdict {
   if ((t.pork || t.shellfish) && restricts(p, "vegetarian"))
     return out("It contains animal-derived ingredients, and you're vegetarian or vegan.");
   if (t.soy && restricts(p, "soy")) return out("It's made from soy, and you told us you're allergic.");
-  if (t.caffeine && restricts(p, "caffeine")) return out("It's made with coffee, and caffeine doesn't agree with you.");
+  if (t.caffeine && restricts(p, "caffeine")) return out("It contains caffeine, which doesn't agree with you.");
 
   // Blood clotting
   const onThinners = hasMed(p, "thinners") || hasCond(p, "bleeding");
@@ -68,7 +68,7 @@ export function checkProduct(product: Product, p: Profile): SafetyVerdict {
     cautions.push("Mushroom extracts act on the immune system. With an autoimmune condition, check with your doctor first.");
   if (t.immuneActive && hasCond(p, "cancer"))
     cautions.push("If you're having cancer treatment, your oncologist should approve this first.");
-  if (t.caffeine && hasCond(p, "ulcers")) cautions.push("Coffee can irritate stomach ulcers. Have it with food, or skip it.");
+  if (t.caffeine && hasCond(p, "ulcers")) cautions.push("Drinks with caffeine can irritate stomach ulcers. Have it with food, or skip it.");
   if (t.caffeine && (p.signals.sleep_poor ?? 0) >= 0.5)
     cautions.push("It contains caffeine. Have it before midday so it doesn't get in the way of your sleep.");
   const watchingSugar =

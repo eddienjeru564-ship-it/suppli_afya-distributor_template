@@ -164,6 +164,18 @@ describe("safety", () => {
     expect(r.profile.medications).toContain("diabetes_meds");
   });
 
+  it("leaves out Relivin Tea when caffeine doesn't agree: it's made with green tea", () => {
+    const r = recommend({ ...base, restrictions: ["caffeine"], goals: ["heart"], heart_concerns: ["bp"] });
+    expect(all(r)).not.toContain("relivin-tea");
+    const ok = recommend({ ...base, goals: ["heart"], heart_concerns: ["bp"] });
+    expect(all(ok)).toContain("relivin-tea");
+  });
+
+  it("never suggests something with caffeine for sleep and stress", () => {
+    const r = recommend({ ...base, goals: ["sleep_stress"], stress_level: 4, sleep_quality: ["falling", "waking"] });
+    for (const c of r.core.filter((c) => c.covers.includes("sleep_stress"))) expect(c.product.traits.caffeine).toBeFalsy();
+  });
+
   it("drops coffee products when caffeine doesn't agree", () => {
     const r = recommend({
       ...base,
@@ -342,5 +354,22 @@ describe("fuzz", () => {
       }
       expect(whatsappMessage(r, ctx).length).toBeLessThan(1500);
     }
+  });
+});
+
+describe("catalogue", () => {
+  it("never says a pack lasts longer than it can, one a day", () => {
+    // A box of 20 sachets can't last a month. Doses of more than one a day are set per product.
+    for (const p of CATALOGUE) {
+      const m = p.pack?.match(/^(\d+) (sachets|tea bags|pouches)$/);
+      if (m) expect(p.supplyDays, p.id).toBeLessThanOrEqual(Number(m[1]));
+    }
+  });
+
+  it("carries the label cautions read off the packs", () => {
+    const byId = Object.fromEntries(CATALOGUE.map((p) => [p.id, p]));
+    for (const id of ["relivin-tea", "youth-ever", "micro2-cycle"]) expect(byId[id].traits.notInPregnancy, id).toBe(true);
+    expect(byId["relivin-tea"].traits.caffeine).toBe(true);
+    expect(byId["relivin-tea"].goals).not.toContain("sleep_stress");
   });
 });

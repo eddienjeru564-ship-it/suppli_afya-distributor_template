@@ -1,14 +1,12 @@
 import { CATALOGUE, GOALS_BY_ID, PRODUCTS_BY_ID, type GoalId, type Product } from "@/engine";
 import type { GoalMeta } from "@/engine/goals";
-import { LABEL_FORMAT, LABEL_PACK, SUPPLY_DISAGREES } from "./labels";
 import photos from "./product-photos.json";
 import type { Offer, Storefront } from "./types";
 
 /**
  * How products are presented on a storefront. Every fact here comes from the engine's
- * catalogue (name, summary, ingredients, traits, supply), the pack labels (./labels) or the
- * distributor's offer (price, pack). Nothing is added: no claims, no dose instructions the
- * label doesn't give.
+ * catalogue (name, summary, ingredients, traits, pack, supply) or the distributor's offer
+ * (price, pack). Nothing is added: no claims, no dose instructions the label doesn't give.
  */
 
 export interface Listing {
@@ -26,19 +24,12 @@ export const FORMAT_LABEL: Record<Product["format"], string> = {
   skincare: "Skincare",
 };
 
-/** The product's form as its pack shows it ("Tablets"), which wins over the catalogue's. */
-export function formatLabel(p: Product): string {
-  return FORMAT_LABEL[LABEL_FORMAT[p.id] ?? p.format];
-}
-
-/** What's in one pack, e.g. "60 capsules", or null when it hasn't been read off a label. */
+/**
+ * What's in one pack, e.g. "60 capsules": the distributor's own pack if they sell a different
+ * one, else what the catalogue read off the label. Null until someone has read it.
+ */
 export function packOf(p: Product, offer?: Offer | null): string | null {
-  return offer?.pack ?? LABEL_PACK[p.id] ?? null;
-}
-
-/** How long one pack lasts at the usual dose, or null when the label says otherwise. */
-export function supplyOf(p: Product): string | null {
-  return SUPPLY_DISAGREES.has(p.id) ? null : supplyLabel(p.supplyDays);
+  return offer?.pack ?? p.pack ?? null;
 }
 
 /**
@@ -82,6 +73,8 @@ export function oneLiner(p: Product): string {
 
 /** How long one pack lasts at the usual label dose, in plain words. */
 export function supplyLabel(days: number): string {
+  if (days <= 9) return "About a week per pack";
+  if (days <= 12) return "About ten days per pack";
   if (days <= 17) return "About two weeks per pack";
   if (days <= 24) return "About three weeks per pack";
   if (days <= 35) return "About a month per pack";
@@ -102,7 +95,7 @@ export function matchesQuery(p: Product, query: string): boolean {
   const words = normalise(query).split(" ").filter(Boolean);
   if (!words.length) return true;
   const haystack = normalise(
-    [p.name, p.line, formatLabel(p), packOf(p) ?? "", p.keyIngredients.join(" "), goalsOf(p).map((g) => `${g.label} ${g.hint}`).join(" ")].join(" "),
+    [p.name, p.line, FORMAT_LABEL[p.format], packOf(p) ?? "", p.keyIngredients.join(" "), goalsOf(p).map((g) => `${g.label} ${g.hint}`).join(" ")].join(" "),
   );
   return words.every((w) => haystack.includes(w));
 }
@@ -139,6 +132,7 @@ export function checkNotes(p: Product, distributorFirstName: string): string[] {
   if (t.immuneActive) out.push("Acts on the immune system. With an autoimmune condition or during cancer treatment, check with your doctor first.");
   if (t.sexualHealth) out.push("Not advised with heart disease unless your doctor agrees. With high blood pressure, check with your doctor first.");
   if (t.topical) out.push("For external use.");
+  if (t.notInPregnancy) out.push("Not advised during pregnancy or breastfeeding.");
   return out;
 }
 

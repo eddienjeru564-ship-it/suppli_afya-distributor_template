@@ -14,7 +14,7 @@ import { ChatPreview } from "@/components/whatsapp/ChatPreview";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { askMessage } from "@/storefront/messages";
 import { kes } from "@/storefront/money";
-import { formatLabel, packOf, supplyOf } from "@/storefront/products";
+import { FORMAT_LABEL, packOf, supplyLabel } from "@/storefront/products";
 import { priceSuggestions, type Suggestion } from "@/storefront/suggestions";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -342,7 +342,7 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
           )}
           <h4 className={clsx("mt-3 text-ink", lead ? "display-card" : "font-display text-[1.35rem] leading-tight")}>{p.name}</h4>
           <div className="meta mt-1">
-            {[packOf(p, listing?.offer) ?? formatLabel(p), supplyOf(p)].filter(Boolean).join(" · ")}
+            {packOf(p, listing?.offer) ?? FORMAT_LABEL[p.format]} · {supplyLabel(p.supplyDays)}
           </div>
 
           <div className="mt-5">

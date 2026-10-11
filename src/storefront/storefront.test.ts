@@ -6,7 +6,6 @@ import { STOREFRONTS, storefrontBySlug } from "@/storefronts";
 import { kate } from "@/storefronts/kate";
 import { engineDrift } from "../../scripts/engine.mjs";
 import { cartReducer, priceCart, sanitiseCart, MAX_QTY, type CartItem } from "./cart";
-import { LABEL_FORMAT, LABEL_PACK, SUPPLY_DISAGREES } from "./labels";
 import { askMessage, whatsappHref } from "./messages";
 import { amount, kes } from "./money";
 import {
@@ -25,7 +24,7 @@ import {
   type OrderDetails,
 } from "./order";
 import photos from "./product-photos.json";
-import { checkNotes, formatLabel, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel, supplyOf } from "./products";
+import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel } from "./products";
 import { nextShown, partProgress } from "./progress";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
@@ -140,18 +139,12 @@ describe("products", () => {
     expect(photo.slice(photo.indexOf(false))).not.toContain(true);
   });
 
-  it("reads pack sizes off the label, and never contradicts the label on how long a pack lasts", () => {
+  it("shows what one pack holds, from the label, unless the distributor sells a different pack", () => {
     expect(packOf(PRODUCTS_BY_ID["arthroxtra"])).toBe("60 tablets");
     expect(packOf(PRODUCTS_BY_ID["arthroxtra"], { price: 1, pack: "30 tablets" })).toBe("30 tablets");
     expect(packOf(PRODUCTS_BY_ID["veggie-veggie"])).toBeNull();
-    expect(supplyOf(PRODUCTS_BY_ID["probio3"])).toBeNull();
-    expect(supplyOf(PRODUCTS_BY_ID["arthroxtra"])).toBe("About a month per pack");
-    expect(formatLabel(PRODUCTS_BY_ID["ez-xlim"])).toBe("Tablets");
-    // Every label fact is for a product in the catalogue that has a photo to read it from.
-    for (const id of [...Object.keys(LABEL_PACK), ...Object.keys(LABEL_FORMAT), ...SUPPLY_DISAGREES]) {
-      expect(PRODUCTS_BY_ID[id], id).toBeTruthy();
-      expect(id in photos, id).toBe(true);
-    }
+    // Pack sizes were read off the official photos, so every product with a photo has one.
+    for (const id of Object.keys(photos)) expect(PRODUCTS_BY_ID[id].pack, id).toBeTruthy();
   });
 
   it("searches names, ingredients, formats and goals", () => {
@@ -174,6 +167,8 @@ describe("products", () => {
   });
 
   it("describes supply in plain words", () => {
+    expect(supplyLabel(8)).toBe("About a week per pack");
+    expect(supplyLabel(11)).toBe("About ten days per pack");
     expect(supplyLabel(15)).toBe("About two weeks per pack");
     expect(supplyLabel(20)).toBe("About three weeks per pack");
     expect(supplyLabel(30)).toBe("About a month per pack");
@@ -182,8 +177,8 @@ describe("products", () => {
 
   it("says what every safety trait means, and nothing else", () => {
     // If the engine gains a trait, this fails until the product page knows how to explain it.
-    const explained = new Set(["shellfish", "pork", "porkUnconfirmed", "soy", "caffeine", "mayContainSugar", "stimulant", "clotting", "lowersBloodSugar", "mayLowerBp", "moodMedInteraction", "immuneActive", "sexualHealth", "topical"]);
-    const silent = new Set(["premium", "notInPregnancy"]); // premium isn't a safety fact; pregnancy is covered for every product
+    const explained = new Set(["shellfish", "pork", "porkUnconfirmed", "soy", "caffeine", "mayContainSugar", "stimulant", "clotting", "lowersBloodSugar", "mayLowerBp", "moodMedInteraction", "immuneActive", "sexualHealth", "topical", "notInPregnancy"]);
+    const silent = new Set(["premium"]); // premium isn't a safety fact
     for (const p of CATALOGUE) {
       for (const [trait, value] of Object.entries(p.traits)) {
         if (!value) continue;
@@ -195,6 +190,8 @@ describe("products", () => {
       for (const n of notes) expect(n).not.toMatch(/\b(cure|treat|prevent|heal)s?\b/i);
     }
     expect(checkNotes(PRODUCTS_BY_ID["arthroxtra"], "Amani").join(" ")).toMatch(/ask Amani first/);
+    // Label warnings read off the packs: Relivin Tea is made with green tea, and isn't for pregnancy.
+    expect(checkNotes(PRODUCTS_BY_ID["relivin-tea"], "Amani")).toEqual(expect.arrayContaining(["Contains caffeine.", "Not advised during pregnancy or breastfeeding."]));
   });
 });
 
