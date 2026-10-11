@@ -15,6 +15,11 @@ export function askMessage(sf: Storefront, product?: Product | null): string {
   return `Hi ${first}, I have a question about ${product.name}${offer ? ` (${kes(offer.price)})` : ""}.`;
 }
 
+/** From the results, for a goal where nothing in the range suits the customer. */
+export function goalMessage(sf: Storefront, goal: string): string {
+  return `Hi ${sf.distributor.firstName}, I did the recommendations on your page and nothing came up for ${goal} that suits me. Could you talk me through the options?`;
+}
+
 /** A wa.me link, or null when the storefront has no number yet (preview pages never message a real person). */
 export function whatsappHref(sf: Storefront, message: string): string | null {
   if (sf.status !== "live" || !sf.distributor.whatsapp) return null;

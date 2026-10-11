@@ -68,8 +68,9 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 - **One name for one action.** The guided path is "Find My Recommendations" everywhere it's a button
   (hero, phone bar, closing, empty order, product page), "Recommendations" in the nav, and "Your
   recommendations" once there's a result. Browsing is always a quieter link or button.
-- **One colour per role on a screen.** In the results, the whole plan is the main action (filled);
-  each product's own "Add to order" is outlined beside it. With a single product, it's filled.
+- **One colour per role on a screen.** In the results, the whole plan is the main action (the
+  plan bar on phones, the filled button in the plan summary on large screens); each product's own
+  "Add" is the same quieter pill as on the product cards.
 - **Steps.** "How it works" and "How ordering works" share one component (`ui/Steps`): sage numerals
   joined by a hairline, down the page on phones and across from tablet up.
 - **Eyebrows only where a heading is a name.** "Meet your distributor" sits over Kate's name; section
@@ -162,15 +163,37 @@ The engine decides; the interface renders. Presentation choices:
 
 ## Results
 
-1. The plan status if it needs a professional first (review, or clinic first with no products)
-2. **Your plan**: every suggested product in one short list (what it's for, price), the total and the
-   one main action, "Add the whole plan" (or "Add to order" for one product), in the first screen
-3. Based on what you told us (the engine's summary, goals in rank order, plan size)
-4. **Start with** / Also in your plan: each suggestion in detail (why it came up, cautions, what to
-   expect, price), each with its own quieter "Add to order"
-5. Worth considering later, what we left out and why, small changes that help, worth checking with a doctor
+Arranged the way the customer asked: one goal at a time, in the order they ranked them
+(`src/storefront/plan.ts`, tested). Every goal gets an answer, every product appears once, and the
+engine's words are used as they are.
+
+1. **The title and the plan in a sentence**: "Two products for energy and digestion. KES 7,300 for
+   a pack of each." It also says when a goal has nothing suitable, or can wait because the customer
+   asked to start small. "Change my answers" sits right under it. The title takes focus on arrival.
+2. The plan status if it needs a professional first (review, or clinic first with no products). The
+   engine's "we couldn't find a … product" notes move into their goal instead.
+3. **Goal by goal**: a sage numeral, "Your main goal" / "Goal 2", the goal's name, then its answer:
+   - the product: picture, name, pack and how long it lasts, why it came up, every caution (always
+     open), what to expect, price and "Add", in the same place as on the product cards;
+   - or "covered by … above", when one product answers two goals;
+   - or **"Nothing here suits you yet"**, with what was left out and why, and "Ask {first} about
+     {goal}" on WhatsApp;
+   - other good matches for that goal folded into one line ("2 more for digestion, for later") with
+     their packs, so the plan stays the focus. Opened, each shows its first reason, every caution
+     and its add;
+   - "Left out for you": products for that goal that don't suit, and why.
+4. Also worth a look (matches for something the customer said, not for a goal they named), worth
+   checking with a doctor, and anything else left out
+5. **Small changes that help**, introduced with what the customer told us ("You told us you're
+   sleeping less than you need…"), so the advice reads as an answer, not a list
 6. **Want to talk it through?** The engine's handoff message, sent to the distributor on WhatsApp
-7. Change my answers, start again, browse all products
+7. Start again, browse all products, the reference and the disclaimer
+
+**The plan stays in reach.** On phones a bar holds the plan's total and "Add the whole plan" from
+the first screen; once the plan is in the order it becomes "N items in your order · Review order".
+On large screens the plan sits beside the detail as an order summary (each product, what it's for,
+its price, the total, the main action, "Questions first? Message {first}"), sticky while scrolling.
+Adding the plan only adds what isn't in the order yet.
 
 A suggestion that isn't on the distributor's price list stays in the result with "Ask" instead of a
 price: pricing never changes what the engine recommends.

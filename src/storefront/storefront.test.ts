@@ -26,6 +26,7 @@ import {
 import photos from "./product-photos.json";
 import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel, supplyShort } from "./products";
 import { nextShown, partProgress, previousShown, resumeAt, sectionLead } from "./progress";
+import { listOf, planSentence, planView } from "./plan";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
 import { contrast, validateStorefront } from "./validate";
@@ -408,5 +409,87 @@ describe("priced suggestions", () => {
     expect(sparse.coreTotal).toBe(0);
     // The engine's choice is never changed by pricing.
     expect(sparse.core.map((s) => s.rec.product.id)).toEqual(result.core.map((r) => r.product.id));
+  });
+});
+
+describe("results, goal by goal", () => {
+  const base: Answers = {
+    first_name: "Wanjiru",
+    sex: "female",
+    age: 34,
+    pregnancy: "none",
+    experience: "never",
+    goals: ["energy", "digestion"],
+    energy_level: 2,
+    energy_dips: ["afternoon"],
+    gut_issues: ["constipation", "bloating"],
+    constipation_freq: "weekly",
+    meals: "home",
+    veg: "none",
+    sugary: "daily",
+    water: "low",
+    active: "none",
+    sleep_hours: "lt5",
+    alcohol: "none",
+    smoke: "yes",
+    conditions: ["none"],
+    medications: ["none"],
+    restrictions: ["none"],
+    plan_size: "focused",
+  };
+  const view = (a: Answers) => {
+    const result = recommend(a, { salt: "t" });
+    const priced = priceSuggestions(kate, result);
+    return { result, priced, view: planView(result, priced) };
+  };
+  const ids = (xs: { rec: { product: { id: string } } }[]) => xs.map((x) => x.rec.product.id);
+
+  it("answers every goal in the order it was ranked, and shows each product once", () => {
+    const { priced, view: v } = view(base);
+    expect(v.goals.map((g) => g.goal)).toEqual(["energy", "digestion"]);
+    expect(v.goals.every((g) => g.status === "picked")).toBe(true);
+    const shown = [...v.goals.flatMap((g) => [...ids(g.picks), ...ids(g.later)]), ...ids(v.extraPicks), ...ids(v.extraLater)];
+    expect(new Set(shown).size).toBe(shown.length);
+    expect(shown.sort()).toEqual([...ids(priced.core), ...ids(priced.addons)].sort());
+  });
+
+  it("says where nothing suits, and puts what was left out under the goal it was for", () => {
+    const { result, view: v } = view({
+      ...base,
+      goals: ["joints", "heart"],
+      joint_issues: ["pain", "stiffness"],
+      joint_duration: "long",
+      bone_risk: "no",
+      heart_concerns: ["bp", "cholesterol"],
+      restrictions: ["shellfish"],
+    });
+    const joints = v.goals[0];
+    expect(joints.status).toBe("unmet");
+    expect(joints.picks).toEqual([]);
+    expect(joints.leftOut.length).toBeGreaterThan(0);
+    expect(joints.leftOut.every((e) => /shellfish/.test(e.reason))).toBe(true);
+    // The engine's "couldn't find" note moves into the goal instead of repeating at the top.
+    expect(result.planNotes.some((n) => n.startsWith("We couldn't find a joints & bones product"))).toBe(true);
+    expect(v.notes.some((n) => n.startsWith("We couldn't find"))).toBe(false);
+    expect(v.unmet).toEqual(["joints"]);
+    expect(v.otherLeftOut.length + v.goals.reduce((n, g) => n + g.leftOut.length, 0)).toBe(result.excluded.length);
+  });
+
+  it("keeps a smaller plan small, and says the other goals can wait", () => {
+    const { view: v } = view({ ...base, plan_size: "one" });
+    expect(v.goals[0].status).toBe("picked");
+    expect(v.goals[1].status).toBe("waiting");
+    expect(v.waiting).toEqual(["digestion"]);
+  });
+
+  it("sums it up in plain words", () => {
+    const price = (n: number) => kes(n);
+    const a = view(base);
+    expect(planSentence(a.view, a.priced, { firstName: "Kate", price })).toBe(`Two products for energy and digestion. ${kes(a.priced.coreTotal)} for a pack of each.`);
+    const one = view({ ...base, plan_size: "one" });
+    expect(planSentence(one.view, one.priced, { firstName: "Kate", price })).toBe(
+      `One product for energy. ${kes(one.priced.coreTotal)} for one pack. Digestion can wait until you're ready.`,
+    );
+    expect(listOf(["a", "b", "c"])).toBe("a, b and c");
   });
 });

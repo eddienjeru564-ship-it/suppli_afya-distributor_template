@@ -80,9 +80,14 @@ test("help me choose: suggestions come with the reason, the price and a way to o
   await energyAndDigestion(page);
   const results = sheet(page);
   await expect(results.getByRole("heading", { name: "Wanjiru, here's what fits." })).toBeVisible();
-  await expect(results.getByRole("heading", { name: "Based on what you told us" })).toBeVisible();
-  await expect(results.getByText("Why this came up").first()).toBeVisible();
-  await expect(results.getByText("Your main goal is energy, followed by digestion.")).toBeVisible();
+  // The whole plan in a sentence, then one goal at a time, in the order they were ranked.
+  await expect(results.getByText(/^Two products for energy and digestion\. KES/)).toBeVisible();
+  const goals = results.locator("section[aria-labelledby^='goal-'] h2");
+  await expect(goals).toHaveText(["Energy", "Digestion"]);
+  // Each product says why it came up, with its price and its own add.
+  await expect(results.locator("section[aria-labelledby='goal-energy'] article li").first()).toBeVisible();
+  await expect(results.locator("section[aria-labelledby='goal-energy']").getByRole("button", { name: /^Add .+ to your order$/ })).toBeVisible();
+  await expect(results.getByRole("heading", { name: "Small changes that help" })).toBeVisible();
   await expect(results.getByRole("heading", { name: "Want to talk it through?" })).toBeVisible();
 
   await results.getByRole("button", { name: "Add the whole plan" }).click();
@@ -133,7 +138,9 @@ test("the questions flow on their own, and a quick extra tap never skips one", a
   // A short "putting it together" moment, then the result.
   await expect(sheet(page).getByRole("status")).toContainText("putting your recommendations together");
   await expect(sheet(page).getByRole("heading", { name: /^Wanjiru, here's/ })).toBeVisible();
-  await expect(sheet(page).getByRole("heading", { name: "Your plan" })).toBeVisible();
+  await expect(sheet(page).getByRole("heading", { name: "Energy", exact: true })).toBeVisible();
+  // Reading starts at the title.
+  await expect(sheet(page).getByRole("heading", { level: 1 })).toBeFocused();
 });
 
 test("the order keeps count: add from a card, change it, and the whole plan never doubles up", async ({ page }) => {
@@ -153,7 +160,8 @@ test("the order keeps count: add from a card, change it, and the whole plan neve
   await sheet(page).getByRole("button", { name: /Add the whole plan/ }).click();
   await expect(sheet(page).getByText("Suggested for you")).toHaveCount(2);
   await sheet(page).getByRole("button", { name: "Close" }).click();
-  await expect(sheet(page).getByRole("button", { name: /In your order · View/ })).toBeVisible();
+  // The plan's action now shows the order instead (a bar on phones, the summary on large screens).
+  await expect(sheet(page).getByRole("button", { name: /In your order · View|Review order/ })).toBeVisible();
   await expect(sheet(page).getByRole("button", { name: "Your order: 2 items" })).toBeVisible();
   // Survives a reload.
   await page.goto("/");
@@ -175,7 +183,7 @@ test("safety: a product that doesn't suit is left out, and the reason is given",
 
   const results = sheet(page);
   await expect(results.getByText("Check with your doctor or pharmacist first")).toBeVisible();
-  await expect(results.getByRole("heading", { name: "What we left out, and why" })).toBeVisible();
+  await expect(results.getByRole("heading", { name: "Left out for you" })).toBeVisible();
   await expect(results.getByText("One of its ingredients comes from pork, which you avoid.")).toBeVisible();
   await expect(results.getByRole("heading", { name: "ArthroXtra Tablets" })).toBeVisible();
 });
@@ -192,7 +200,7 @@ test("pregnancy: clinic first, and nothing is offered for sale", async ({ page }
   const results = sheet(page);
   await expect(results.getByRole("heading", { name: "Amina, let's start with your clinic." })).toBeVisible();
   await expect(results.getByText("Speak to your clinic first")).toBeVisible();
-  await expect(results.getByRole("button", { name: "Add to order" })).toHaveCount(0);
+  await expect(results.getByRole("button", { name: /^Add/ })).toHaveCount(0);
 });
 
 test("interests picked on the page carry into the questions, and are never asked twice", async ({ page }) => {
@@ -221,7 +229,8 @@ test("interests picked on the page carry into the questions, and are never asked
   await pick(page, "Most weeks");
   await dailyLife(page);
   await safety(page);
-  await expect(sheet(page).getByText("Your main goal is energy, followed by digestion.")).toBeVisible();
+  // The picks, in the order they were picked, are the goals the result answers.
+  await expect(sheet(page).locator("section[aria-labelledby^='goal-'] h2")).toHaveText(["Energy", "Digestion"]);
 });
 
 test("interests stay picked when you come back, up to three, and can be changed in the questions", async ({ page }) => {
