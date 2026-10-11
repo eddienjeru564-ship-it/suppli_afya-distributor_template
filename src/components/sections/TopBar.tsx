@@ -37,7 +37,7 @@ export function TopBar() {
       )}
     >
       <div className="container-x flex h-16 items-center gap-3">
-        <a href="#top" className="flex min-w-0 items-center gap-2.5" aria-label={`${d.name}, back to the top`}>
+        <a href="#top" className="flex min-h-11 min-w-0 items-center gap-2.5" aria-label={`${d.name}, back to the top`}>
           <Portrait distributor={d} size="sm" />
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[0.98rem] font-semibold text-ink">{d.name}</span>
@@ -51,7 +51,7 @@ export function TopBar() {
               key={n.id}
               type="button"
               onClick={() => goToSection(n.id)}
-              className="rounded-full px-3.5 py-2 text-[0.9rem] font-medium text-ink-2 transition-colors hover:bg-ink/[0.05] hover:text-ink"
+              className="h-11 rounded-full px-3.5 text-[0.9rem] font-medium text-ink-2 transition-colors hover:bg-ink/[0.05] hover:text-ink"
             >
               {n.label}
             </button>

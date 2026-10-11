@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import { PRODUCTS_BY_ID } from "@/engine";
 import { PackArt } from "@/components/product/PackArt";
@@ -190,13 +191,13 @@ function OrderFlow() {
       </SheetHeader>
 
       <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={step} {...slide} transition={{ duration: 0.25, ease }} className="flex min-h-0 flex-1 flex-col">
+        <m.div key={step} {...slide} transition={{ duration: 0.25, ease }} className="flex min-h-0 flex-1 flex-col">
           {step === "review" && <Review onNext={() => setStep("details")} />}
           {step === "details" && (
             <Details details={details} setDetails={setDetails} order={order} problem={problem} onSend={send} onPlace={place} placing={placing} />
           )}
           {step === "sent" && sentOrder && <Sent order={sentOrder} onAgain={() => openChat(sentOrder.message, `Your order to ${first}`)} />}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </>
   );
@@ -255,7 +256,7 @@ function Review({ onNext }: { onNext: () => void }) {
         <ul className="grid gap-2.5">
           <AnimatePresence initial={false}>
             {priced.lines.map((l) => (
-              <motion.li
+              <m.li
                 key={l.id}
                 layout
                 initial={{ opacity: 0, y: 8 }}
@@ -280,7 +281,7 @@ function Review({ onNext }: { onNext: () => void }) {
                     <span className="price font-semibold text-ink">{kes(l.total)}</span>
                   </div>
                 </div>
-              </motion.li>
+              </m.li>
             ))}
           </AnimatePresence>
         </ul>
@@ -373,9 +374,9 @@ function Details({
           {modes.length > 1 && (
             <Field label="How would you like to get it?">
               <div className="grid grid-cols-2 gap-2" role="radiogroup">
-                {modes.map((m) => (
-                  <Choice key={m} selected={details.receive === m} onSelect={() => set({ receive: m })}>
-                    {m === "delivery" ? "Delivery" : "Collect"}
+                {modes.map((mode) => (
+                  <Choice key={mode} selected={details.receive === mode} onSelect={() => set({ receive: mode })}>
+                    {mode === "delivery" ? "Delivery" : "Collect"}
                   </Choice>
                 ))}
               </div>
@@ -416,9 +417,9 @@ function Details({
           {sf.payment.methods.length > 0 && (
             <Field label="How will you pay?">
               <div className="grid grid-cols-2 gap-2" role="radiogroup">
-                {sf.payment.methods.map((m) => (
-                  <Choice key={m} selected={details.payment === m} onSelect={() => set({ payment: m })}>
-                    {m === "mpesa" ? "M-Pesa" : details.receive === "pickup" ? "Cash when I collect" : "Cash on delivery"}
+                {sf.payment.methods.map((method) => (
+                  <Choice key={method} selected={details.payment === method} onSelect={() => set({ payment: method })}>
+                    {method === "mpesa" ? "M-Pesa" : details.receive === "pickup" ? "Cash when I collect" : "Cash on delivery"}
                   </Choice>
                 ))}
               </div>
@@ -456,7 +457,7 @@ function Details({
       <SheetFooter>
         <AnimatePresence>
           {problem && (
-            <motion.p
+            <m.p
               role="alert"
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -464,7 +465,7 @@ function Details({
               className="mb-2.5 text-center text-[0.88rem] font-medium text-caution"
             >
               {problem}
-            </motion.p>
+            </m.p>
           )}
         </AnimatePresence>
         {direct ? (
@@ -503,7 +504,7 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
   const reduce = useReducedMotion();
   const [copied, setCopied] = useState(false);
   const first = sf.distributor.firstName;
-  const m = sf.payment.mpesa;
+  const mpesa = sf.payment.mpesa;
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(order.message);
@@ -515,14 +516,14 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
   };
   return (
     <SheetBody className="px-5 pb-8">
-      <motion.div
+      <m.div
         initial={reduce ? false : { scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 380, damping: 22 }}
         className="grid h-14 w-14 place-items-center rounded-full bg-accent text-on-accent"
       >
         <Check className="h-6 w-6" />
-      </motion.div>
+      </m.div>
       {order.via === "placed" ? (
         <>
           <h2 className="display-card mt-5 text-ink">{first} has your order.</h2>
@@ -549,12 +550,12 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
         <Row label="Order reference" value={<span className="font-mono">{order.ref}</span>} />
         <Row label={order.totalConfirmed ? "Total" : "Total before delivery"} value={kes(order.total)} strong />
       </dl>
-      {m && (
+      {mpesa && (
         <p className="mt-4 text-[0.92rem] leading-relaxed text-ink-2">
-          When {first} confirms, pay by <span className="whitespace-nowrap">M-Pesa</span> to {m.kind === "till" ? "Till" : "Paybill"}{" "}
-          <span className="font-semibold text-ink">{m.number}</span>
-          {m.account ? `, account ${m.account}` : ""}
-          {m.name ? ` (${m.name})` : ""}.
+          When {first} confirms, pay by <span className="whitespace-nowrap">M-Pesa</span> to {mpesa.kind === "till" ? "Till" : "Paybill"}{" "}
+          <span className="font-semibold text-ink">{mpesa.number}</span>
+          {mpesa.account ? `, account ${mpesa.account}` : ""}
+          {mpesa.name ? ` (${mpesa.name})` : ""}.
         </p>
       )}
       {order.via === "placed" ? (

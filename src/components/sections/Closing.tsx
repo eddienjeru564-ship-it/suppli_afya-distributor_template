@@ -62,11 +62,11 @@ export function Footer() {
       <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
         <span suppressHydrationWarning>
           © {new Date().getFullYear()} {d.name} ·{" "}
-          <Link href="/privacy" className="underline-offset-4 hover:text-ink hover:underline">
+          <Link href="/privacy" className="-my-3 inline-block py-3 underline-offset-4 hover:text-ink hover:underline">
             Privacy
           </Link>
         </span>
-        <a href={process.env.NEXT_PUBLIC_SUPPLI_AFYA_SITE || "https://suppliafya.co.ke"} className="inline-flex items-center gap-2 hover:text-ink" rel="noopener">
+        <a href={process.env.NEXT_PUBLIC_SUPPLI_AFYA_SITE || "https://suppliafya.co.ke"} className="inline-flex min-h-11 items-center gap-2 hover:text-ink" rel="noopener">
           <span>Powered by</span>
           <SuppliMark />
         </a>

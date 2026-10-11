@@ -106,7 +106,7 @@ function Interests() {
             <button
               type="button"
               onClick={() => openSelector({ fresh: true })}
-              className="text-[0.86rem] font-semibold text-ink-2 underline decoration-ink/25 underline-offset-4 hover:text-ink hover:decoration-ink"
+              className="-my-2 py-2 text-[0.86rem] font-semibold text-ink-2 underline decoration-ink/25 underline-offset-4 hover:text-ink hover:decoration-ink"
             >
               Start again
             </button>
@@ -154,7 +154,7 @@ function Interests() {
             type="button"
             aria-expanded={showAll}
             onClick={() => setShowAll((v) => !v)}
-            className="mt-3 inline-flex h-10 items-center gap-1.5 rounded-full px-1 text-[0.9rem] font-semibold text-ink-2 transition-colors hover:text-ink"
+            className="mt-3 inline-flex h-11 items-center gap-1.5 rounded-full px-1 text-[0.9rem] font-semibold text-ink-2 transition-colors hover:text-ink"
           >
             {showAll ? "Show fewer" : `View all interests (${hiddenCount} more)`}
             <ChevronDown className={clsx("h-4 w-4 transition-transform duration-300", showAll && "rotate-180")} />
@@ -261,7 +261,7 @@ function YourSuggestions() {
         <button
           type="button"
           onClick={() => openSelector({ fresh: true })}
-          className="mt-4 text-[0.84rem] font-medium text-ink-3 underline-offset-4 hover:text-ink hover:underline"
+          className="mt-2 inline-flex min-h-11 items-center text-[0.84rem] font-medium text-ink-3 underline-offset-4 hover:text-ink hover:underline"
         >
           Start again with different answers
         </button>

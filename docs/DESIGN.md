@@ -77,6 +77,27 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when
   something is added, the "+" becomes a quantity stepper. Everything honours "reduce motion".
 
+## Speed and reach
+
+Most customers arrive on a mid-range Android on prepaid data, so the first screen is built to be readable
+before any script runs, and as little as possible is sent up front.
+
+- **Sheets load on first use.** The questions, product, order and message sheets (`components/Overlays.tsx`)
+  are fetched when first opened, and quietly in the background once the phone is idle, so opening one is
+  still instant.
+- **Animation engine after the page.** Components use the light `m` elements (`motion/react-m`);
+  `LazyMotion` (`ui/MotionProvider.tsx`) loads the engine when the phone is idle. `strict` stops a full
+  `motion` element from bringing it back into the first load.
+- **One display font instance.** Newsreader is self-hosted as regular and italic at one weight and optical
+  size, Latin only: about 47 KB, against 278 KB for the full variable family.
+- **Text never waits.** The hero's words are on screen from the first paint and only drift into place
+  (`.settle`); section heads move as they scroll in but never fade, so text is always at full contrast.
+- **Readable and tappable.** No text under 12px, and every link or button has at least a 44px tap area,
+  including text links ("Browse all 29 products", footer links).
+
+Measured on a Pixel 7 profile with 4x CPU slowdown and slow 4G: the main content paints in about 1.6s
+(was 3.3s), with no layout shift and no automated accessibility violations (axe, WCAG 2.1 AA).
+
 ## The page, and why it's in this order
 
 | Section | Job |
@@ -86,7 +107,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | What would you like help with? | The first step of the recommendations, on the page. Six broad interests, "View all interests" opens the rest in place. Pick up to three (numbered: the first counts most) or none, then one filled Continue. Picks become the selector's goals answer, so the goals question is stepped over, the opening screen says what came with them, and the goals part opens with "You picked … Change". With none, the selector asks about goals as usual. Picks stay when you come back. After a result, this section shows the suggestions with prices |
 | How it works | Three steps: answer a few questions, see what may suit you (with reasons and prices, and what's left out), order from the distributor or ask first |
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
-| How ordering works | Four steps, then delivery, payment and prices, answered plainly |
+| How ordering works | Four steps, with what the prices mean in the intro, then delivery and payment, answered plainly |
 | Meet your distributor | Their photo (or, in a preview, where it will go) beside their name, role, own words, where they are and the languages they chat in, how to reach them, and that the page is theirs, not BF Suma's |
 | Still deciding? | A low-pressure last ask, on sage: the one strong colour is the green "Message Kate" button, with recommendations as the quieter second choice |
 

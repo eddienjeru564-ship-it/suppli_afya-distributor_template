@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import type { Product } from "@/engine";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Plus } from "@/components/ui/icons";
@@ -15,7 +16,7 @@ export function AddButton({ product, className, from }: { product: Product; clas
     <div className={clsx("relative z-10 flex h-11 items-center justify-end", className)}>
       <AnimatePresence initial={false} mode="popLayout">
         {qty === 0 ? (
-          <motion.button
+          <m.button
             key="add"
             type="button"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -27,9 +28,9 @@ export function AddButton({ product, className, from }: { product: Product; clas
             className="grid h-11 w-11 place-items-center rounded-full bg-ink text-canvas transition-colors hover:bg-black active:scale-95"
           >
             <Plus />
-          </motion.button>
+          </m.button>
         ) : (
-          <motion.div
+          <m.div
             key="qty"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -43,7 +44,7 @@ export function AddButton({ product, className, from }: { product: Product; clas
               onChange={(n) => setQty(product.id, n)}
               onRemove={() => removeFromOrder(product.id)}
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

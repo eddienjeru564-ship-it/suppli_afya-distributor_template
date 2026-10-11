@@ -20,11 +20,12 @@ import { listings, shortName } from "@/storefront/products";
 export function Hero() {
   const { sf, openSelector, goToSection } = useStorefront();
   const count = Object.keys(sf.catalogue.offers).length;
-  const rise = (i: number) => ({ className: "rise", style: { "--i": i } as CSSProperties });
+  // The words are on screen from the first paint and only settle into place; nothing waits on them.
+  const rise = (i: number) => ({ className: "settle", style: { "--i": i } as CSSProperties });
 
   return (
     <section id="top" aria-labelledby="hero-title" className="relative">
-      <div className="container-x grid grid-cols-1 gap-12 pb-16 pt-8 md:pt-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16 lg:pb-24 lg:pt-16">
+      <div className="container-x grid grid-cols-1 gap-9 pb-16 pt-6 sm:gap-12 sm:pt-8 md:pt-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-16 lg:pb-24 lg:pt-16">
         <div>
           <h1 {...rise(0)} id="hero-title">
             {/* Broken by hand so the promise reads in three even lines at every width. */}
@@ -35,7 +36,7 @@ export function Hero() {
             </span>
           </h1>
           <p {...rise(1)}>
-            <span className="lede mt-6 block max-w-[32rem]">
+            <span className="lede mt-5 block max-w-[32rem] sm:mt-6">
               Answer a few simple questions about your wellness goals and get personalised recommendations to help you
               explore the BF Suma products that may be right for you.
             </span>
@@ -43,7 +44,7 @@ export function Hero() {
 
           <div {...rise(2)}>
             {/* Phones: the button, what it takes, then the quieter way in. Wider: side by side. */}
-            <div className="mt-9 grid grid-cols-1 justify-items-center sm:grid-cols-[auto_auto] sm:items-center sm:justify-start sm:gap-x-8">
+            <div className="mt-7 grid grid-cols-1 justify-items-center sm:mt-9 sm:grid-cols-[auto_auto] sm:items-center sm:justify-start sm:gap-x-8">
               <Button variant="accent" size="lg" arrow onClick={() => openSelector()} className="w-full px-7 sm:w-auto">
                 Find My Recommendations
               </Button>
@@ -56,7 +57,7 @@ export function Hero() {
                   e.preventDefault();
                   goToSection("products");
                 }}
-                className="mt-6 text-[0.98rem] font-semibold text-ink underline decoration-ink/25 decoration-1 underline-offset-[6px] transition-colors hover:decoration-ink sm:mt-0"
+                className="mt-2 inline-flex min-h-11 items-center text-[0.98rem] font-semibold text-ink underline decoration-ink/25 decoration-1 underline-offset-[6px] transition-colors hover:decoration-ink sm:mt-0"
               >
                 Browse all {count} products
               </a>
@@ -105,9 +106,9 @@ function StillLife() {
           >
             <span className="rise block" style={{ "--i": i } as CSSProperties}>
               <span className="block overflow-hidden rounded-[1rem] bg-white shadow-[0_1px_2px_rgb(28_26_23/0.05),0_12px_28px_-18px_rgb(28_26_23/0.32)] ring-1 ring-ink/[0.05] transition-[translate,box-shadow] duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1 group-hover:shadow-[0_1px_2px_rgb(28_26_23/0.05),0_18px_36px_-18px_rgb(28_26_23/0.36)]">
-                <PackArt product={l!.product} className="aspect-[4/5] w-full" sizes="(min-width: 1024px) 14rem, 40vw" />
+                <PackArt product={l!.product} className="aspect-[4/5] w-full" sizes="(min-width: 1024px) 14rem, 40vw" eager={l === center} />
                 <span className="flex flex-col items-center border-t border-ink/[0.05] px-2 pb-2.5 pt-2 text-center leading-tight sm:pb-3 sm:pt-2.5">
-                  <span className="line-clamp-2 max-w-full text-balance text-[0.68rem] font-medium text-ink-3 sm:text-[0.76rem]">
+                  <span className="line-clamp-2 max-w-full text-balance text-[0.75rem] font-medium text-ink-3 sm:text-[0.8rem]">
                     {shortName(l!.product)}
                   </span>
                   <span className="price mt-0.5 whitespace-nowrap text-[0.8rem] font-semibold text-ink sm:text-[0.9rem]">
@@ -124,7 +125,7 @@ function StillLife() {
       <div className="relative z-10 mx-4 -mt-9 flex items-center gap-3 rounded-[1.1rem] bg-surface p-3 shadow-[0_1px_2px_rgb(28_26_23/0.06),0_16px_36px_-20px_rgb(28_26_23/0.4)] ring-1 ring-ink/[0.06] sm:mx-10 lg:absolute lg:-bottom-7 lg:left-7 lg:mx-0 lg:mt-0 lg:w-[22.5rem]">
         <Portrait distributor={d} size="md" />
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="whitespace-nowrap text-[0.7rem] font-medium uppercase tracking-[0.1em] text-ink-3">Your distributor</div>
+          <div className="whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-ink-3">Your distributor</div>
           <div className="mt-1 truncate text-[1rem] font-semibold text-ink">{d.name}</div>
           {d.area && (
             <div className="mt-0.5 flex items-center gap-1 text-[0.8rem] text-ink-3">

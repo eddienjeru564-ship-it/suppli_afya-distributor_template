@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useState } from "react";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
@@ -56,7 +57,7 @@ export function MobileBar() {
   return (
     <AnimatePresence>
       {show && (
-        <motion.div
+        <m.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
@@ -68,7 +69,7 @@ export function MobileBar() {
               <>
                 <div className="min-w-0 flex-1 pl-2.5 leading-tight" aria-live="polite">
                   <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
+                    <m.div
                       key={justAdded ? justAdded.id : "count"}
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -77,7 +78,7 @@ export function MobileBar() {
                       className={clsx("truncate text-[0.78rem]", justAdded ? "font-semibold text-white" : "text-white/60")}
                     >
                       {justAdded ? justAdded.text : `${priced.count} ${priced.count === 1 ? "item" : "items"} in your order`}
-                    </motion.div>
+                    </m.div>
                   </AnimatePresence>
                   <div className="price text-[1.02rem] font-semibold">{kes(priced.subtotal)}</div>
                 </div>
@@ -101,7 +102,7 @@ export function MobileBar() {
               </>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -126,7 +127,7 @@ export function Toaster() {
     >
       <AnimatePresence>
         {toast && !quiet && (
-          <motion.div
+          <m.div
             key={toast.id}
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -147,7 +148,7 @@ export function Toaster() {
                 {toast.action.label}
               </button>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

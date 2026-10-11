@@ -52,6 +52,7 @@ export function PackArt({
   thumb,
   center,
   sizes,
+  eager,
 }: {
   product: Product;
   className?: string;
@@ -67,6 +68,8 @@ export function PackArt({
   center?: boolean;
   /** How wide the stage is drawn, for picking the photo's resolution (`next/image` sizes). */
   sizes?: string;
+  /** The first thing people see (the hero's centre pack): fetched first, not lazily. */
+  eager?: boolean;
 }) {
   const printed = label ?? !thumb;
   const tone = LINE_TONE[product.line];
@@ -86,6 +89,7 @@ export function PackArt({
             src={thumb ? photo.small : photo.src}
             alt=""
             fill
+            {...(eager ? { loading: "eager" as const, fetchPriority: "high" as const } : {})}
             sizes={sizes ?? (thumb ? "96px" : "(min-width: 1024px) 32rem, 90vw")}
             className="object-contain"
           />

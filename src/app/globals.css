@@ -215,20 +215,36 @@
     animation: rise 0.8s var(--ease-out) both;
     animation-delay: calc(var(--i, 0) * 70ms);
   }
-  /* Sections fade up as they scroll into view, where the browser can do it without script. */
+  /* For the first words on the page: visible from the first paint, they only drift into place. */
+  .settle {
+    animation: settle 0.7s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+  /* Section heads drift up as they scroll into view, where the browser can do it without script.
+     Movement only, never transparency: text is always at full contrast. */
   @supports (animation-timeline: view()) {
     .reveal {
-      animation: rise linear both;
+      animation: settle linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 55%;
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .rise,
+    .settle,
     .reveal,
     .interest-in {
       animation: none;
     }
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: none;
   }
 }
 

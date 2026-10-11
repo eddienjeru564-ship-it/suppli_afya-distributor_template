@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { useState, type ReactNode } from "react";
 import { GOALS_BY_ID, whatsappMessage, type Answers, type EngineResult } from "@/engine";
 import { Portrait } from "@/components/brand/Portrait";
@@ -28,14 +29,14 @@ const PREFERENCE: Record<string, string> = {
 function Appear({ children, i = 0, className }: { children: ReactNode; i?: number; className?: string }) {
   const reduce = useReducedMotion();
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay: 0.07 * i, ease }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -276,7 +277,7 @@ export function Results({
       {/* The order, one tap away while reading. */}
       <AnimatePresence>
         {cart.count > 0 && (
-          <motion.div
+          <m.div
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
@@ -294,7 +295,7 @@ export function Results({
                 Review order
               </Button>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -316,12 +317,13 @@ function SuggestionCard({ s, result, lead, planBelow }: { s: Suggestion; result:
           type="button"
           onClick={() => openProduct(p.id)}
           aria-label={`More about ${p.name}`}
-          className={clsx("group block shrink-0", !lead && "sm:w-40")}
+          // Phones: the lead keeps a short picture; the others show a thumbnail beside the name instead.
+          className={clsx("group block shrink-0", !lead && "hidden sm:block sm:w-40")}
         >
           <PackArt
             product={p}
             center
-            className={clsx(lead ? "aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[20rem]" : "aspect-[2/1] w-full sm:aspect-auto sm:h-full")}
+            className={clsx(lead ? "aspect-[2/1] w-full sm:aspect-[16/10] md:aspect-auto md:h-full md:min-h-[20rem]" : "aspect-[2/1] w-full sm:aspect-auto sm:h-full")}
             sizes={lead ? "(min-width: 768px) 15rem, 100vw" : "(min-width: 640px) 10rem, 100vw"}
             packClassName="transition-transform duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1.5"
           />
@@ -339,9 +341,18 @@ function SuggestionCard({ s, result, lead, planBelow }: { s: Suggestion; result:
               })}
             </div>
           )}
-          <h4 className={clsx("mt-3 text-ink", lead ? "display-card" : "font-display text-[1.35rem] leading-tight")}>{p.name}</h4>
-          <div className="meta mt-1">
-            {packOf(p, listing?.offer) ?? FORMAT_LABEL[p.format]} · {supplyLabel(p.supplyDays)}
+          <div className="mt-3 flex items-center gap-3.5">
+            {!lead && (
+              <button type="button" onClick={() => openProduct(p.id)} aria-label={`More about ${p.name}`} className="shrink-0 sm:hidden">
+                <PackArt product={p} thumb className="aspect-square w-16 rounded-xl ring-1 ring-ink/[0.06]" />
+              </button>
+            )}
+            <div className="min-w-0">
+              <h4 className={clsx("text-ink", lead ? "display-card" : "font-display text-[1.35rem] leading-tight")}>{p.name}</h4>
+              <div className="meta mt-1">
+                {packOf(p, listing?.offer) ?? FORMAT_LABEL[p.format]} · {supplyLabel(p.supplyDays)}
+              </div>
+            </div>
           </div>
 
           <div className="mt-5">
@@ -488,7 +499,7 @@ function Handoff({ result, answers }: { result: EngineResult; answers: Answers }
       </p>
       <AnimatePresence initial={false}>
         {preview && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -496,7 +507,7 @@ function Handoff({ result, answers }: { result: EngineResult; answers: Answers }
             className="overflow-hidden"
           >
             <ChatPreview message={message} to={d.name} className="mt-5" />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </section>

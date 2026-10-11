@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useMemo, type ReactNode } from "react";
 import { GOALS_BY_ID, deriveProfile, profileFlags, pruneAnswers, type Answers } from "@/engine";
 import { summarise } from "@/engine/advice";
@@ -89,7 +90,7 @@ export function SoFar({ answers }: { answers: Answers }) {
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
@@ -99,6 +100,6 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
     >
       <dt className="text-[0.78rem] text-ink-3">{label}</dt>
       <dd className="mt-1.5 text-[0.95rem] leading-snug text-ink">{children}</dd>
-    </motion.div>
+    </m.div>
   );
 }

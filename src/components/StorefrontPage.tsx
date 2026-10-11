@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { OrderSheet } from "@/components/order/OrderSheet";
-import { ProductSheet } from "@/components/product/ProductSheet";
 import { About } from "@/components/sections/About";
 import { Catalogue } from "@/components/sections/Catalogue";
 import { ChooseSection } from "@/components/sections/ChooseSection";
@@ -8,12 +6,11 @@ import { Closing, Footer } from "@/components/sections/Closing";
 import { Hero } from "@/components/sections/Hero";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { MobileBar, Toaster } from "@/components/sections/MobileBar";
+import { Overlays } from "@/components/Overlays";
 import { Ordering } from "@/components/sections/Ordering";
 import { TopBar } from "@/components/sections/TopBar";
-import { SelectorOverlay } from "@/components/selector/SelectorOverlay";
 import { PageShell } from "@/components/store/PageShell";
 import { StorefrontProvider } from "@/components/store/StorefrontProvider";
-import { MessageSheet } from "@/components/whatsapp/MessageSheet";
 import { canPlaceOrders } from "@/storefront/order";
 import { themeCss } from "@/storefront/theme";
 import type { Storefront } from "@/storefront/types";
@@ -50,10 +47,7 @@ export function StorefrontPage({ sf }: { sf: Storefront }) {
           <MobileBar />
         </PageShell>
         <Toaster />
-        <SelectorOverlay />
-        <ProductSheet />
-        <OrderSheet />
-        <MessageSheet />
+        <Overlays />
       </StorefrontProvider>
     </>
   );

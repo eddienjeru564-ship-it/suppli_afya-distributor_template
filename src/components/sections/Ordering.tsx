@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useStorefront } from "@/components/store/StorefrontProvider";
-import { Tag, Truck, Wallet } from "@/components/ui/icons";
+import { Truck, Wallet } from "@/components/ui/icons";
 import { keepTogether } from "@/components/ui/KeepTogether";
 import { Reveal } from "@/components/ui/Reveal";
 import { Steps } from "@/components/ui/Steps";
@@ -45,13 +45,14 @@ export function Ordering() {
             How ordering works
           </h2>
           <p className="mt-4 max-w-[34rem] text-[1rem] leading-relaxed text-ink-2">
-            No account and no card details. Your order goes straight to {first}, who confirms it with you before you pay.
+            No account and no card details. The prices are {first}&apos;s own, in Kenyan shillings, for one pack. Your order goes
+            straight to {first}, who confirms it and any delivery cost with you before you pay.
           </p>
         </Reveal>
 
         <Steps steps={steps} className="mt-10 sm:mt-12" />
 
-        <div className="mt-14 grid gap-3 md:grid-cols-3 md:gap-4">
+        <div className="mt-12 grid grid-cols-1 gap-3 md:mt-14 md:grid-cols-2 md:gap-4">
           <InfoCard icon={<Truck />} title={delivery ? "Delivery" : "Collection"}>
             <ul className="grid gap-2">
               {delivery?.areas.map((a) => (
@@ -82,12 +83,6 @@ export function Ordering() {
               )}
             </p>
             <p className="mt-3 text-[0.88rem] text-ink-3">{keepTogether("This page never asks for a card number or an M-Pesa PIN.")}</p>
-          </InfoCard>
-          <InfoCard icon={<Tag />} title="Prices">
-            <p>
-              The prices here are {first}&apos;s own, in Kenyan shillings, for one pack. Delivery, if there&apos;s a cost, is
-              agreed with you before you pay.
-            </p>
           </InfoCard>
         </div>
       </div>

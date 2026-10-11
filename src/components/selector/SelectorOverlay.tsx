@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   GOALS_BY_ID,
@@ -198,14 +199,14 @@ function Selector() {
             {sectionProgress.map((s) => (
               <div key={s.id} className="flex-1">
                 <div className="h-1 overflow-hidden rounded-full bg-ink/10">
-                  <motion.div
+                  <m.div
                     className="h-full rounded-full bg-accent"
                     initial={false}
                     animate={{ width: `${Math.round(s.fill * 100)}%` }}
                     transition={{ duration: 0.5, ease }}
                   />
                 </div>
-                <div className={clsx("mt-1.5 hidden text-[0.7rem] font-semibold sm:block", s.current ? "text-ink" : "text-ink-3")}>{s.label}</div>
+                <div className={clsx("mt-1.5 hidden text-[0.75rem] font-semibold sm:block", s.current ? "text-ink" : "text-ink-3")}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -273,12 +274,12 @@ function Selector() {
         <div ref={scrollRef} className="thin-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <AnimatePresence mode="wait" initial={false}>
             {showingResult && result ? (
-              <motion.div {...slide("result")}>
+              <m.div {...slide("result")}>
                 <Results result={result} answers={outcome!.answers} onEdit={back} onRestart={restart} />
-              </motion.div>
+              </m.div>
             ) : (
               q && (
-                <motion.div {...slide(q.id)} className="mx-auto flex min-h-full max-w-xl flex-col px-5 pb-6 pt-4 sm:px-8 sm:pt-10">
+                <m.div {...slide(q.id)} className="mx-auto flex min-h-full max-w-xl flex-col px-5 pb-6 pt-4 sm:px-8 sm:pt-10">
                   <QuestionView
                     q={q}
                     answers={answers}
@@ -291,7 +292,7 @@ function Selector() {
                     onSelectAdvance={selectAndAdvance}
                     onNext={() => next()}
                   />
-                </motion.div>
+                </m.div>
               )
             )}
           </AnimatePresence>
@@ -396,7 +397,7 @@ function QuestionView({
               <button
                 type="button"
                 onClick={onEditGoals}
-                className="font-semibold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+                className="-my-2 py-2 font-semibold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
               >
                 Change
               </button>

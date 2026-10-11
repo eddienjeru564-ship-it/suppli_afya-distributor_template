@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { useDeferredValue, useMemo, useState } from "react";
 import { GOALS, GOALS_BY_ID, type GoalId } from "@/engine";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -14,8 +15,9 @@ import { dateLabel } from "@/storefront/dates";
 import { askMessage } from "@/storefront/messages";
 import { listings, matchesQuery, servesGoal } from "@/storefront/products";
 
-/** How many products show before "Show all": enough to scan, not a wall. */
+/** How many products show before "Show all": enough to scan, not a wall (four of these on phones, where each is a full row). */
 const FIRST_VIEW = 6;
+const PHONE_VIEW = 4;
 
 /**
  * For customers who know what they want: find it by name, or narrow by what it's for.
@@ -107,7 +109,7 @@ export function Catalogue() {
             <button
               type="button"
               onClick={() => openSelector({ goal })}
-              className="group inline-flex items-center gap-1.5 text-[0.9rem] font-semibold text-accent"
+              className="group inline-flex min-h-11 items-center gap-1.5 text-[0.9rem] font-semibold text-accent"
             >
               Not sure which? Get recommendations
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -138,23 +140,23 @@ export function Catalogue() {
             </div>
           </div>
         ) : (
-          <motion.ul layout={!reduce} className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
+          <m.ul layout={!reduce} className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
             <AnimatePresence initial={false} mode="popLayout">
-              {shown.map((l) => (
-                <motion.li
+              {shown.map((l, i) => (
+                <m.li
                   key={l.product.id}
                   layout={!reduce}
                   initial={reduce ? false : { opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={reduce ? undefined : { opacity: 0, scale: 0.98 }}
                   transition={{ duration: 0.25 }}
-                  className="flex"
+                  className={clsx("flex", !narrowing && !expanded && i >= PHONE_VIEW && "max-sm:hidden")}
                 >
                   <ProductCard listing={l} className="w-full" />
-                </motion.li>
+                </m.li>
               ))}
             </AnimatePresence>
-          </motion.ul>
+          </m.ul>
         )}
 
         {hidden > 0 && (

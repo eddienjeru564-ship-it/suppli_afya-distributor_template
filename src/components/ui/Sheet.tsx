@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion, useDragControls, useReducedMotion, type PanInfo } from "motion/react";
+import { AnimatePresence, useDragControls, useReducedMotion, type PanInfo } from "motion/react";
+import * as m from "motion/react-m";
 import { createContext, useContext, useEffect, useId, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Close } from "./icons";
@@ -187,7 +188,7 @@ export function Sheet({
       {open && (
         <div className="fixed inset-0" style={{ zIndex: z }} inert={covered}>
           {kind !== "screen" && (
-            <motion.div
+            <m.div
               aria-hidden
               className="absolute inset-0 bg-[rgb(20_18_16/0.42)]"
               initial={{ opacity: 0 }}
@@ -197,7 +198,7 @@ export function Sheet({
               onClick={onClose}
             />
           )}
-          <motion.div
+          <m.div
             ref={panel}
             data-sheet=""
             role="dialog"
@@ -228,7 +229,7 @@ export function Sheet({
             )}
           >
             <Ctx.Provider value={{ titleId, startDrag: (e) => drag.start(e), close: onClose, mobileSheet }}>{children}</Ctx.Provider>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>,

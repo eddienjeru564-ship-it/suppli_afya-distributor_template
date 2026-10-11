@@ -12,7 +12,7 @@ export function HowItWorks() {
   const steps = [
     {
       title: "Tell us what you'd like help with",
-      body: "A few short questions about your goals, your day and any medicines you take. About 3 minutes, no account.",
+      body: "A few short questions about your goals, your day and any medicines you take. About 3 minutes.",
     },
     {
       title: "See what may suit you",

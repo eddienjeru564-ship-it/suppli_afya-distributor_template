@@ -7,7 +7,8 @@
  */
 
 import clsx from "clsx";
-import { motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import type { Question, QuestionOption } from "@/engine";
 import { Check } from "@/components/ui/icons";
 
@@ -82,7 +83,7 @@ export function SingleChoice({
       {options.map((o, i) => {
         const selected = value === o.id;
         return (
-          <motion.button
+          <m.button
             key={o.id}
             type="button"
             role="radio"
@@ -93,7 +94,7 @@ export function SingleChoice({
           >
             <Radio selected={selected} />
             <Label o={o} />
-          </motion.button>
+          </m.button>
         );
       })}
     </div>
@@ -122,7 +123,7 @@ export function MultiChoice({
         const selected = idx >= 0;
         const disabled = !selected && full && !o.exclusive;
         return (
-          <motion.button
+          <m.button
             key={o.id}
             type="button"
             role="checkbox"
@@ -134,7 +135,7 @@ export function MultiChoice({
           >
             <Box selected={selected} rank={ranked ? idx + 1 : undefined} />
             <Label o={o} />
-          </motion.button>
+          </m.button>
         );
       })}
     </div>
@@ -157,7 +158,7 @@ export function Scale({
         {[1, 2, 3, 4, 5].map((n, i) => {
           const selected = value === n;
           return (
-            <motion.button
+            <m.button
               key={n}
               type="button"
               role="radio"
@@ -173,7 +174,7 @@ export function Scale({
               {...enter(i)}
             >
               {n}
-            </motion.button>
+            </m.button>
           );
         })}
       </div>
