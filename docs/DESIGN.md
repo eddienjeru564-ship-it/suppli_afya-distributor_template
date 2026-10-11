@@ -36,7 +36,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | sunken | `#ebe8e1` | Quiet fills |
 | white | `#ffffff` | Product stages: every pack, photo or drawing, stands on white |
 | ink / ink-2 / ink-3 | `#1c1a17` / `#48443d` / `#6b655c` | Text, all at 4.5:1 or better on canvas |
-| night | `#171614` | The selector's panel, order bar, handoff: the "instrument" surfaces |
+| night | `#171614` | Only the floating order bars: they sit over everything, so they need the contrast |
 | accent | per distributor | Kate: jacaranda `#4b3a8c` (Nairobi's October trees). Guided actions, selection, progress |
 | caution | `#8f4418` on `#f7e8da` | Cautions and "check with your doctor" |
 | WhatsApp | `#25d366` | Only on buttons that open a chat |
@@ -62,8 +62,8 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
   picture. The small monogram stays only where a name needs a mark (top bar, calling card).
 - **Sage.** Cream and neutrals carry the page; sage (`sage-soft`, with `moss` for numbers and icons) marks
   the calm, supportive parts: choosing what you'd like help with, every numbered step, the selector's
-  "What you've told us" panel, goal tags, small habits, the whole-plan total, info-card icons and
-  meeting the distributor. The distributor's own colour is kept for actions and selection, so purple
+  "What you've told us" panel, goal tags, small habits, the whole-plan total, info-card icons,
+  meeting the distributor, "Want to talk it through?" and "Still deciding?". The distributor's own colour is kept for actions and selection, so purple
   always means "this does something".
 - **One name for one action.** The guided path is "Find My Recommendations" everywhere it's a button
   (hero, phone bar, closing, empty order, product page), "Recommendations" in the nav, and "Your
@@ -88,7 +88,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
 | How ordering works | Four steps, then delivery, payment and prices, answered plainly |
 | Meet your distributor | Their photo (or, in a preview, where it will go) beside their name, role, own words, where they are and the languages they chat in, how to reach them, and that the page is theirs, not BF Suma's |
-| Still deciding? | A low-pressure last ask |
+| Still deciding? | A low-pressure last ask, on sage: the one strong colour is the green "Message Kate" button, with recommendations as the quieter second choice |
 
 ## Overlays
 

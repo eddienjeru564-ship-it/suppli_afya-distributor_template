@@ -13,25 +13,26 @@ export function Closing() {
   const first = sf.distributor.firstName;
   return (
     <section id="closing" aria-labelledby="closing-title" className="container-x pb-8">
-      <div className="grain relative overflow-hidden rounded-panel bg-accent px-6 py-12 text-on-accent md:px-14 md:py-16">
-        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-white/15" aria-hidden />
-        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full border border-white/10" aria-hidden />
+      {/* Calm and personal, like the rest of the page: the one strong colour is the WhatsApp button. */}
+      <div className="relative overflow-hidden rounded-panel bg-sage-soft px-6 py-12 text-ink ring-1 ring-moss/10 md:px-14 md:py-16">
+        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-moss/15" aria-hidden />
+        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full border border-moss/10" aria-hidden />
         <div className="relative grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div>
             <h2 id="closing-title" className="display-section max-w-[14ch]">
               Still deciding? Ask {first}.
             </h2>
-            <p className="mt-4 max-w-[30rem] text-[1.02rem] leading-relaxed text-on-accent/80">
+            <p className="mt-4 max-w-[30rem] text-[1.02rem] leading-relaxed text-ink-2">
               A question about a product, a price or delivery. {first} answers on WhatsApp, and there&apos;s no need to
               order first.
             </p>
           </div>
           {/* Phones: full-width and stacked, so both are easy to reach and line up. */}
           <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap">
-            <ContactAction text={askMessage(sf)} variant="light" size="lg">
-              <WhatsAppIcon className="text-[#1a9e4b]" /> Message {first}
+            <ContactAction text={askMessage(sf)} size="lg">
+              <WhatsAppIcon /> Message {first}
             </ContactAction>
-            <Button variant="night-outline" size="lg" onClick={() => openSelector()}>
+            <Button variant="outline" size="lg" onClick={() => openSelector()}>
               {result ? "My recommendations" : "Find My Recommendations"}
             </Button>
           </div>

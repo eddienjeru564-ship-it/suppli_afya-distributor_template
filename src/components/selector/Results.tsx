@@ -441,47 +441,47 @@ function Handoff({ result, answers }: { result: EngineResult; answers: Answers }
   };
 
   return (
-    <section aria-labelledby="handoff-title" className="grain overflow-hidden rounded-panel bg-night p-6 text-white sm:p-8">
+    <section aria-labelledby="handoff-title" className="overflow-hidden rounded-panel bg-sage-soft p-6 text-ink ring-1 ring-moss/10 sm:p-8">
       <div className="flex items-center gap-3">
         <Portrait distributor={d} size="md" />
         <div className="leading-tight">
           <h2 id="handoff-title" className="font-display text-[1.6rem] leading-tight">
             Want to talk it through?
           </h2>
-          <div className="mt-0.5 text-[0.85rem] text-white/60">{d.name} · on WhatsApp</div>
+          <div className="mt-0.5 text-[0.85rem] text-ink-3">{d.name} · on WhatsApp</div>
         </div>
       </div>
-      <p className="mt-5 max-w-[34rem] text-[0.98rem] leading-relaxed text-white/75">
+      <p className="mt-5 max-w-[34rem] text-[0.98rem] leading-relaxed text-ink-2">
         Send your answers and these suggestions to {d.firstName}, so you don&apos;t have to explain everything again.{" "}
         {d.firstName} can answer your questions, confirm stock and help you get started.
       </p>
       {recorded && (
-        <label className="mt-5 block max-w-sm text-[0.84rem] font-medium text-white/75">
-          Your WhatsApp number <span className="text-white/45">(optional)</span>
+        <label className="mt-5 block max-w-sm text-[0.84rem] font-medium text-ink-2">
+          Your WhatsApp number <span className="text-ink-3">(optional)</span>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             inputMode="tel"
             autoComplete="tel"
             placeholder="07XX XXX XXX"
-            className="mt-1.5 w-full rounded-control bg-white/[0.07] px-3.5 py-3 text-[1rem] text-white outline-none ring-1 ring-white/15 placeholder:text-white/30 focus:ring-white/50"
+            className="mt-1.5 w-full rounded-control bg-surface px-3.5 py-3 text-[1rem] text-ink outline-none ring-1 ring-ink/12 placeholder:text-ink-3 focus:ring-2 focus:ring-accent"
           />
         </label>
       )}
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <ContactAction text={message} title={`Your message to ${d.firstName}`} size="lg" onSend={saveLead}>
+        <ContactAction text={message} title={`Your message to ${d.firstName}`} size="lg" onSend={saveLead} className="w-full sm:w-auto">
           <WhatsAppIcon /> Send to {d.firstName} on WhatsApp
         </ContactAction>
         <button
           type="button"
           onClick={() => setPreview((v) => !v)}
           aria-expanded={preview}
-          className="h-12 px-2 text-[0.9rem] font-semibold text-white/75 underline-offset-4 hover:text-white hover:underline"
+          className="h-11 text-[0.9rem] font-semibold text-ink-2 underline decoration-ink/25 sm:h-12 sm:px-2 underline-offset-4 hover:text-ink hover:decoration-ink"
         >
           {preview ? "Hide the message" : "See the message first"}
         </button>
       </div>
-      <p className="mt-3 max-w-[34rem] text-[0.78rem] leading-snug text-white/45">
+      <p className="mt-3 max-w-[34rem] text-[0.78rem] leading-snug text-ink-3">
         {recorded
           ? `Sending shares your answers and suggestions with ${d.firstName}, in WhatsApp and in ${d.firstName}'s Suppli Afya workspace.`
           : "This opens WhatsApp with the message written. Nothing is sent until you press send there."}
