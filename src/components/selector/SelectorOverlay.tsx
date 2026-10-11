@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { AnimatePresence, useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   GOALS_BY_ID,
   QUESTIONS_BY_ID,
@@ -19,7 +19,7 @@ import {
 import { Portrait } from "@/components/brand/Portrait";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
-import { Bag, ChevronLeft, Close, Lock, Shield } from "@/components/ui/icons";
+import { Bag, Check, ChevronLeft, Close, Lock, Shield } from "@/components/ui/icons";
 import { Sheet } from "@/components/ui/Sheet";
 import { nextShown, partProgress, previousShown, sectionLead } from "@/storefront/progress";
 import { MultiChoice, Scale, SingleChoice, TextField } from "./inputs";
@@ -43,6 +43,12 @@ import { SoFar } from "./SoFar";
 const FIRST = "disclaimer";
 const LAST = "plan_size";
 const ease = [0.22, 1, 0.36, 1] as const;
+/** A one-tap answer moves on by itself after this pause, long enough to see the tick. */
+const ADVANCE_MS = 280;
+/** "None of these" in a choose-all question: a little longer, since it can also be a slip. */
+const ADVANCE_EXCLUSIVE_MS = 450;
+/** The short "putting it together" screen before the results. */
+const PREPARE_MS = 2100;
 
 
 /** Goals can be picked on the page before sex is known; drop any the engine wouldn't offer. */
@@ -70,6 +76,8 @@ function Selector() {
   const [touched, setTouched] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prepTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [preparing, setPreparing] = useState(false);
 
   const answers = useMemo(() => session?.answers ?? {}, [session]);
   // Questions answered on the page (the interests): stepped over, never asked twice.
@@ -82,14 +90,46 @@ function Selector() {
   );
   const showingResult = Boolean(result);
 
-  useEffect(() => () => {
+  // The question on screen, for timers: an auto-advance only ever moves on from the question it was set on.
+  const currentRef = useRef(currentId);
+  useEffect(() => {
+    currentRef.current = currentId;
+  }, [currentId]);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+      if (prepTimer.current) clearTimeout(prepTimer.current);
+    },
+    [],
+  );
+
+  const cancelAdvance = () => {
     if (timer.current) clearTimeout(timer.current);
-  }, []);
+    timer.current = null;
+  };
+
+  /**
+   * Move on after a short pause, unless the person has moved first (tapped Continue, Back, or
+   * another answer). This is what keeps a quick tap followed by Continue from skipping a question.
+   */
+  const advanceLater = (from: string, run: () => void, ms = ADVANCE_MS) => {
+    cancelAdvance();
+    timer.current = setTimeout(
+      () => {
+        timer.current = null;
+        if (currentRef.current === from) run();
+      },
+      reduce ? 0 : ms,
+    );
+  };
 
   const toTop = () => scrollRef.current?.scrollTo({ top: 0 });
 
   const goTo = useCallback(
     (id: string, direction: 1 | -1, a: Answers, keep: string[] = preset) => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = null;
       setDir(direction);
       setError(null);
       setTouched(true);
@@ -101,13 +141,25 @@ function Selector() {
 
   const finish = useCallback(
     (final: Answers) => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = null;
       setDir(1);
+      // The result is saved at once (closing now still keeps it); the short screen is only what's shown.
       setOutcome({ answers: final, salt: String(Date.now()) });
       setSession(null);
+      setPreparing(true);
+      if (prepTimer.current) clearTimeout(prepTimer.current);
+      prepTimer.current = setTimeout(() => setPreparing(false), reduce ? 700 : PREPARE_MS);
       toTop();
     },
-    [setOutcome, setSession],
+    [reduce, setOutcome, setSession],
   );
+
+  const stopPreparing = () => {
+    if (prepTimer.current) clearTimeout(prepTimer.current);
+    prepTimer.current = null;
+    setPreparing(false);
+  };
 
   const next = useCallback(
     (a: Answers = answers) => {
@@ -125,6 +177,8 @@ function Selector() {
 
   const back = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    if (preparing) return;
     if (showingResult && outcome) {
       // Change my answers: reopen the last question with everything filled in.
       setOutcome(null);
@@ -134,9 +188,11 @@ function Selector() {
     const p = previousShown(currentId, answers, preset);
     if (p) goTo(p, -1, answers);
     else close("selector");
-  }, [answers, close, currentId, goTo, outcome, preset, setOutcome, showingResult]);
+  }, [answers, close, currentId, goTo, outcome, preparing, preset, setOutcome, showingResult]);
 
   const restart = useCallback(() => {
+    if (prepTimer.current) clearTimeout(prepTimer.current);
+    setPreparing(false);
     setOutcome(null);
     goTo(FIRST, -1, {}, []);
   }, [goTo, setOutcome]);
@@ -146,6 +202,7 @@ function Selector() {
 
   const keep = preset.length ? { preset } : {};
   const setValue = (id: string, value: Answers[string]) => {
+    cancelAdvance();
     setError(null);
     setSession({ answers: tidy({ ...answers, [id]: value }), currentId, ...keep });
   };
@@ -153,18 +210,29 @@ function Selector() {
   const selectAndAdvance = (id: string, value: string | number) => {
     const updated = tidy({ ...answers, [id]: value });
     setSession({ answers: updated, currentId, ...keep });
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => next(updated), reduce ? 0 : 260);
+    advanceLater(currentId, () => next(updated));
+  };
+
+  /** Choose-all questions: "None of these" (or "I sleep well") moves on by itself; real picks wait for Continue. */
+  const toggle = (optionId: string) => {
+    const current = Array.isArray(answers[q.id]) ? (answers[q.id] as string[]) : [];
+    const value = toggleOption(q, current, optionId);
+    const updated = tidy({ ...answers, [q.id]: value });
+    setError(null);
+    setSession({ answers: updated, currentId, ...keep });
+    const exclusive = q.options?.find((o) => o.id === optionId)?.exclusive;
+    if (exclusive && value.includes(optionId)) advanceLater(currentId, () => next(updated), ADVANCE_EXCLUSIVE_MS);
+    else cancelAdvance();
   };
 
   const sectionProgress = useMemo(() => {
     const fills = partProgress(answers, currentId, showingResult, preset);
-    const currentSection = SECTIONS.findIndex((x) => x.id === q?.section);
+    const currentSection = SECTIONS.findIndex((x) => x.id === q.section);
     return SECTIONS.map((s, i) => ({ ...s, fill: fills[i], current: !showingResult && i === currentSection }));
-  }, [answers, currentId, preset, q?.section, showingResult]);
+  }, [answers, currentId, preset, q.section, showingResult]);
 
-  const intro = !showingResult && q?.section === "intro";
-  const opening = !showingResult && currentId === FIRST;
+  const intro = !showingResult && q.section === "intro";
+  const opening = (!showingResult && currentId === FIRST) || preparing;
   const d = sf.distributor;
 
   const header = (
@@ -206,7 +274,15 @@ function Selector() {
                     transition={{ duration: 0.5, ease }}
                   />
                 </div>
-                <div className={clsx("mt-1.5 hidden text-[0.75rem] font-semibold sm:block", s.current ? "text-ink" : "text-ink-3")}>{s.label}</div>
+                {/* Phones: only the current part's name, so it always fits. */}
+                <div
+                  className={clsx(
+                    "mt-1.5 whitespace-nowrap text-[0.75rem] font-semibold",
+                    s.current ? "block text-ink" : "hidden text-ink-3 sm:block",
+                  )}
+                >
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
@@ -273,7 +349,11 @@ function Selector() {
         {header}
         <div ref={scrollRef} className="thin-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <AnimatePresence mode="wait" initial={false}>
-            {showingResult && result ? (
+            {showingResult && result && preparing ? (
+              <m.div {...slide("preparing")} className="h-full">
+                <Preparing name={result.profile.name} count={Object.keys(sf.catalogue.offers).length} first={d.firstName} onSkip={stopPreparing} />
+              </m.div>
+            ) : showingResult && result ? (
               <m.div {...slide("result")}>
                 <Results result={result} answers={outcome!.answers} onEdit={back} onRestart={restart} />
               </m.div>
@@ -290,6 +370,7 @@ function Selector() {
                     error={error}
                     onValue={setValue}
                     onSelectAdvance={selectAndAdvance}
+                    onToggle={toggle}
                     onNext={() => next()}
                   />
                 </m.div>
@@ -312,6 +393,7 @@ function QuestionView({
   error,
   onValue,
   onSelectAdvance,
+  onToggle,
   onNext,
 }: {
   q: Question;
@@ -323,6 +405,7 @@ function QuestionView({
   error: string | null;
   onValue: (id: string, v: Answers[string]) => void;
   onSelectAdvance: (id: string, v: string | number) => void;
+  onToggle: (optionId: string) => void;
   onNext: () => void;
 }) {
   const prompt = resolveText(q.prompt, answers, ctx);
@@ -342,7 +425,7 @@ function QuestionView({
   if (q.kind === "section") {
     // Only the privacy and "not medical advice" screen is shown on its own.
     return (
-      <div className="flex flex-1 flex-col sm:justify-center">
+      <div className="flex flex-1 flex-col sm:justify-center" data-question={q.id}>
         <div className="my-auto py-6 sm:my-0">
           <span className="kicker">Your recommendations</span>
           {/* What they picked on the page, so it's clear it came with them. */}
@@ -384,7 +467,7 @@ function QuestionView({
   }
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col" data-question={q.id}>
       {lead ? (
         <div className="mb-6">
           <span className="kicker">
@@ -428,7 +511,7 @@ function QuestionView({
             options={options}
             value={Array.isArray(value) ? value : []}
             ranked={q.kind === "ranked"}
-            onToggle={(id) => onValue(q.id, toggleOption(q, Array.isArray(value) ? value : [], id))}
+            onToggle={onToggle}
           />
         )}
         {(q.kind === "text" || q.kind === "number") && (
@@ -470,4 +553,36 @@ function QuestionView({
 /** "Energy", "Energy and Digestion", "Energy, Digestion and Weight". */
 function joinAnd(items: string[]) {
   return items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}` : (items[0] ?? "");
+}
+
+/**
+ * A short pause between the last answer and the results, saying in plain words what the check is
+ * doing (it is: matching goals, leaving out what doesn't suit, pricing). The result is already
+ * saved; a tap shows it straight away.
+ */
+function Preparing({ name, count, first, onSkip }: { name: string | null; count: number; first: string; onSkip: () => void }) {
+  const steps = [`Matching your goals with ${first}'s ${count} products`, "Leaving out anything that doesn't suit you", "Adding prices and the reason for each"];
+  return (
+    <button
+      type="button"
+      onClick={onSkip}
+      aria-label="Show my recommendations now"
+      className="mx-auto flex min-h-full w-full max-w-md cursor-default flex-col justify-center px-6 py-12 text-left"
+    >
+      <span aria-hidden className="prep-ring mx-auto block h-14 w-14 rounded-full border-[3px] border-sage-soft border-t-moss" />
+      <span role="status" aria-live="polite" className="mt-7 block text-center font-display text-[1.65rem] leading-tight text-ink">
+        {name ? `${name}, putting your recommendations together` : "Putting your recommendations together"}
+      </span>
+      <span className="mt-7 grid gap-3">
+        {steps.map((s, i) => (
+          <span key={s} className="prep-step flex items-center gap-3 text-[0.95rem] leading-snug text-ink-2" style={{ "--i": i } as CSSProperties}>
+            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-sage-soft text-moss">
+              <Check className="prep-tick h-3.5 w-3.5" />
+            </span>
+            {s}
+          </span>
+        ))}
+      </span>
+    </button>
+  );
 }

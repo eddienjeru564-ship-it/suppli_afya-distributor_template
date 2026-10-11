@@ -1,9 +1,13 @@
 "use client";
 
+import clsx from "clsx";
 import { useState, type ReactNode } from "react";
+import { paymentPhrase } from "@/components/sections/Ordering";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
-import { Alert, Check, Share, WhatsAppIcon } from "@/components/ui/icons";
+import { Disclosure } from "@/components/ui/Disclosure";
+import { Alert, Check, Share, Shield, Truck, Wallet, WhatsAppIcon } from "@/components/ui/icons";
+import { keepTogether } from "@/components/ui/KeepTogether";
 import { Sheet, SheetBody, SheetFooter, SheetHandle, SheetHeader, useSheet } from "@/components/ui/Sheet";
 import { useIsDesktop } from "@/components/ui/useMediaQuery";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
@@ -63,58 +67,74 @@ function ProductDetail({ listing }: { listing: Listing }) {
     close("product");
   };
 
+  const payBy = paymentPhrase(sf);
+  const { delivery, pickup } = sf.fulfilment;
+  // Reassurance where the decision is made: nothing is paid now, how you pay, how it reaches you.
+  const trust = [
+    { icon: <Shield className="h-4 w-4" />, text: `${first} confirms stock and the total before you pay` },
+    payBy && { icon: <Wallet className="h-4 w-4" />, text: `Pay by ${payBy}` },
+    (delivery || pickup) && {
+      icon: <Truck className="h-4 w-4" />,
+      text: delivery && pickup ? "Delivery or collection, agreed with you first" : delivery ? "Delivered to you, cost agreed first" : `Collect: ${pickup!.label}`,
+    },
+  ].filter(Boolean) as { icon: ReactNode; text: string }[];
+
+  const reassurance = (
+    <ul className="grid gap-2 rounded-card bg-sage-soft px-4 py-3.5 text-[0.88rem] leading-snug text-ink">
+      {trust.map((t) => (
+        <li key={t.text} className="flex items-start gap-2.5">
+          <span className="mt-px text-moss">{t.icon}</span>
+          <span>{keepTogether(t.text)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
   const facts = (
-    <div className="grid gap-7">
-      <Block title={`Often chosen for`}>
-        <ul className="grid gap-2">
-          {goalsOf(p).map((g) => (
-            <li key={g.id} className="flex items-baseline justify-between gap-3 rounded-xl bg-surface px-3.5 py-2.5 ring-1 ring-ink/[0.06]">
-              <span className="font-semibold text-ink">{g.label}</span>
-              <span className="text-right text-[0.85rem] text-ink-3">{g.hint}</span>
-            </li>
-          ))}
-        </ul>
-      </Block>
-      <Block title="What's in it">
-        <ul className="grid gap-1.5">
-          {p.keyIngredients.map((k) => (
-            <li key={k} className="flex gap-2.5">
-              <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-accent" />
-              {k}
-            </li>
-          ))}
-        </ul>
-      </Block>
-      <Block title="How it's taken">
-        <p>
-          {FORMAT_LABEL[p.format]}.{pack && ` One pack holds ${pack}.`} Follow the dose on the label, or as {first} advises.{" "}
-          {supply} at the usual dose.
-        </p>
-      </Block>
-      <Block title="What to expect">
-        <p>{p.expectation}</p>
-      </Block>
-      {p.note && (
-        <Block title="Good to know">
-          <p>{p.note}</p>
-        </Block>
-      )}
-      <Block title="Check before you buy">
-        <ul className="grid gap-2">
+    <div>
+      {/* Safety is never folded away. */}
+      <section className="mb-6">
+        <h3 className="mb-2.5 text-[0.98rem] font-semibold text-ink">Check before you buy</h3>
+        <ul className={clsx("grid gap-2 rounded-card p-4 text-[0.92rem] leading-relaxed", notes.length ? "bg-caution-soft" : "bg-surface ring-1 ring-ink/[0.06]")}>
           {notes.map((n) => (
-            <li key={n} className="flex gap-2.5 text-caution">
-              <Alert className="mt-1 h-3.5 w-3.5 shrink-0" />
-              <span className="text-ink">{n}</span>
+            <li key={n} className="flex gap-2.5 text-ink">
+              <Alert className="mt-1 h-3.5 w-3.5 shrink-0 text-caution" />
+              <span>{n}</span>
             </li>
           ))}
-          <li className="flex gap-2.5">
+          <li className="flex gap-2.5 text-ink-2">
             <Alert className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-3" />
             <span>{ALWAYS_CHECK}</span>
           </li>
         </ul>
-      </Block>
+      </section>
 
-      <div className="rounded-card bg-sage-soft p-4">
+      <Disclosure title="What's in it" defaultOpen>
+        <ul className="grid gap-1.5">
+          {p.keyIngredients.map((k) => (
+            <li key={k} className="flex gap-2.5">
+              <span className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-moss" />
+              {k}
+            </li>
+          ))}
+        </ul>
+      </Disclosure>
+      <Disclosure title="How it's taken">
+        <p>
+          {FORMAT_LABEL[p.format]}.{pack && ` One pack holds ${pack}.`} Follow the dose on the label, or as {first} advises.{" "}
+          {supply} at the usual dose.
+        </p>
+      </Disclosure>
+      <Disclosure title="What to expect">
+        <p>{p.expectation}</p>
+      </Disclosure>
+      {p.note && (
+        <Disclosure title="Good to know">
+          <p>{p.note}</p>
+        </Disclosure>
+      )}
+
+      <div className="mt-6 rounded-card bg-surface p-4 ring-1 ring-ink/[0.06]">
         <p className="text-[0.92rem] leading-relaxed text-ink">
           <span className="font-semibold">Not sure it suits you?</span> A few questions about your goals, medicines, allergies
           and pregnancy, and anything that doesn&apos;t fit is left out, with the reason.
@@ -134,7 +154,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
       </div>
 
       {!p.verified && (
-        <p className="text-[0.8rem] leading-relaxed text-ink-3">
+        <p className="mt-5 text-[0.8rem] leading-relaxed text-ink-3">
           Product details are still being checked against the official BF Suma catalogue. Always read the pack label before
           use.
         </p>
@@ -144,17 +164,24 @@ function ProductDetail({ listing }: { listing: Listing }) {
 
   const header = (
     <div>
-      <div className="meta">
-        {p.line} · {FORMAT_LABEL[p.format]}
-      </div>
-      <h2 id={sheet?.titleId} className="display-card mt-1.5 text-ink">
+      <h2 id={sheet?.titleId} className="display-card text-ink">
         {p.name}
       </h2>
-      <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="price text-[1.35rem] font-semibold text-ink">{kes(offer.price)}</span>
-        <span className="text-[0.88rem] text-ink-3">{[pack, supply].filter(Boolean).join(" · ")}</span>
+      <div className="mt-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="price text-[1.45rem] font-semibold text-ink">{kes(offer.price)}</span>
+        <span className="text-[0.9rem] text-ink-3">{[pack ?? FORMAT_LABEL[p.format], supply].filter(Boolean).join(" · ")}</span>
       </div>
       {out && <p className="mt-1 text-[0.88rem] font-medium text-caution">Out of stock right now. Ask {first} when it&apos;s back.</p>}
+      <div className="mt-4">
+        <h3 className="text-[0.8rem] font-medium text-ink-3">Often chosen for</h3>
+        <ul className="mt-1.5 flex flex-wrap gap-1.5">
+          {goalsOf(p).map((g) => (
+            <li key={g.id} className="rounded-full bg-sage-soft px-3 py-1 text-[0.85rem] font-medium text-moss">
+              {g.label}
+            </li>
+          ))}
+        </ul>
+      </div>
       <p className="mt-4 text-[1rem] leading-relaxed text-ink-2">{p.summary}</p>
     </div>
   );
@@ -213,8 +240,9 @@ function ProductDetail({ listing }: { listing: Listing }) {
             <div className="mt-6 grid gap-4">
               {actions}
               {secondary}
+              {reassurance}
             </div>
-            <div className="mt-8 border-t border-ink/10 pt-8 text-[0.95rem] leading-relaxed text-ink-2">{facts}</div>
+            <div className="mt-8">{facts}</div>
           </SheetBody>
         </div>
       </div>
@@ -244,19 +272,11 @@ function ProductDetail({ listing }: { listing: Listing }) {
         <div className="px-5 pb-8 pt-5">
           {header}
           <div className="mt-3">{secondary}</div>
-          <div className="mt-7 text-[0.95rem] leading-relaxed text-ink-2">{facts}</div>
+          <div className="mt-5">{reassurance}</div>
+          <div className="mt-7">{facts}</div>
         </div>
       </SheetBody>
       <SheetFooter>{actions}</SheetFooter>
     </>
-  );
-}
-
-function Block({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section>
-      <h3 className="mb-2.5 text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-ink-3">{title}</h3>
-      {children}
-    </section>
   );
 }

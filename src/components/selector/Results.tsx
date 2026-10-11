@@ -65,7 +65,7 @@ export function Results({
   onEdit: () => void;
   onRestart: () => void;
 }) {
-  const { sf, qtyOf, addToOrder, openOrder, goToSection, priced: cart } = useStorefront();
+  const { sf, qtyOf, addToOrder, openOrder, openProduct, goToSection, priced: cart } = useStorefront();
   const s = priceSuggestions(sf, result);
   const p = result.profile;
   const clinic = result.status === "clinic-first";
@@ -88,7 +88,95 @@ export function Results({
         <h1 className="display-section mt-4 text-ink">{title}</h1>
       </Appear>
 
-      <Appear i={step++} className="mt-7">
+      {result.planNotes.length > 0 && (
+        <Appear i={step++} className="mt-6">
+          <div
+            className={clsx(
+              "rounded-card p-5",
+              result.status === "ready" ? "bg-surface ring-1 ring-ink/[0.07]" : "bg-caution-soft ring-1 ring-caution/20",
+            )}
+          >
+            <div className="flex items-center gap-2 text-[0.92rem] font-semibold text-caution">
+              <Shield />
+              {clinic ? "Speak to your clinic first" : result.status === "review" ? "Check with your doctor or pharmacist first" : "Good to know"}
+            </div>
+            <div className="mt-2 grid gap-2 text-[0.95rem] leading-relaxed text-ink">
+              {result.planNotes.map((n) => (
+                <p key={n}>{n}</p>
+              ))}
+            </div>
+          </div>
+        </Appear>
+      )}
+
+      {/* The whole plan as one decision, with its total and the main action, before the detail. */}
+      {!clinic && s.core.length > 0 && (
+        <Appear i={step++} className="mt-6">
+          <section aria-labelledby="plan-title" className="rounded-card bg-surface p-4 ring-1 ring-ink/[0.07] sm:p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+              <h2 id="plan-title" className="text-[1.02rem] font-semibold text-ink">
+                Your plan
+              </h2>
+              <span className="text-[0.84rem] text-ink-3">
+                {s.core.length} {s.core.length === 1 ? "product" : "products"}, one pack each
+              </span>
+            </div>
+            <ul className="mt-2 divide-y divide-ink/[0.07]">
+              {s.core.map((x) => {
+                const covers = x.rec.covers.map((g) => GOALS_BY_ID[g]?.label.toLowerCase()).filter(Boolean);
+                return (
+                  <li key={x.rec.product.id}>
+                    <button
+                      type="button"
+                      onClick={() => openProduct(x.rec.product.id)}
+                      className="flex w-full items-center gap-3 py-2.5 text-left"
+                      aria-label={`More about ${x.rec.product.name}`}
+                    >
+                      <PackArt product={x.rec.product} thumb className="aspect-square w-12 shrink-0 rounded-lg ring-1 ring-ink/[0.06]" />
+                      <span className="min-w-0 flex-1 leading-tight">
+                        <span className="block font-semibold text-ink">{x.rec.product.name}</span>
+                        <span className="mt-0.5 block text-[0.82rem] text-ink-3">
+                          {covers.length ? `For ${covers.join(" and ")}` : "Also a good match"}
+                        </span>
+                      </span>
+                      <span className="price shrink-0 text-[0.95rem] font-semibold text-ink">
+                        {x.listing ? kes(x.listing.offer.price) : <span className="text-ink-3">Ask {sf.distributor.firstName}</span>}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {s.orderableCore.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-4">
+                <div className="leading-tight">
+                  <div className="text-[0.82rem] text-ink-3">Total</div>
+                  <div className="price text-[1.35rem] font-semibold text-ink">{kes(s.coreTotal)}</div>
+                </div>
+                {allIn ? (
+                  <Button variant="outline" onClick={openOrder}>
+                    <Check /> In your order · View
+                  </Button>
+                ) : (
+                  <Button
+                    variant="accent"
+                    arrow
+                    onClick={() => {
+                      for (const x of s.orderableCore) if (!qtyOf(x.rec.product.id)) addToOrder(x.rec.product.id, { from: "selector", quiet: true });
+                      openOrder();
+                    }}
+                  >
+                    {s.orderableCore.length > 1 ? "Add the whole plan" : "Add to order"}
+                  </Button>
+                )}
+              </div>
+            )}
+            <p className="mt-3 text-[0.8rem] leading-snug text-ink-3">Nothing is charged here. {sf.distributor.firstName} confirms everything before you pay.</p>
+          </section>
+        </Appear>
+      )}
+
+      <Appear i={step++} className="mt-4">
         <div className="rounded-card bg-surface p-5 ring-1 ring-ink/[0.07] sm:p-6">
           <Heading>Based on what you told us</Heading>
           <div className="grid gap-1 text-[1rem] leading-relaxed text-ink">
@@ -109,31 +197,10 @@ export function Results({
         </div>
       </Appear>
 
-      {result.planNotes.length > 0 && (
-        <Appear i={step++} className="mt-4">
-          <div
-            className={clsx(
-              "rounded-card p-5",
-              result.status === "ready" ? "bg-surface ring-1 ring-ink/[0.07]" : "bg-caution-soft ring-1 ring-caution/20",
-            )}
-          >
-            <div className="flex items-center gap-2 text-[0.92rem] font-semibold text-caution">
-              <Shield />
-              {clinic ? "Speak to your clinic first" : result.status === "review" ? "Check with your doctor or pharmacist first" : "Good to know"}
-            </div>
-            <div className="mt-2 grid gap-2 text-[0.95rem] leading-relaxed text-ink">
-              {result.planNotes.map((n) => (
-                <p key={n}>{n}</p>
-              ))}
-            </div>
-          </div>
-        </Appear>
-      )}
-
       {lead && (
         <Appear i={step++} className="mt-10">
-          <Heading>{s.core.length === 1 ? "Where to start" : "Start with"}</Heading>
-          <SuggestionCard s={lead} result={result} lead planBelow={s.orderableCore.length > 1} />
+          <Heading>{s.core.length === 1 ? "In detail" : "Start with"}</Heading>
+          <SuggestionCard s={lead} result={result} lead />
         </Appear>
       )}
 
@@ -142,38 +209,8 @@ export function Results({
           <Heading>Also in your plan</Heading>
           <div className="grid gap-3">
             {more.map((x) => (
-              <SuggestionCard key={x.rec.product.id} s={x} result={result} planBelow={s.orderableCore.length > 1} />
+              <SuggestionCard key={x.rec.product.id} s={x} result={result} />
             ))}
-          </div>
-        </Appear>
-      )}
-
-      {s.orderableCore.length > 1 && (
-        <Appear i={step++} className="mt-4">
-          {/* The plan as one decision: the main action on this screen. */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-card bg-sage-soft p-4 pl-5 ring-1 ring-moss/10">
-            <div className="leading-tight">
-              <div className="text-[0.84rem] text-ink-2">
-                The whole plan · {s.orderableCore.length} products, one pack each
-              </div>
-              <div className="price mt-1 text-[1.3rem] font-semibold text-ink">{kes(s.coreTotal)}</div>
-            </div>
-            {allIn ? (
-              <Button variant="outline" onClick={openOrder}>
-                <Check /> In your order · View
-              </Button>
-            ) : (
-              <Button
-                variant="accent"
-                arrow
-                onClick={() => {
-                  for (const x of s.orderableCore) if (!qtyOf(x.rec.product.id)) addToOrder(x.rec.product.id, { from: "selector", quiet: true });
-                  openOrder();
-                }}
-              >
-                Add the whole plan
-              </Button>
-            )}
           </div>
         </Appear>
       )}
@@ -302,7 +339,7 @@ export function Results({
   );
 }
 
-function SuggestionCard({ s, result, lead, planBelow }: { s: Suggestion; result: EngineResult; lead?: boolean; planBelow?: boolean }) {
+function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResult; lead?: boolean }) {
   const { sf, qtyOf, addToOrder, setQty, removeFromOrder, openProduct } = useStorefront();
   const { rec, listing } = s;
   const p = rec.product;
@@ -399,8 +436,8 @@ function SuggestionCard({ s, result, lead, planBelow }: { s: Suggestion; result:
                     <QtyStepper size="sm" name={p.name} value={qty} onChange={(n) => setQty(p.id, n)} onRemove={() => removeFromOrder(p.id)} />
                   </div>
                 ) : (
-                  // One colour per role: with a whole-plan button below, each card's add is the quieter choice.
-                  <Button variant={planBelow ? "outline" : "accent"} onClick={() => addToOrder(p.id, { from: "selector" })}>
+                  // One colour per role: the plan's button above is the main action; each card's add is the quieter one.
+                  <Button variant="outline" onClick={() => addToOrder(p.id, { from: "selector" })}>
                     Add to order
                   </Button>
                 )}

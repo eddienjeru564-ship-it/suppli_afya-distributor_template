@@ -71,6 +71,11 @@ export function oneLiner(p: Product): string {
   return (m ? m[0] : p.summary).trim();
 }
 
+/** "About a month per pack" without the frame, for tight spaces: "lasts about a month". */
+export function supplyShort(days: number): string {
+  return `lasts ${supplyLabel(days).replace(/^About /, "about ").replace(/ per pack$/, "")}`;
+}
+
 /** How long one pack lasts at the usual label dose, in plain words. */
 export function supplyLabel(days: number): string {
   if (days <= 9) return "About a week per pack";

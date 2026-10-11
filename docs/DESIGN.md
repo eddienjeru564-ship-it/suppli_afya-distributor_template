@@ -106,10 +106,21 @@ Measured on a Pixel 7 profile with 4x CPU slowdown and slow 4G: the main content
 | Hero | One promise ("Find the right wellness products for your goals"), one main action (Find My Recommendations) with what it takes underneath (about 3 minutes, no account), and a quiet text link straight to the products for people who already know. On the right, three real packs on white cards with their names and prices, on a softly tinted panel, with the distributor's calling card ("Your distributor", name, area, Chat) in front. Calm on purpose: the packs and prices are the point. The link preview shows the same three |
 | What would you like help with? | The first step of the recommendations, on the page. Six broad interests, "View all interests" opens the rest in place. Pick up to three (numbered: the first counts most) or none, then one filled Continue. Picks become the selector's goals answer, so the goals question is stepped over, the opening screen says what came with them, and the goals part opens with "You picked … Change". With none, the selector asks about goals as usual. Picks stay when you come back. After a result, this section shows the suggestions with prices |
 | How it works | Three steps: answer a few questions, see what may suit you (with reasons and prices, and what's left out), order from the distributor or ask first |
-| Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
+| Products | Search by name or ingredient, filter by what it's for, the most-asked-about first (six, or four on phones), the rest one tap away. Each card reads the way people shop: what it's for (goal tags), what it is (name and one line), what it costs and how much you get ("60 capsules · lasts about a month"), and one labelled "Add" that turns into a quantity stepper. A goal filter offers "Not sure which? Get recommendations" |
 | How ordering works | Four steps, with what the prices mean in the intro, then delivery and payment, answered plainly |
 | Meet your distributor | Their photo (or, in a preview, where it will go) beside their name, role, own words, where they are and the languages they chat in, how to reach them, and that the page is theirs, not BF Suma's |
 | Still deciding? | A low-pressure last ask, on sage: the one strong colour is the green "Message Kate" button, with recommendations as the quieter second choice |
+
+## The product page
+
+Ordered the way a customer decides: name, price with pack size and how long it lasts, what it's often
+chosen for (goal tags), the one-paragraph summary, then quantity and **Add to order**. Right under the
+button, a sage strip answers the three worries at the moment of choice: the distributor confirms stock and
+the total before you pay, how you pay, how it reaches you (all from the storefront's own config).
+
+**Check before you buy** is always open, never folded away. The rest (what's in it, how it's taken, what
+to expect, good to know) sits in sections that open in place (`ui/Disclosure`, real headings with a button
+inside), with "What's in it" open to start.
 
 ## Overlays
 
@@ -135,6 +146,15 @@ The engine decides; the interface renders. Presentation choices:
   be based on, including anything we'll take care around ("Takes blood pressure medicine").
 - Closing keeps your answers. The interests on the page show what was picked, and say how far through
   you are, with "Start again" beside it.
+- It moves on by itself wherever one tap is the whole answer: one-choice questions, the 1 to 5 scale,
+  and "None of these" (or "I sleep well", "It doesn't really drop") in choose-all questions. Real picks
+  and typed answers wait for Continue. Every auto-advance is guarded: it only moves on from the question
+  it was set on, and any tap on Continue, Back or another answer cancels it, so a quick extra tap never
+  skips a question.
+- After the last answer, a two-second "putting your recommendations together" screen says in plain words
+  what the check does (match goals to the products, leave out what doesn't suit, add prices and
+  reasons). The result is saved before it starts; a tap shows it at once; reduced motion shortens it.
+- On phones the progress bar names the current part.
 - Interests picked on the page are the goals answer (`SelectorSession.preset` names it): the flow steps
   over the goals question while that answer stands (`storefront/progress.ts`), so nothing is asked twice.
   If a pick stops applying (a men's or women's interest once sex is known), the question is asked as
@@ -142,10 +162,12 @@ The engine decides; the interface renders. Presentation choices:
 
 ## Results
 
-1. Based on what you told us (the engine's summary, goals in rank order, plan size)
-2. The plan status if it needs a professional first (review, or clinic first with no products)
-3. **Start with**: the lead suggestion, large: why it came up, cautions, what to expect, price, add
-4. Also in your plan, then "Add the whole plan · KES total"
+1. The plan status if it needs a professional first (review, or clinic first with no products)
+2. **Your plan**: every suggested product in one short list (what it's for, price), the total and the
+   one main action, "Add the whole plan" (or "Add to order" for one product), in the first screen
+3. Based on what you told us (the engine's summary, goals in rank order, plan size)
+4. **Start with** / Also in your plan: each suggestion in detail (why it came up, cautions, what to
+   expect, price), each with its own quieter "Add to order"
 5. Worth considering later, what we left out and why, small changes that help, worth checking with a doctor
 6. **Want to talk it through?** The engine's handoff message, sent to the distributor on WhatsApp
 7. Change my answers, start again, browse all products

@@ -1,5 +1,5 @@
 import { devices, expect, test } from "@playwright/test";
-import { basics, dailyLife, energyAndDigestion, fitsWidth, next, openSelector, pick, safety, sheet, tick } from "./helpers";
+import { basics, dailyLife, energyAndDigestion, fitsWidth, next, on, openSelector, pick, safety, sheet, tick } from "./helpers";
 
 test("the first screen says whose page it is, and offers both ways in", async ({ page }) => {
   await page.goto("/");
@@ -99,6 +99,65 @@ test("help me choose: suggestions come with the reason, the price and a way to o
   // Back on the page, the result stays with the customer.
   await sheet(page).getByRole("button", { name: /^Close/ }).click();
   await expect(page.locator("#choose").getByText("Your recommendations")).toBeVisible();
+});
+
+test("the questions flow on their own, and a quick extra tap never skips one", async ({ page }) => {
+  await page.goto("/");
+  await openSelector(page);
+  await basics(page, { name: "Wanjiru" });
+  await tick(page, /^Energy/);
+  await pick(page, "2 of 5");
+  await tick(page, "Mid-afternoon");
+
+  // A double tap on a one-tap answer moves on once.
+  await sheet(page).getByRole("radio", { name: "Mostly home-cooked" }).dblclick();
+  await expect(on(page, "veg")).toBeVisible();
+  await page.waitForTimeout(800);
+  await expect(on(page, "veg")).toBeVisible();
+  for (const a of ["One or two", "Every day", "Less than three glasses", "One or two", "Five to six", "None", "No"]) await pick(page, a);
+
+  // "None of these" moves on by itself.
+  await expect(on(page, "conditions")).toBeVisible();
+  await sheet(page).getByRole("checkbox", { name: "None of these" }).click();
+  await expect(sheet(page).getByRole("heading", { name: "Do you take any of these regularly?" })).toBeVisible();
+
+  // Tapping Continue straight after doesn't move on twice.
+  await sheet(page).getByRole("checkbox", { name: "None of these" }).click();
+  await sheet(page).getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(on(page, "restrictions")).toBeVisible();
+  await page.waitForTimeout(900);
+  await expect(on(page, "restrictions")).toBeVisible();
+
+  await tick(page, "None of these");
+  await sheet(page).getByRole("radio", { name: /focused plan/ }).click();
+  // A short "putting it together" moment, then the result.
+  await expect(sheet(page).getByRole("status")).toContainText("putting your recommendations together");
+  await expect(sheet(page).getByRole("heading", { name: /^Wanjiru, here's/ })).toBeVisible();
+  await expect(sheet(page).getByRole("heading", { name: "Your plan" })).toBeVisible();
+});
+
+test("the order keeps count: add from a card, change it, and the whole plan never doubles up", async ({ page }) => {
+  await page.goto("/");
+  const products = page.locator("#products");
+  await products.getByRole("button", { name: "Add Probio3 to your order" }).click();
+  await expect(page.getByRole("button", { name: "Your order: 1 item" })).toBeVisible();
+  await products.getByRole("button", { name: "One more Probio3" }).click();
+  await expect(page.getByRole("button", { name: "Your order: 2 items" })).toBeVisible();
+  await products.getByRole("button", { name: "One fewer Probio3" }).click();
+  await products.getByRole("button", { name: "Remove Probio3" }).click();
+  await expect(page.getByRole("button", { name: "Your order", exact: true })).toBeVisible();
+  await expect(products.getByRole("button", { name: "Add Probio3 to your order" })).toBeVisible();
+
+  // The whole plan, twice: the second time it only shows what's already there.
+  await energyAndDigestion(page);
+  await sheet(page).getByRole("button", { name: /Add the whole plan/ }).click();
+  await expect(sheet(page).getByText("Suggested for you")).toHaveCount(2);
+  await sheet(page).getByRole("button", { name: "Close" }).click();
+  await expect(sheet(page).getByRole("button", { name: /In your order · View/ })).toBeVisible();
+  await expect(sheet(page).getByRole("button", { name: "Your order: 2 items" })).toBeVisible();
+  // Survives a reload.
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Your order: 2 items" })).toBeVisible();
 });
 
 test("safety: a product that doesn't suit is left out, and the reason is given", async ({ page }) => {

@@ -8,7 +8,10 @@ import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Plus } from "@/components/ui/icons";
 import { QtyStepper } from "./QtyStepper";
 
-/** Quick add on a product card: a "+" that becomes a quantity stepper once the product is in the order. */
+/**
+ * Quick add on a product card: a labelled "Add" (a bare "+" makes people guess), which becomes a
+ * quantity stepper once the product is in the order, so the card always shows what's in it.
+ */
 export function AddButton({ product, className, from }: { product: Product; className?: string; from?: "selector" }) {
   const { qtyOf, addToOrder, setQty, removeFromOrder } = useStorefront();
   const qty = qtyOf(product.id);
@@ -19,15 +22,15 @@ export function AddButton({ product, className, from }: { product: Product; clas
           <m.button
             key="add"
             type="button"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.18 }}
             onClick={() => addToOrder(product.id, { from })}
             aria-label={`Add ${product.name} to your order`}
-            className="grid h-11 w-11 place-items-center rounded-full bg-ink text-canvas transition-colors hover:bg-black active:scale-95"
+            className="inline-flex h-11 items-center gap-1.5 rounded-full bg-ink pl-3.5 pr-4 text-[0.9rem] font-semibold text-canvas transition-colors hover:bg-black active:scale-95"
           >
-            <Plus />
+            <Plus className="h-4 w-4" /> Add
           </m.button>
         ) : (
           <m.div

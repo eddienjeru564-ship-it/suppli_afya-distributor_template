@@ -24,7 +24,7 @@ import {
   type OrderDetails,
 } from "./order";
 import photos from "./product-photos.json";
-import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel } from "./products";
+import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel, supplyShort } from "./products";
 import { nextShown, partProgress, previousShown, resumeAt, sectionLead } from "./progress";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
@@ -173,6 +173,8 @@ describe("products", () => {
     expect(supplyLabel(20)).toBe("About three weeks per pack");
     expect(supplyLabel(30)).toBe("About a month per pack");
     expect(supplyLabel(45)).toBe("About six weeks per pack");
+    expect(supplyShort(30)).toBe("lasts about a month");
+    expect(supplyShort(11)).toBe("lasts about ten days");
   });
 
   it("says what every safety trait means, and nothing else", () => {

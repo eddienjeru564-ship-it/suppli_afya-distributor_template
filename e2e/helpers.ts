@@ -13,9 +13,25 @@ export async function next(page: Page, label: string | RegExp = "Continue") {
   await page.waitForTimeout(350);
 }
 
+/** A question screen by its engine id. */
+export const on = (page: Page, id: string) => sheet(page).locator(`[data-question="${id}"]`);
+
+/**
+ * Tick options, then move on. "None of these" and the like move on by themselves, so Continue is
+ * only pressed if the question is still on screen once that pause (and its exit) has passed. The
+ * question is found by the option being ticked, so a previous question still animating out is never
+ * mistaken for this one.
+ */
 export async function tick(page: Page, ...names: (string | RegExp)[]) {
-  for (const n of names) await sheet(page).getByRole("checkbox", { name: n, exact: typeof n === "string" }).click();
-  await next(page);
+  const option = (n: string | RegExp) => page.getByRole("checkbox", { name: n, exact: typeof n === "string" });
+  const found = sheet(page).locator("[data-question]", { has: option(names[0]) });
+  await found.waitFor();
+  const id = await found.getAttribute("data-question");
+  // Pinned by id: ticking can rename an option ("Energy" becomes "1 Energy" in a ranked question).
+  const question = sheet(page).locator(`[data-question="${id}"]`);
+  for (const n of names) await question.getByRole("checkbox", { name: n, exact: typeof n === "string" }).click();
+  await page.waitForTimeout(1000);
+  if (await sheet(page).locator(`[data-question="${id}"]`).count()) await next(page);
 }
 
 /** Opens the selector from the first screen. */
