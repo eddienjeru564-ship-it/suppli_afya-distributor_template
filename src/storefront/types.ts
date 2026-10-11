@@ -8,8 +8,8 @@
  */
 
 /**
- * `preview`: the page is shown with a small "Preview" ribbon, and nothing is sent to a real
- * WhatsApp number (messages are shown on screen instead). `live`: everything is real.
+ * `preview`: the footer carries a "Preview" note listing what's still a placeholder, and nothing
+ * is sent to a real WhatsApp number (messages are shown on screen instead). `live`: everything is real.
  */
 export type StorefrontStatus = "preview" | "live";
 
@@ -72,7 +72,7 @@ export interface Storefront {
   status: StorefrontStatus;
   /**
    * What is still a placeholder, in plain words ("Prices", "WhatsApp number"). Listed in the
-   * preview ribbon so nobody mistakes a template value for a fact. Empty once everything is confirmed.
+   * preview note so nobody mistakes a template value for a fact. Empty once everything is confirmed.
    */
   pending: string[];
   distributor: DistributorProfile;

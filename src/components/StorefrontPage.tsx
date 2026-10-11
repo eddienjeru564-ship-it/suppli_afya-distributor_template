@@ -8,7 +8,7 @@ import { Closing, Footer } from "@/components/sections/Closing";
 import { Hero } from "@/components/sections/Hero";
 import { MobileBar, Toaster } from "@/components/sections/MobileBar";
 import { Ordering } from "@/components/sections/Ordering";
-import { PreviewRibbon, TopBar } from "@/components/sections/TopBar";
+import { TopBar } from "@/components/sections/TopBar";
 import { SelectorOverlay } from "@/components/selector/SelectorOverlay";
 import { PageShell } from "@/components/store/PageShell";
 import { StorefrontProvider } from "@/components/store/StorefrontProvider";
@@ -34,7 +34,6 @@ export function StorefrontPage({ sf }: { sf: Storefront }) {
       <style dangerouslySetInnerHTML={{ __html: themeCss(sf.theme) }} />
       <StorefrontProvider sf={sf}>
         <PageShell>
-          <PreviewRibbon />
           <TopBar />
           <main>
             <Hero />
@@ -61,7 +60,7 @@ export function storefrontMetadata(sf: Storefront, path: string): Metadata {
   const d = sf.distributor;
   const count = Object.keys(sf.catalogue.offers).length;
   const title = `${d.name} · Help choosing BF Suma products, with prices`;
-  const description = `Not sure which product is right for you? Answer a few questions and see what fits, with prices and the reasons why. Or browse ${count} products and order from ${d.firstName}${canPlaceOrders(sf) ? "" : " on WhatsApp"}.`;
+  const description = `Find the right wellness products for your goals. Answer a few simple questions and see what may suit you, with prices and the reasons why. Or browse ${count} products and order from ${d.firstName}${canPlaceOrders(sf) ? "" : " on WhatsApp"}.`;
   return {
     title,
     description,

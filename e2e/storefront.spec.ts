@@ -4,19 +4,19 @@ import { basics, dailyLife, energyAndDigestion, fitsWidth, next, openSelector, p
 test("the first screen says whose page it is, and offers both ways in", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("banner").getByText("Kate Cromuel")).toBeVisible();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Not sure which product is right for you?");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Find the right wellness products for your goals.");
   const top = page.locator("#top");
-  await expect(top.getByRole("button", { name: /Help me choose/ })).toBeVisible();
-  await expect(top.getByRole("button", { name: /Browse products/ })).toBeVisible();
-  // Placeholders are never passed off as facts.
-  await expect(page.getByText("some details are placeholders")).toBeVisible();
+  await expect(top.getByRole("button", { name: /Find My Recommendations/ })).toBeVisible();
+  await expect(top.getByRole("link", { name: /Browse all \d+ products/ })).toBeVisible();
+  // Placeholders are never passed off as facts: the preview says so, at the foot of the page.
+  await expect(page.getByRole("contentinfo").getByText("Preview of Kate's page.")).toBeAttached();
   // Prices are on the page, not behind a message.
   await expect(page.getByText(/KES \d/).first()).toBeAttached();
 });
 
 test("browsing: find a product, read about it and send the order to the distributor", async ({ page }) => {
   await page.goto("/");
-  await page.locator("#top").getByRole("button", { name: /Browse products/ }).click();
+  await page.locator("#top").getByRole("link", { name: /Browse all \d+ products/ }).click();
   await page.getByPlaceholder("Search by name or ingredient").fill("probio");
   await page.locator("#products").getByRole("button", { name: /^Probio3, KES 3,900/ }).click();
 

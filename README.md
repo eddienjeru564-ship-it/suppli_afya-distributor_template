@@ -87,8 +87,8 @@ from the Suppli Afya portal, `storefrontBySlug` in `src/storefronts/index.ts` is
 
 ## Preview and live
 
-`status: "preview"` shows a one-line "Preview · some details are placeholders" ribbon, keeps the page out
-of search engines, and never opens a chat: every WhatsApp button shows the exact message instead.
+`status: "preview"` lists what's still a placeholder in a quiet note at the foot of the page, keeps the
+page out of search engines, and never opens a chat: every WhatsApp button shows the exact message instead.
 `status: "live"` requires a WhatsApp number and an empty `pending` list (validation enforces both).
 
 ## Ordering and payments

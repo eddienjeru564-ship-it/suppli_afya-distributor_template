@@ -1,8 +1,8 @@
 # Before Kate's page goes live
 
 Kate's storefront (`src/storefronts/kate.ts`) is in **preview**. Only her name is confirmed. Everything
-else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`, so the page shows a
-"Preview" ribbon and never opens a chat to a real number.
+else is a placeholder, marked `PLACEHOLDER` in the file and listed in `pending`, so the page lists them
+in a preview note in the footer and never opens a chat to a real number.
 
 ## Ask Kate for
 

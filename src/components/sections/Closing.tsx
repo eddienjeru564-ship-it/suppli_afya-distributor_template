@@ -45,6 +45,7 @@ export function Footer() {
   const d = sf.distributor;
   return (
     <footer className="container-x pb-12 pt-8 text-[0.8rem] leading-relaxed text-ink-3">
+      <PreviewNote />
       <div className="grid gap-3 border-t border-ink/10 pt-8 md:grid-cols-2 md:gap-10">
         <p>
           General wellness information, not medical advice. Products here aren&apos;t intended to diagnose, treat, cure or
@@ -69,5 +70,22 @@ export function Footer() {
         </a>
       </div>
     </footer>
+  );
+}
+
+/**
+ * Shown only while a storefront is in preview, so a template value is never mistaken for a
+ * fact. Kept in the footer, out of the way of the page, but always on it.
+ */
+function PreviewNote() {
+  const { sf } = useStorefront();
+  if (sf.status !== "preview") return null;
+  const list = sf.pending.length ? sf.pending : ["some details"];
+  const joined = list.length > 1 ? `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}` : list[0];
+  return (
+    <p className="mb-8 rounded-xl bg-ink/[0.04] px-4 py-3 text-ink-2">
+      <span className="font-semibold text-ink">Preview of {sf.distributor.firstName}&apos;s page.</span>{" "}
+      {joined.charAt(0).toUpperCase() + joined.slice(1)} are placeholders until they&apos;re confirmed.
+    </p>
   );
 }

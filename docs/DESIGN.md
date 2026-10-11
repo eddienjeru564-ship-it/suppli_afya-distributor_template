@@ -67,7 +67,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 | Section | Job |
 |---|---|
 | Top bar | Name and face always visible; message and order one tap away |
-| Hero | The question customers actually have ("Not sure which product is right for you?"), two doors, and three of their products on white tiles, each with its name and price, like the front table of a small shop, beside the distributor's calling card. The link preview shows the same three. The kicker says where they are and when the prices were checked |
+| Hero | One promise ("Find the right wellness products for your goals"), one main action (Find My Recommendations) with what it takes underneath (about 3 minutes, no account), and a quiet text link straight to the products for people who already know. On the right, three real packs on white cards with their names and prices, on a softly tinted panel, with the distributor's calling card ("Your distributor", name, area, Chat) in front. Calm on purpose: the packs and prices are the point. The link preview shows the same three |
 | Help me choose | Goal tiles: tapping one starts the selector with that goal already chosen. After a result, this section shows the suggestions with prices |
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
 | How ordering works | Four steps, then delivery, payment and prices, answered plainly |

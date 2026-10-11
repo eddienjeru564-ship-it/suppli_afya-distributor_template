@@ -20,7 +20,7 @@ export async function tick(page: Page, ...names: (string | RegExp)[]) {
 
 /** Opens the selector from the first screen. */
 export async function openSelector(page: Page) {
-  await page.locator("#top").getByRole("button", { name: /Help me choose/ }).click();
+  await page.locator("#top").getByRole("button", { name: /Find My Recommendations/ }).click();
   await expect(sheet(page).getByRole("heading", { name: "Before we start" })).toBeVisible();
 }
 

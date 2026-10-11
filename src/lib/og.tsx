@@ -55,9 +55,9 @@ export async function storefrontCard(sf: Storefront) {
   const packs = await shelf(sf, 3);
   const [center, left, right] = packs;
   const table = [
-    { p: left, w: 150, x: 18, y: 206, turn: -4 },
-    { p: right, w: 150, x: 232, y: 176, turn: 3 },
-    { p: center, w: 176, x: 112, y: 92, turn: 0 },
+    { p: left, w: 148, x: 20, y: 200, turn: -2 },
+    { p: right, w: 148, x: 232, y: 200, turn: 2 },
+    { p: center, w: 168, x: 116, y: 74, turn: 0 },
   ].filter((t) => t.p);
   return new ImageResponse(
     (
@@ -102,17 +102,18 @@ export async function storefrontCard(sf: Storefront) {
               display: "flex",
               flexDirection: "column",
               fontFamily: "Newsreader",
-              fontSize: packs.length ? 60 : 78,
+              fontSize: packs.length ? 64 : 78,
               lineHeight: 1.04,
               letterSpacing: packs.length ? -1.6 : -2.4,
               maxWidth: packs.length ? 640 : 900,
             }}
           >
-            <span>Not sure which product is right for you?</span>
-            <span style={{ fontStyle: "italic", color: accent }}>Let&apos;s narrow it down.</span>
+            <span>Find the right</span>
+            <span>wellness products</span>
+            <span style={{ fontStyle: "italic", color: accent }}>for your goals.</span>
           </div>
           <div style={{ display: "flex", gap: 14, fontSize: 24, color: "#48443d" }}>
-            {!packs.length && <span>Help choosing</span>}
+            {!packs.length && <span>Personal recommendations</span>}
             {!packs.length && <span style={{ color: accent }}>·</span>}
             <span>{count} products with prices</span>
             <span style={{ color: accent }}>·</span>
@@ -122,7 +123,16 @@ export async function storefrontCard(sf: Storefront) {
 
         {/* The hero's front table: the first featured products with a photo, on white tiles. */}
         {packs.length > 0 && (
-          <div style={{ display: "flex", position: "relative", width: 400, borderRadius: 36, background: sf.theme.accentSoft }}>
+          <div
+            style={{
+              display: "flex",
+              position: "relative",
+              width: 400,
+              borderRadius: 36,
+              background: `linear-gradient(180deg, #ffffff 0%, ${sf.theme.accentSoft} 100%)`,
+              border: "1px solid rgba(28,26,23,0.05)",
+            }}
+          >
             {table.map(({ p, w, x, y, turn }) => {
               const box = { w: w - 28, h: Math.round((w - 28) * 1.18) };
               const fit = p!.ratio > box.w / box.h ? { width: box.w, height: Math.round(box.w / p!.ratio) } : { width: Math.round(box.h * p!.ratio), height: box.h };
@@ -140,7 +150,8 @@ export async function storefrontCard(sf: Storefront) {
                     padding: "14px 14px 12px",
                     borderRadius: 22,
                     background: "#ffffff",
-                    boxShadow: "0 14px 30px -14px rgba(28,26,23,0.32)",
+                    boxShadow: "0 12px 28px -16px rgba(28,26,23,0.3)",
+                    border: "1px solid rgba(28,26,23,0.05)",
                     transform: `rotate(${turn}deg)`,
                   }}
                 >

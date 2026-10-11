@@ -7,8 +7,8 @@ import type { Storefront } from "@/storefront/types";
  * WHAT IS REAL AND WHAT IS A PLACEHOLDER
  * Only Kate's name is confirmed. Everything marked PLACEHOLDER below is a template value
  * chosen to show the design at full quality. It must be replaced with Kate's own details
- * before the page goes live, and `status` switched to "live". Until then the page shows a
- * small "Preview" ribbon listing `pending`, and never opens a chat to a real number.
+ * before the page goes live, and `status` switched to "live". Until then the page's footer
+ * lists `pending` in a preview note, and never opens a chat to a real number.
  * docs/LAUNCH.md lists what to ask Kate for.
  *
  * Never add qualifications, years of experience, medical credentials or sourcing claims
