@@ -14,10 +14,10 @@ import { kes } from "@/storefront/money";
  * On phones, the next step is always under the thumb: once you've scrolled past the two
  * paths, the bar offers them again; once something is in your order, it shows the total.
  * It steps aside whenever a sheet is open, at the end of the page, and (until there's an
- * order) over the "Help me choose" section, whose goals are already the next step.
+ * order) over "What would you like help with?", whose interests are already the next step.
  */
 export function MobileBar() {
-  const { sf, priced, overlays, message, openOrder, openSelector, toast } = useStorefront();
+  const { sf, priced, overlays, message, openOrder, openSelector, toast, result } = useStorefront();
   const justAdded = toast?.kind === "order" ? toast : null;
   const [pastHero, setPastHero] = useState(false);
   const [atEnd, setAtEnd] = useState(false);
@@ -87,8 +87,8 @@ export function MobileBar() {
               </>
             ) : (
               <>
-                <Button variant="accent" className={clsx("flex-1")} onClick={() => openSelector()}>
-                  Help me choose
+                <Button variant="accent" className="flex-1" onClick={() => openSelector()}>
+                  {result ? "My recommendations" : "Find My Recommendations"}
                 </Button>
                 <ContactAction
                   text={askMessage(sf)}

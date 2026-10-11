@@ -55,7 +55,7 @@ function tidy(a: Answers): Answers {
 export function SelectorOverlay() {
   const { overlays, close } = useStorefront();
   return (
-    <Sheet open={overlays.selector} onClose={() => close("selector")} kind="screen" z={40} label="Help me choose">
+    <Sheet open={overlays.selector} onClose={() => close("selector")} kind="screen" z={40} label="Your recommendations">
       <Selector />
     </Sheet>
   );
@@ -184,7 +184,7 @@ function Selector() {
       </button>
       <div className="flex min-w-0 flex-1 items-center justify-center">
         {showingResult ? (
-          <span className="truncate text-[0.95rem] font-semibold text-ink">Your suggestions</span>
+          <span className="truncate text-[0.95rem] font-semibold text-ink">Your recommendations</span>
         ) : (
           <div
             className={clsx("flex w-full max-w-md gap-1.5 transition-opacity duration-500", intro ? "opacity-0" : "opacity-100")}
@@ -250,19 +250,19 @@ function Selector() {
     <div className="flex h-full min-h-0 bg-canvas">
       {/* Large screens: who you're doing this with, and what's been noted so far. */}
       {!showingResult && (
-        <aside className="grain hidden w-[min(40%,30rem)] shrink-0 flex-col justify-between bg-night p-10 text-white lg:flex">
+        <aside className="hidden w-[min(40%,30rem)] shrink-0 flex-col justify-between bg-sage-soft p-10 text-ink lg:flex">
           <div className="flex items-center gap-3">
             <Portrait distributor={d} size="md" />
             <div className="leading-tight">
-              <div className="text-[0.8rem] text-white/55">Help me choose, with</div>
+              <div className="text-[0.8rem] text-ink-3">Your recommendations, with</div>
               <div className="font-semibold">{d.name}</div>
             </div>
           </div>
           <div className="thin-scrollbar my-10 min-h-0 flex-1 overflow-y-auto">
             <SoFar answers={answers} />
           </div>
-          <p className="flex items-start gap-2 text-[0.82rem] leading-snug text-white/50">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <p className="flex items-start gap-2 text-[0.82rem] leading-snug text-ink-3">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
             Your answers stay in this browser. {d.firstName} only sees them if you choose to send them.
           </p>
         </aside>
@@ -343,7 +343,7 @@ function QuestionView({
     return (
       <div className="flex flex-1 flex-col sm:justify-center">
         <div className="my-auto py-6 sm:my-0">
-          <span className="kicker">Help me choose</span>
+          <span className="kicker">Your recommendations</span>
           {/* What they picked on the page, so it's clear it came with them. */}
           {goals.length > 0 && (
             <div className="mt-4 flex flex-wrap items-center gap-1.5">

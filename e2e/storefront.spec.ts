@@ -98,7 +98,7 @@ test("help me choose: suggestions come with the reason, the price and a way to o
 
   // Back on the page, the result stays with the customer.
   await sheet(page).getByRole("button", { name: /^Close/ }).click();
-  await expect(page.locator("#choose").getByText("Your suggestions")).toBeVisible();
+  await expect(page.locator("#choose").getByText("Your recommendations")).toBeVisible();
 });
 
 test("safety: a product that doesn't suit is left out, and the reason is given", async ({ page }) => {
@@ -252,7 +252,7 @@ test("small phones: nothing is wider than the screen, on the page or in a sheet"
   // The page itself once it's showing the customer's suggestions.
   await sheet(page).getByRole("button", { name: "Close" }).click();
   await sheet(page).getByRole("button", { name: /^Close/ }).click();
-  await expect(page.locator("#choose").getByText("Your suggestions")).toBeVisible();
+  await expect(page.locator("#choose").getByText("Your recommendations")).toBeVisible();
   expect(await fitsWidth(page), "page with a result").toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   await ctx.close();

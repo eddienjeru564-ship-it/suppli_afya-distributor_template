@@ -22,10 +22,10 @@ export function TopBar() {
   }, []);
 
   const nav = [
-    { id: "choose", label: "Help me choose" },
+    { id: "choose", label: "Recommendations" },
     { id: "products", label: "Products" },
-    { id: "ordering", label: "How ordering works" },
-    { id: "about", label: `About ${d.firstName}` },
+    { id: "ordering", label: "Ordering" },
+    { id: "about", label: `Meet ${d.firstName}` },
   ];
 
   return (

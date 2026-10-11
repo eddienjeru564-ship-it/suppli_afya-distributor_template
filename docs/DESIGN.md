@@ -61,8 +61,19 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
   distributor" shows a quiet sage frame where it will go; a live page without one simply has no
   picture. The small monogram stays only where a name needs a mark (top bar, calling card).
 - **Sage.** Cream and neutrals carry the page; sage (`sage-soft`, with `moss` for numbers and icons) marks
-  the calm, personal parts: choosing what you'd like help with, how it works, meeting the distributor.
-  The distributor's own colour stays for actions and selection.
+  the calm, supportive parts: choosing what you'd like help with, every numbered step, the selector's
+  "What you've told us" panel, goal tags, small habits, the whole-plan total, info-card icons and
+  meeting the distributor. The distributor's own colour is kept for actions and selection, so purple
+  always means "this does something".
+- **One name for one action.** The guided path is "Find My Recommendations" everywhere it's a button
+  (hero, phone bar, closing, empty order, product page), "Recommendations" in the nav, and "Your
+  recommendations" once there's a result. Browsing is always a quieter link or button.
+- **One colour per role on a screen.** In the results, the whole plan is the main action (filled);
+  each product's own "Add to order" is outlined beside it. With a single product, it's filled.
+- **Steps.** "How it works" and "How ordering works" share one component (`ui/Steps`): sage numerals
+  joined by a hairline, down the page on phones and across from tablet up.
+- **Eyebrows only where a heading is a name.** "Meet your distributor" sits over Kate's name; section
+  headings that already say what they are ("Kate's products", "How ordering works") stand alone.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when
   something is added, the "+" becomes a quantity stepper. Everything honours "reduce motion".
 
@@ -83,7 +94,7 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 
 | Overlay | Phone | Larger screens | URL |
 |---|---|---|---|
-| Selector | Full screen, slides up | Full screen, with a dark panel of "What you've told us" beside the questions | `?find` (`?find=digestion` starts with that goal) |
+| Selector | Full screen, slides up | Full screen, with a sage panel of "What you've told us" beside the questions | `?find` (`?find=digestion` starts with that goal) |
 | Product | Bottom sheet, pull down to close, add button in thumb reach | Two-column dialog | `?p=<product id>` (shareable) |
 | Order | Bottom sheet | Drawer from the right | `?order` |
 | Message (preview only) | Bottom sheet | Dialog | none |

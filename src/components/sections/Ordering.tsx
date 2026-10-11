@@ -5,6 +5,7 @@ import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Tag, Truck, Wallet } from "@/components/ui/icons";
 import { keepTogether } from "@/components/ui/KeepTogether";
 import { Reveal } from "@/components/ui/Reveal";
+import { Steps } from "@/components/ui/Steps";
 import { PAYMENT_LABEL, canPlaceOrders, deliveryFeeLabel } from "@/storefront/order";
 import type { Storefront } from "@/storefront/types";
 
@@ -25,7 +26,7 @@ export function Ordering() {
   const receive = [delivery && "delivered", pickup && "collected"].filter(Boolean).join(" or ");
 
   const steps = [
-    { title: "Choose", body: "Add what you need to your order, or use Help me choose if you're not sure." },
+    { title: "Choose", body: "Add what you need to your order, or get recommendations first if you're not sure." },
     canPlaceOrders(sf)
       ? { title: "Place your order", body: `Right here, with your name and number. Or send it on WhatsApp, already written for you.` }
       : { title: "Send your order", body: "It opens in WhatsApp with every product, price and your details already written." },
@@ -40,8 +41,7 @@ export function Ordering() {
     <section id="ordering" aria-labelledby="ordering-title" className="scroll-mt-16 border-y border-ink/[0.08] bg-surface/70 py-20 md:py-28">
       <div className="container-x">
         <Reveal>
-          <p className="kicker">Ordering</p>
-          <h2 id="ordering-title" className="display-section mt-4 max-w-[16ch] text-ink">
+          <h2 id="ordering-title" className="display-section max-w-[16ch] text-ink">
             How ordering works
           </h2>
           <p className="mt-4 max-w-[34rem] text-[1rem] leading-relaxed text-ink-2">
@@ -49,17 +49,7 @@ export function Ordering() {
           </p>
         </Reveal>
 
-        {/* Phones: the number sits beside its step, so four steps fit in about one screen. */}
-        <ol className="mt-10 grid gap-x-8 gap-y-6 sm:mt-12 sm:grid-cols-2 sm:gap-y-8 lg:grid-cols-4">
-          {steps.map((s, i) => (
-            <li key={s.title} className="relative grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 border-t border-ink/15 pt-5 sm:block">
-              <span className="absolute -top-px left-0 h-px w-10 bg-accent" />
-              <span className="row-span-2 font-display text-[2.1rem] leading-none text-accent">{i + 1}</span>
-              <h3 className="text-[1.05rem] font-semibold text-ink sm:mt-3">{s.title}</h3>
-              <p className="mt-1.5 text-[0.93rem] leading-relaxed text-ink-2">{keepTogether(s.body)}</p>
-            </li>
-          ))}
-        </ol>
+        <Steps steps={steps} className="mt-10 sm:mt-12" />
 
         <div className="mt-14 grid gap-3 md:grid-cols-3 md:gap-4">
           <InfoCard icon={<Truck />} title={delivery ? "Delivery" : "Collection"}>
@@ -109,7 +99,7 @@ function InfoCard({ icon, title, children }: { icon: ReactNode; title: string; c
   return (
     <div className="rounded-card bg-canvas p-5 text-[0.95rem] leading-relaxed text-ink-2 ring-1 ring-ink/[0.07] md:p-6">
       <div className="mb-3 flex items-center gap-2.5 text-ink">
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-accent-soft text-accent">{icon}</span>
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-sage-soft text-moss">{icon}</span>
         <h3 className="text-[1.02rem] font-semibold">{title}</h3>
       </div>
       {children}

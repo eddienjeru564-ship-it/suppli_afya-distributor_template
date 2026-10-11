@@ -35,9 +35,9 @@ export function SoFar({ answers }: { answers: Answers }) {
 
   return (
     <div>
-      <h2 className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-white/50">What you&apos;ve told us</h2>
+      <h2 className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-ink-3">What you&apos;ve told us</h2>
       {empty ? (
-        <p className="mt-4 max-w-[22rem] text-[0.95rem] leading-relaxed text-white/60">
+        <p className="mt-4 max-w-[22rem] text-[0.95rem] leading-relaxed text-ink-2">
           As you answer, what your suggestions will be based on appears here, so you can see exactly what&apos;s being used.
         </p>
       ) : (
@@ -52,8 +52,8 @@ export function SoFar({ answers }: { answers: Answers }) {
               <Row key="goals" label="Looking for help with">
                 <div className="flex flex-wrap gap-1.5">
                   {view.goals.map((g, i) => (
-                    <span key={g} className="rounded-full bg-white/10 px-2.5 py-1 text-[0.85rem]">
-                      <span className="text-white/50">{i + 1}.</span> {g}
+                    <span key={g} className="rounded-full bg-surface px-2.5 py-1 text-[0.85rem] ring-1 ring-ink/[0.06]">
+                      <span className="text-moss">{i + 1}.</span> {g}
                     </span>
                   ))}
                 </div>
@@ -69,7 +69,7 @@ export function SoFar({ answers }: { answers: Answers }) {
                 <ul className="grid gap-1.5">
                   {view.flags.map((f) => (
                     <li key={f} className="flex items-center gap-2">
-                      <Alert className="h-3.5 w-3.5 shrink-0 text-[#f0b48a]" /> {f}
+                      <Alert className="h-3.5 w-3.5 shrink-0 text-caution" /> {f}
                     </li>
                   ))}
                 </ul>
@@ -95,10 +95,10 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="border-t border-white/10 pt-3"
+      className="border-t border-ink/10 pt-3"
     >
-      <dt className="text-[0.78rem] text-white/45">{label}</dt>
-      <dd className="mt-1.5 text-[0.95rem] leading-snug text-white/90">{children}</dd>
+      <dt className="text-[0.78rem] text-ink-3">{label}</dt>
+      <dd className="mt-1.5 text-[0.95rem] leading-snug text-ink">{children}</dd>
     </motion.div>
   );
 }

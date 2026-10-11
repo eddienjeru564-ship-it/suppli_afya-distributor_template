@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           what you tell it.
         </p>
         <section>
-          <h2 className="font-display text-[1.5rem] text-ink">Help me choose</h2>
+          <h2 className="font-display text-[1.5rem] text-ink">Recommendations</h2>
           <p className="mt-2">
             Your answers are used in your browser to suggest products, and are kept there only until you close the tab. They
             are shared with the distributor only if you choose to send them, by tapping the WhatsApp button at the end. If the

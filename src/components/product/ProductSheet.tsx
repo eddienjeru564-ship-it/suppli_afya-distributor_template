@@ -114,10 +114,10 @@ function ProductDetail({ listing }: { listing: Listing }) {
         </ul>
       </Block>
 
-      <div className="rounded-card bg-accent-soft p-4">
+      <div className="rounded-card bg-sage-soft p-4">
         <p className="text-[0.92rem] leading-relaxed text-ink">
-          <span className="font-semibold">Not sure it suits you?</span> Help me choose asks about your goals, medicines,
-          allergies and pregnancy, and leaves out anything that doesn&apos;t fit, with the reason.
+          <span className="font-semibold">Not sure it suits you?</span> A few questions about your goals, medicines, allergies
+          and pregnancy, and anything that doesn&apos;t fit is left out, with the reason.
         </p>
         <Button
           variant="accent"
@@ -129,7 +129,7 @@ function ProductDetail({ listing }: { listing: Listing }) {
             setTimeout(() => openSelector({ goal: p.goals[0] }), 60);
           }}
         >
-          Help me choose
+          Find My Recommendations
         </Button>
       </div>
 

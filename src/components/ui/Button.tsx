@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 /**
  * Button hierarchy:
  *   primary   ink on canvas: the one main action on a screen
- *   accent    the distributor's colour: guided actions (help me choose, add to order)
+ *   accent    the distributor's colour: guided actions (recommendations, the main step of a flow)
  *   outline   secondary actions
  *   ghost     tertiary, inline actions
  *   whatsapp  anything that opens a chat with the distributor

@@ -40,12 +40,11 @@ export function Catalogue() {
   const hidden = matches.length - shown.length;
 
   return (
-    <section id="products" aria-labelledby="products-title" className="scroll-mt-16 pb-10 pt-16 md:pt-24">
+    <section id="products" aria-labelledby="products-title" className="scroll-mt-16 pb-10 pt-12 md:pt-20">
       <div className="container-x">
         <Reveal className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div>
-            <p className="kicker">Browse</p>
-            <h2 id="products-title" className="display-section mt-4 text-ink">
+            <h2 id="products-title" className="display-section text-ink">
               {first}&apos;s products
             </h2>
             <p className="mt-4 max-w-[36rem] text-[1rem] leading-relaxed text-ink-2">
@@ -110,7 +109,7 @@ export function Catalogue() {
               onClick={() => openSelector({ goal })}
               className="group inline-flex items-center gap-1.5 text-[0.9rem] font-semibold text-accent"
             >
-              Not sure which? Help me choose
+              Not sure which? Get recommendations
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </button>
           )}

@@ -32,12 +32,12 @@ export function About() {
       <div
         className={clsx(
           "grid grid-cols-1 gap-10",
-          framed ? "md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-14 lg:gap-20" : "mx-auto max-w-3xl",
+          framed ? "md:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] md:items-center md:gap-14 lg:gap-20" : "mx-auto max-w-3xl",
         )}
       >
         {framed && (
           <Reveal className="hidden md:block">
-            <Photo distributor={d} className="aspect-[4/5] w-full rounded-panel" />
+            <Photo distributor={d} className="mx-auto aspect-[4/5] w-full max-w-[24rem] rounded-panel" />
           </Reveal>
         )}
 
@@ -55,7 +55,7 @@ export function About() {
           </div>
 
           {d.intro && (
-            <blockquote className="mt-7 border-l-2 border-sage pl-5 font-display text-[clamp(1.25rem,2.1vw,1.6rem)] italic leading-[1.38] tracking-[-0.01em] text-ink">
+            <blockquote className="mt-7 border-l-2 border-sage pl-5 font-display text-[clamp(1.15rem,2.1vw,1.55rem)] italic leading-[1.4] tracking-[-0.01em] text-ink">
               {d.intro}
             </blockquote>
           )}

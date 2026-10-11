@@ -222,7 +222,7 @@ function Review({ onNext }: { onNext: () => void }) {
                 setTimeout(() => openSelector(), 60);
               }}
             >
-              Help me choose
+              Find My Recommendations
             </Button>
             <Button variant="outline" onClick={() => goToSection("products")}>
               Browse products

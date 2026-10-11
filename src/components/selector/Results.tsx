@@ -83,10 +83,7 @@ export function Results({
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-4 sm:px-8 sm:pt-8">
       <Appear i={step++}>
-        {/* The header already says "Your suggestions"; the reference is what's worth quoting to the distributor. */}
-        <p className="kicker">
-          Reference <span className="font-mono tracking-normal">{result.ref}</span>
-        </p>
+        <p className="kicker">Your recommendations</p>
         <h1 className="display-section mt-4 text-ink">{title}</h1>
       </Appear>
 
@@ -102,8 +99,8 @@ export function Results({
           {p.goals.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-1.5">
               {p.goals.map((g, i) => (
-                <span key={g} className="rounded-full bg-accent-soft px-3 py-1 text-[0.82rem] font-medium text-ink">
-                  <span className="text-accent">{i + 1}.</span> {GOALS_BY_ID[g]?.label}
+                <span key={g} className="rounded-full bg-sage-soft px-3 py-1 text-[0.82rem] font-medium text-ink">
+                  <span className="text-moss">{i + 1}.</span> {GOALS_BY_ID[g]?.label}
                 </span>
               ))}
             </div>
@@ -135,7 +132,7 @@ export function Results({
       {lead && (
         <Appear i={step++} className="mt-10">
           <Heading>{s.core.length === 1 ? "Where to start" : "Start with"}</Heading>
-          <SuggestionCard s={lead} result={result} lead />
+          <SuggestionCard s={lead} result={result} lead planBelow={s.orderableCore.length > 1} />
         </Appear>
       )}
 
@@ -144,7 +141,7 @@ export function Results({
           <Heading>Also in your plan</Heading>
           <div className="grid gap-3">
             {more.map((x) => (
-              <SuggestionCard key={x.rec.product.id} s={x} result={result} />
+              <SuggestionCard key={x.rec.product.id} s={x} result={result} planBelow={s.orderableCore.length > 1} />
             ))}
           </div>
         </Appear>
@@ -152,20 +149,22 @@ export function Results({
 
       {s.orderableCore.length > 1 && (
         <Appear i={step++} className="mt-4">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-card bg-night p-4 pl-5 text-white">
+          {/* The plan as one decision: the main action on this screen. */}
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-card bg-sage-soft p-4 pl-5 ring-1 ring-moss/10">
             <div className="leading-tight">
-              <div className="text-[0.84rem] text-white/60">
+              <div className="text-[0.84rem] text-ink-2">
                 The whole plan · {s.orderableCore.length} products, one pack each
               </div>
-              <div className="price mt-1 text-[1.3rem] font-semibold">{kes(s.coreTotal)}</div>
+              <div className="price mt-1 text-[1.3rem] font-semibold text-ink">{kes(s.coreTotal)}</div>
             </div>
             {allIn ? (
-              <Button variant="light" onClick={openOrder}>
+              <Button variant="outline" onClick={openOrder}>
                 <Check /> In your order · View
               </Button>
             ) : (
               <Button
-                variant="light"
+                variant="accent"
+                arrow
                 onClick={() => {
                   for (const x of s.orderableCore) if (!qtyOf(x.rec.product.id)) addToOrder(x.rec.product.id, { from: "selector", quiet: true });
                   openOrder();
@@ -229,8 +228,8 @@ export function Results({
           <Heading note="No products needed. These make everything else work better.">Small changes that help</Heading>
           <ol className="grid gap-2.5 sm:grid-cols-2">
             {result.habits.map((h, i) => (
-              <li key={h.id} className="rounded-card bg-accent-soft/70 p-4">
-                <div className="font-display text-[1rem] text-accent">{String(i + 1).padStart(2, "0")}</div>
+              <li key={h.id} className="rounded-card bg-sage-soft p-4">
+                <div className="font-display text-[1rem] text-moss">{String(i + 1).padStart(2, "0")}</div>
                 <div className="mt-1 font-semibold leading-snug text-ink">{h.title}</div>
                 <p className="mt-1 text-[0.88rem] leading-relaxed text-ink-2">{h.detail}</p>
               </li>
@@ -270,7 +269,7 @@ export function Results({
       </div>
 
       <p className="mt-6 text-center text-[0.78rem] leading-relaxed text-ink-3">
-        General wellness guidance, not medical advice. Supplements don&apos;t replace a varied diet or any medicine you&apos;ve
+        Reference <span className="font-mono">{result.ref}</span> · General wellness guidance, not medical advice. Supplements don&apos;t replace a varied diet or any medicine you&apos;ve
         been prescribed. Read the label before use.
       </p>
 
@@ -302,7 +301,7 @@ export function Results({
   );
 }
 
-function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResult; lead?: boolean }) {
+function SuggestionCard({ s, result, lead, planBelow }: { s: Suggestion; result: EngineResult; lead?: boolean; planBelow?: boolean }) {
   const { sf, qtyOf, addToOrder, setQty, removeFromOrder, openProduct } = useStorefront();
   const { rec, listing } = s;
   const p = rec.product;
@@ -333,7 +332,7 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
               {rec.covers.map((g) => {
                 const rank = goals.indexOf(g);
                 return (
-                  <span key={g} className="rounded-full bg-accent-soft px-2.5 py-0.5 text-[0.76rem] font-semibold text-accent">
+                  <span key={g} className="rounded-full bg-sage-soft px-2.5 py-0.5 text-[0.76rem] font-semibold text-moss">
                     {rank === 0 ? "Main goal" : rank > 0 ? `Goal ${rank + 1}` : "Goal"} · {GOALS_BY_ID[g]?.label}
                   </span>
                 );
@@ -389,7 +388,8 @@ function SuggestionCard({ s, result, lead }: { s: Suggestion; result: EngineResu
                     <QtyStepper size="sm" name={p.name} value={qty} onChange={(n) => setQty(p.id, n)} onRemove={() => removeFromOrder(p.id)} />
                   </div>
                 ) : (
-                  <Button variant={lead ? "accent" : "primary"} onClick={() => addToOrder(p.id, { from: "selector" })}>
+                  // One colour per role: with a whole-plan button below, each card's add is the quieter choice.
+                  <Button variant={planBelow ? "outline" : "accent"} onClick={() => addToOrder(p.id, { from: "selector" })}>
                     Add to order
                   </Button>
                 )}

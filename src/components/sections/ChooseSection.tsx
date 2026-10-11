@@ -203,7 +203,7 @@ function YourSuggestions() {
 
       <div className="min-w-0 rounded-card bg-surface p-4 ring-1 ring-ink/[0.06] sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-ink-3">Your suggestions</span>
+          <span className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-ink-3">Your recommendations</span>
           <span className="font-mono text-[0.78rem] text-ink-3">{result.ref}</span>
         </div>
         {goals.length > 0 && (

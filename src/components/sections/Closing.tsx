@@ -9,7 +9,7 @@ import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { askMessage } from "@/storefront/messages";
 
 export function Closing() {
-  const { sf, openSelector } = useStorefront();
+  const { sf, openSelector, result } = useStorefront();
   const first = sf.distributor.firstName;
   return (
     <section id="closing" aria-labelledby="closing-title" className="container-x pb-8">
@@ -26,12 +26,13 @@ export function Closing() {
               order first.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          {/* Phones: full-width and stacked, so both are easy to reach and line up. */}
+          <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap">
             <ContactAction text={askMessage(sf)} variant="light" size="lg">
               <WhatsAppIcon className="text-[#1a9e4b]" /> Message {first}
             </ContactAction>
             <Button variant="night-outline" size="lg" onClick={() => openSelector()}>
-              Help me choose
+              {result ? "My recommendations" : "Find My Recommendations"}
             </Button>
           </div>
         </div>
