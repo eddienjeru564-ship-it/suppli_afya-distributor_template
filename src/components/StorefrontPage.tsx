@@ -6,6 +6,7 @@ import { Catalogue } from "@/components/sections/Catalogue";
 import { ChooseSection } from "@/components/sections/ChooseSection";
 import { Closing, Footer } from "@/components/sections/Closing";
 import { Hero } from "@/components/sections/Hero";
+import { HowItWorks } from "@/components/sections/HowItWorks";
 import { MobileBar, Toaster } from "@/components/sections/MobileBar";
 import { Ordering } from "@/components/sections/Ordering";
 import { TopBar } from "@/components/sections/TopBar";
@@ -19,11 +20,12 @@ import type { Storefront } from "@/storefront/types";
 
 /**
  * One distributor's storefront. The page reads top to bottom as one journey:
- *   who this is and the two ways in (help me choose / browse)
- *   → the selector, the page's centrepiece
+ *   whose page this is, and personal recommendations or the products
+ *   → what would you like help with? (the first step of the recommendations)
+ *   → how the recommendations work, in three steps
  *   → the products, with prices
  *   → how ordering, delivery and payment work
- *   → who you're buying from
+ *   → meet your distributor
  *   → a last, low-pressure "ask".
  * Overlays (selector, product, order) sit on top of the page rather than replacing it,
  * so nobody loses their place.
@@ -38,6 +40,7 @@ export function StorefrontPage({ sf }: { sf: Storefront }) {
           <main>
             <Hero />
             <ChooseSection />
+            <HowItWorks />
             <Catalogue />
             <Ordering />
             <About />

@@ -1,228 +1,271 @@
 "use client";
 
 import clsx from "clsx";
-import { GOALS, GOALS_BY_ID, SECTIONS, QUESTIONS_BY_ID, type GoalId } from "@/engine";
+import { useState } from "react";
+import { GOALS_BY_ID, SECTIONS, QUESTIONS_BY_ID, type GoalId } from "@/engine";
+import type { GoalMeta } from "@/engine/goals";
 import { PackArt } from "@/components/product/PackArt";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Lock } from "@/components/ui/icons";
+import { Check, ChevronDown, Lock } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/Reveal";
+import { MAX_INTERESTS, interestGroups, toggleInterest } from "@/storefront/interests";
 import { kes } from "@/storefront/money";
 import { priceSuggestions } from "@/storefront/suggestions";
 
-const PARTS: Record<string, string> = {
-  about: "A few basics, so nothing unsuitable is suggested.",
-  goals: "Up to three, with a short follow-up for each.",
-  life: "Food, water, sleep and movement.",
-  safety: "Medicines, conditions and allergies. Anything that doesn't suit you is left out.",
-};
-
 /**
- * The selector's home on the page. Picking what you'd like help with is the first answer,
- * so a tap on a goal starts the questions with that goal already chosen. Once there's a
- * result, this section shows it instead.
+ * "What would you like help with?" The first step of the recommendations, on the page itself.
+ * The interests picked here (up to three, most important first) are the selector's goals
+ * answer, so the questions start from them and never ask again. Nothing picked is fine too:
+ * the selector then asks about goals as usual. Once there's a result, this section shows it.
  */
 export function ChooseSection() {
-  const { sf, result, session, openSelector } = useStorefront();
-  const first = sf.distributor.firstName;
-  const inProgress = !result && session && session.currentId !== "disclaimer" ? session : null;
-  const part = inProgress ? SECTIONS.findIndex((s) => s.id === QUESTIONS_BY_ID[inProgress.currentId]?.section) + 1 : 0;
-
+  const { result } = useStorefront();
   return (
     <section id="choose" aria-labelledby="choose-title" className="container-x scroll-mt-20 py-6 md:py-10">
-      <div className="grain relative overflow-hidden rounded-panel bg-night px-5 py-10 text-white sm:px-8 sm:py-12 md:px-12 md:py-16">
-        {/* Phones: heading, then the goals straight away, then how it works. Large screens: two columns. */}
-        <div className="grid grid-cols-1 gap-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14 lg:gap-y-10">
-          <Reveal className="min-w-0">
-            <p className="kicker text-white/60">Help me choose</p>
-            <h2 id="choose-title" className="display-section mt-4 max-w-[14ch]">
-              {result ? "What fits, based on what you told us." : "What would you like help with?"}
-            </h2>
-            <p className="mt-5 max-w-[30rem] text-[1.02rem] leading-relaxed text-white/70">
-              {result
-                ? `Each suggestion comes with the reason it came up. Add what you'd like to your order, or send the whole thing to ${first} to talk it through.`
-                : "Pick what matters most. A few short questions follow, then you'll see what fits, what to leave out and why."}
-            </p>
-          </Reveal>
-
-          <div className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-            {result ? (
-              <Suggestions />
-            ) : (
-              <>
-                {inProgress && (
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-card bg-white/[0.06] p-4 ring-1 ring-white/10">
-                    <div>
-                      <div className="font-semibold">You&apos;re part-way through</div>
-                      <div className="text-[0.86rem] text-white/60">
-                        Part {Math.max(1, part)} of {SECTIONS.length}: {SECTIONS[Math.max(0, part - 1)]?.label}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="light" size="sm" onClick={() => openSelector()} arrow>
-                        Continue
-                      </Button>
-                      <Button variant="night-outline" size="sm" onClick={() => openSelector({ fresh: true })}>
-                        Start again
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                <GoalGrid onPick={(g) => openSelector({ goal: g })} onStart={() => openSelector()} resuming={Boolean(inProgress)} />
-              </>
-            )}
-          </div>
-
-          <div className="min-w-0">
-            {!result && (
-              <>
-                <h3 className="mb-3 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white/45 sm:sr-only">Four short parts</h3>
-                {/* Phones: the four parts as names only; the goals above are what matters there. */}
-                <ol className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-4 lg:grid-cols-1">
-                  {SECTIONS.map((s, i) => (
-                    <li key={s.id} className="flex items-baseline gap-3 sm:gap-4">
-                      <span className="font-display text-[1.1rem] leading-none text-white/40 sm:text-[1.3rem]">{String(i + 1).padStart(2, "0")}</span>
-                      <span>
-                        <span className="block font-semibold">{s.label}</span>
-                        <span className="mt-0.5 hidden text-[0.88rem] leading-snug text-white/55 sm:block">{PARTS[s.id]}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </>
-            )}
-            <p className={clsx("flex items-start gap-2 text-[0.84rem] leading-snug text-white/55", !result && "mt-8")}>
-              <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>
-                Your answers stay in this browser. {first} only sees them if you choose to send them. General guidance, not
-                medical advice.
-              </span>
-            </p>
-          </div>
-        </div>
+      <div className="rounded-panel bg-sage-soft px-5 py-10 sm:px-8 sm:py-12 md:px-12 md:py-14">
+        {result ? <YourSuggestions /> : <Interests />}
       </div>
     </section>
   );
 }
 
-function GoalGrid({ onPick, onStart, resuming }: { onPick: (g: GoalId) => void; onStart: () => void; resuming: boolean }) {
-  const tile =
-    "group flex h-full w-full items-start justify-between gap-2 rounded-card px-3.5 py-3 text-left transition-[background-color,box-shadow] duration-300 sm:p-4";
+function goalsIn(answers: Record<string, unknown> | undefined): GoalId[] {
+  const g = answers?.goals;
+  return Array.isArray(g) ? g.filter((x): x is GoalId => typeof x === "string" && x in GOALS_BY_ID) : [];
+}
+
+function Interests() {
+  const { sf, session, openSelector } = useStorefront();
+  const first = sf.distributor.firstName;
+  const { first: shownFirst, more } = interestGroups();
+
+  // The picks follow the selector: what was chosen there (or here, earlier) shows here when they come back.
+  const fromSession = goalsIn(session?.answers);
+  const sessionKey = fromSession.join(",");
+  const [picked, setPicked] = useState<GoalId[]>(fromSession);
+  const [syncedWith, setSyncedWith] = useState(sessionKey);
+  if (syncedWith !== sessionKey) {
+    setSyncedWith(sessionKey);
+    setPicked(fromSession);
+  }
+  const [showAll, setShowAll] = useState(false);
+  const [nudge, setNudge] = useState(false);
+
+  const inProgress = session && session.currentId !== "disclaimer" ? session : null;
+  const part = inProgress ? SECTIONS.findIndex((s) => s.id === QUESTIONS_BY_ID[inProgress.currentId]?.section) + 1 : 0;
+  const full = picked.length >= MAX_INTERESTS;
+  // Collapsed: the first six, plus anything picked from the rest, so a choice never disappears.
+  const visible: GoalMeta[] = showAll ? [...shownFirst, ...more] : [...shownFirst, ...more.filter((g) => picked.includes(g.id))];
+  const hiddenCount = shownFirst.length + more.length - visible.length;
+
+  const toggle = (id: GoalId) => {
+    if (full && !picked.includes(id)) {
+      setNudge(true);
+      return;
+    }
+    setNudge(false);
+    setPicked((p) => toggleInterest(p, id));
+  };
+
+  const status =
+    picked.length === 0
+      ? "Not sure yet? Just continue, and we'll help you narrow it down."
+      : full
+        ? nudge
+          ? `You can choose up to ${MAX_INTERESTS}. Tap one you've chosen to swap it.`
+          : `${MAX_INTERESTS} of ${MAX_INTERESTS} chosen. About 3 minutes from here.`
+        : `${picked.length} of ${MAX_INTERESTS} chosen. About 3 minutes from here.`;
+
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5">
-      {GOALS.map((g) => (
-        <li key={g.id}>
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-x-14">
+      <Reveal className="min-w-0">
+        <h2 id="choose-title" className="display-section max-w-[14ch] text-ink">
+          What would you like help with?
+        </h2>
+        <p className="mt-4 max-w-[30rem] text-[1.02rem] leading-relaxed text-ink-2">
+          Choose up to three, starting with what matters most. A few short questions follow, then you&apos;ll see what may
+          suit you, with prices and the reasons why.
+        </p>
+        <p className="mt-6 hidden max-w-[30rem] items-start gap-2 text-[0.84rem] leading-snug text-ink-3 lg:flex">
+          <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
+          <span>
+            Your answers stay in this browser. {first} only sees them if you choose to send them. General guidance, not
+            medical advice.
+          </span>
+        </p>
+      </Reveal>
+
+      <div className="min-w-0">
+        {inProgress && (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-card bg-surface/70 px-4 py-3 ring-1 ring-ink/[0.06]">
+            <span className="text-[0.9rem] text-ink-2">
+              <span className="font-semibold text-ink">You&apos;re part-way through.</span> Part {Math.max(1, part)} of{" "}
+              {SECTIONS.length}: {SECTIONS[Math.max(0, part - 1)]?.label}
+            </span>
+            <button
+              type="button"
+              onClick={() => openSelector({ fresh: true })}
+              className="text-[0.86rem] font-semibold text-ink-2 underline decoration-ink/25 underline-offset-4 hover:text-ink hover:decoration-ink"
+            >
+              Start again
+            </button>
+          </div>
+        )}
+
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5" aria-label="Wellness interests">
+          {visible.map((g, i) => {
+            const rank = picked.indexOf(g.id);
+            const on = rank >= 0;
+            const blocked = full && !on;
+            return (
+              <li key={g.id} className={clsx(i >= shownFirst.length && "interest-in")}>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  aria-disabled={blocked || undefined}
+                  onClick={() => toggle(g.id)}
+                  className={clsx(
+                    "relative flex h-full w-full flex-col justify-start rounded-card bg-surface px-3.5 py-3 text-left transition-[box-shadow,opacity,background-color] duration-200 sm:px-4 sm:py-3.5",
+                    on ? "ring-2 ring-accent" : "ring-1 ring-ink/[0.08] hover:ring-ink/25",
+                    blocked && "opacity-55",
+                  )}
+                >
+                  <span className="block pr-6 text-[0.93rem] font-semibold leading-snug text-ink sm:text-[0.95rem]">{g.label}</span>
+                  <span className="mt-0.5 block text-[0.78rem] leading-snug text-ink-3 sm:pr-4 sm:text-[0.8rem]">{g.hint}</span>
+                  {/* Filled with its place in the order once picked: the first counts most. */}
+                  <span
+                    aria-hidden
+                    className={clsx(
+                      "absolute right-3 top-3 grid h-[1.3rem] w-[1.3rem] place-items-center rounded-full text-[0.7rem] font-bold transition-colors sm:right-3.5 sm:top-3.5",
+                      on ? "bg-accent text-on-accent" : "ring-1 ring-inset ring-ink/20",
+                    )}
+                  >
+                    {on && (picked.length > 1 ? rank + 1 : <Check className="h-3 w-3" />)}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+
+        {(showAll || hiddenCount > 0) && (
           <button
             type="button"
-            onClick={() => onPick(g.id)}
-            className={clsx(tile, "bg-white/[0.045] ring-1 ring-white/10 hover:bg-white/[0.08] hover:ring-white/30")}
+            aria-expanded={showAll}
+            onClick={() => setShowAll((v) => !v)}
+            className="mt-3 inline-flex h-10 items-center gap-1.5 rounded-full px-1 text-[0.9rem] font-semibold text-ink-2 transition-colors hover:text-ink"
           >
-            <span className="min-w-0">
-              <span className="block text-[0.95rem] font-semibold leading-snug sm:text-[0.98rem]">{g.label}</span>
-              <span className="mt-0.5 line-clamp-2 text-[0.78rem] leading-snug text-white/55 sm:mt-1 sm:text-[0.8rem]">{g.hint}</span>
-            </span>
-            <ArrowRight className="mt-1 hidden h-3.5 w-3.5 shrink-0 text-white/35 transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-white sm:block" />
+            {showAll ? "Show fewer" : `View all interests (${hiddenCount} more)`}
+            <ChevronDown className={clsx("h-4 w-4 transition-transform duration-300", showAll && "rotate-180")} />
           </button>
-        </li>
-      ))}
-      {/* Fills the grid's last row, and gives the unsure a way in. */}
-      <li className="col-span-1 sm:col-span-2">
-        <button type="button" onClick={onStart} className={clsx(tile, "items-center bg-canvas text-ink hover:bg-white")}>
-          <span className="min-w-0">
-            <span className="block text-[0.95rem] font-semibold leading-snug sm:text-[0.98rem]">
-              {resuming ? "Carry on where I left off" : "Not sure? Start without choosing"}
-            </span>
-            <span className="mt-0.5 block text-[0.78rem] leading-snug text-ink-3 sm:mt-1 sm:text-[0.8rem]">
-              About 3 minutes<span className="hidden sm:inline">. Most answers are one tap.</span>
-            </span>
-          </span>
-          {/* Phones: half a row is too narrow for text and a button; the whole tile is the button. */}
-          <span className="hidden h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-canvas transition-transform duration-300 group-hover:translate-x-0.5 sm:grid">
-            <ArrowRight className="h-3.5 w-3.5" />
-          </span>
-        </button>
-      </li>
-    </ul>
+        )}
+
+        <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <p aria-live="polite" className="text-center text-[0.86rem] leading-snug text-ink-2 sm:text-left">
+            {status}
+          </p>
+          <Button variant="accent" size="lg" arrow onClick={() => openSelector({ interests: picked })} className="w-full shrink-0 px-8 sm:w-auto">
+            Continue
+          </Button>
+        </div>
+
+        <p className="mt-6 flex items-start gap-2 text-[0.82rem] leading-snug text-ink-3 lg:hidden">
+          <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
+          <span>Your answers stay in this browser. {first} only sees them if you choose to send them. Not medical advice.</span>
+        </p>
+      </div>
+    </div>
   );
 }
 
 /** A compact version of the result: what came up and what it costs, one tap from the order. */
-function Suggestions() {
+function YourSuggestions() {
   const { sf, result, openSelector, addToOrder, qtyOf, openOrder } = useStorefront();
   if (!result) return null;
+  const first = sf.distributor.firstName;
   const priced = priceSuggestions(sf, result);
   const goals = result.profile.goals.map((g) => GOALS_BY_ID[g]?.label).filter(Boolean);
   const clinic = result.status === "clinic-first";
   const allIn = priced.orderableCore.length > 0 && priced.orderableCore.every((s) => qtyOf(s.rec.product.id) > 0);
 
   return (
-    <div className="sm:rounded-card sm:bg-white/[0.05] sm:p-6 sm:ring-1 sm:ring-white/10">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-white/50">Your suggestions</span>
-        <span className="font-mono text-[0.78rem] text-white/45">{result.ref}</span>
-      </div>
-      {goals.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {goals.map((g, i) => (
-            <span key={g} className="rounded-full bg-white/10 px-2.5 py-1 text-[0.78rem] font-medium">
-              {i + 1}. {g}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {clinic ? (
-        <p className="mt-5 text-[0.95rem] leading-relaxed text-white/75">{result.planNotes[0]}</p>
-      ) : priced.core.length === 0 ? (
-        <p className="mt-5 text-[0.95rem] leading-relaxed text-white/75">
-          Nothing in the range suited your answers well enough to suggest. {sf.distributor.firstName} can talk you through
-          other options.
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-x-14">
+      <Reveal className="min-w-0">
+        <h2 id="choose-title" className="display-section max-w-[14ch] text-ink">
+          What fits, based on what you told us.
+        </h2>
+        <p className="mt-4 max-w-[30rem] text-[1.02rem] leading-relaxed text-ink-2">
+          Each suggestion comes with the reason it came up. Add what you&apos;d like to your order, or send the whole thing to{" "}
+          {first} to talk it through.
         </p>
-      ) : (
-        <ul className="mt-5 grid grid-cols-1 gap-2.5">
-          {priced.core.map((s) => (
-            <li key={s.rec.product.id} className="flex items-center gap-3.5 rounded-xl bg-white/[0.06] p-2.5 pr-3 sm:bg-white/[0.04]">
-              <PackArt product={s.rec.product} thumb className="aspect-square w-14 shrink-0 rounded-lg" />
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold leading-snug">{s.rec.product.name}</div>
-                <div className="hidden truncate text-[0.82rem] text-white/55 sm:block">{s.rec.reasons[0]}</div>
-                {/* Phones: the price under the name, so the name gets the full width. */}
-                <div className="price mt-0.5 text-[0.88rem] text-white/70 sm:hidden">
-                  {s.listing ? kes(s.listing.offer.price) : `Ask ${sf.distributor.firstName}`}
-                </div>
-              </div>
-              <div className="price hidden shrink-0 text-right text-[0.92rem] font-semibold sm:block">
-                {s.listing ? kes(s.listing.offer.price) : <span className="text-white/55">Ask</span>}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      </Reveal>
 
-      <div className="mt-6 flex flex-wrap gap-2.5">
-        {!clinic && priced.orderableCore.length > 0 && (
-          <Button
-            variant="light"
-            onClick={() => {
-              if (allIn) return openOrder();
-              for (const s of priced.orderableCore) if (!qtyOf(s.rec.product.id)) addToOrder(s.rec.product.id, { from: "selector", quiet: true });
-              openOrder();
-            }}
-          >
-            {allIn ? "View order" : priced.orderableCore.length > 1 ? `Add all · ${kes(priced.coreTotal)}` : `Add to order · ${kes(priced.coreTotal)}`}
-          </Button>
+      <div className="min-w-0 rounded-card bg-surface p-4 ring-1 ring-ink/[0.06] sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[0.78rem] font-semibold uppercase tracking-[0.12em] text-ink-3">Your suggestions</span>
+          <span className="font-mono text-[0.78rem] text-ink-3">{result.ref}</span>
+        </div>
+        {goals.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {goals.map((g, i) => (
+              <span key={g} className="rounded-full bg-sage-soft px-2.5 py-1 text-[0.78rem] font-medium text-moss">
+                {i + 1}. {g}
+              </span>
+            ))}
+          </div>
         )}
-        <Button variant="night-outline" onClick={() => openSelector()} arrow>
-          Why these came up
-        </Button>
+
+        {clinic ? (
+          <p className="mt-5 text-[0.95rem] leading-relaxed text-ink-2">{result.planNotes[0]}</p>
+        ) : priced.core.length === 0 ? (
+          <p className="mt-5 text-[0.95rem] leading-relaxed text-ink-2">
+            Nothing in the range suited your answers well enough to suggest. {first} can talk you through other options.
+          </p>
+        ) : (
+          <ul className="mt-5 grid grid-cols-1 gap-2">
+            {priced.core.map((s) => (
+              <li key={s.rec.product.id} className="flex items-center gap-3.5 rounded-xl bg-canvas p-2.5 pr-3">
+                <PackArt product={s.rec.product} thumb className="aspect-square w-14 shrink-0 rounded-lg ring-1 ring-ink/[0.06]" />
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold leading-snug text-ink">{s.rec.product.name}</div>
+                  <div className="hidden truncate text-[0.82rem] text-ink-3 sm:block">{s.rec.reasons[0]}</div>
+                  {/* Phones: the price under the name, so the name gets the full width. */}
+                  <div className="price mt-0.5 text-[0.88rem] text-ink-2 sm:hidden">{s.listing ? kes(s.listing.offer.price) : `Ask ${first}`}</div>
+                </div>
+                <div className="price hidden shrink-0 text-right text-[0.92rem] font-semibold text-ink sm:block">
+                  {s.listing ? kes(s.listing.offer.price) : <span className="text-ink-3">Ask</span>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-6 flex flex-wrap gap-2.5">
+          {!clinic && priced.orderableCore.length > 0 && (
+            <Button
+              variant="accent"
+              onClick={() => {
+                if (allIn) return openOrder();
+                for (const s of priced.orderableCore) if (!qtyOf(s.rec.product.id)) addToOrder(s.rec.product.id, { from: "selector", quiet: true });
+                openOrder();
+              }}
+            >
+              {allIn ? "View order" : priced.orderableCore.length > 1 ? `Add all · ${kes(priced.coreTotal)}` : `Add to order · ${kes(priced.coreTotal)}`}
+            </Button>
+          )}
+          <Button variant="outline" onClick={() => openSelector()} arrow>
+            Why these came up
+          </Button>
+        </div>
+        <button
+          type="button"
+          onClick={() => openSelector({ fresh: true })}
+          className="mt-4 text-[0.84rem] font-medium text-ink-3 underline-offset-4 hover:text-ink hover:underline"
+        >
+          Start again with different answers
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={() => openSelector({ fresh: true })}
-        className={clsx("mt-4 text-[0.84rem] font-medium text-white/55 underline-offset-4 hover:text-white hover:underline")}
-      >
-        Start again with different answers
-      </button>
     </div>
   );
 }

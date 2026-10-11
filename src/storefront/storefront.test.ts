@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATALOGUE, PRODUCTS_BY_ID, recommend, type Answers } from "@/engine";
+import { CATALOGUE, PRODUCTS_BY_ID, QUESTIONS_BY_ID, recommend, type Answers } from "@/engine";
 import { STOREFRONTS, storefrontBySlug } from "@/storefronts";
 import { kate } from "@/storefronts/kate";
 import { engineDrift } from "../../scripts/engine.mjs";
@@ -25,7 +25,7 @@ import {
 } from "./order";
 import photos from "./product-photos.json";
 import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel } from "./products";
-import { nextShown, partProgress } from "./progress";
+import { nextShown, partProgress, previousShown, resumeAt, sectionLead } from "./progress";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
 import { contrast, validateStorefront } from "./validate";
@@ -327,6 +327,36 @@ describe("selector progress", () => {
 
   it("is full once the suggestions are showing", () => {
     expect(partProgress(about, "goals", true)).toEqual([1, 1, 1, 1]);
+  });
+});
+
+describe("interests picked on the page", () => {
+  const about: Answers = { first_name: "Wanjiru", sex: "female", age: 34, pregnancy: "none", experience: "never" };
+  const picked: Answers = { ...about, goals: ["energy", "digestion"] };
+  const preset = ["goals"];
+
+  it("are never asked for again: the flow steps from the basics straight to their follow-ups", () => {
+    const first = nextShown("experience", picked, preset)!;
+    expect(first).not.toBe("goals");
+    expect(QUESTIONS_BY_ID[first].goal).toBe("energy");
+    expect(previousShown(first, picked, preset)).toBe("experience");
+    // The goals part still opens with its header, now on the first follow-up.
+    expect(sectionLead(first, picked, preset)?.id).toBe("goals_intro");
+    // And the bar counts only what's actually asked.
+    expect(partProgress(picked, first, false, preset)[1]).toBe(0);
+  });
+
+  it("are asked about as usual when the answer no longer stands, or nothing was picked", () => {
+    expect(nextShown("experience", { ...about, goals: [] }, preset)).toBe("goals");
+    expect(nextShown("experience", picked)).toBe("goals");
+  });
+
+  it("send someone part-way through to the first question their new interests add", () => {
+    const answered: Answers = { ...picked, energy_level: 2, energy_dips: ["afternoon"], gut_issues: ["bloating"], meals: "home" };
+    const withJoints: Answers = { ...answered, goals: ["energy", "digestion", "joints"] };
+    expect(QUESTIONS_BY_ID[resumeAt(withJoints, "veg", preset)].goal).toBe("joints");
+    expect(resumeAt(answered, "veg", preset)).toBe("veg");
+    expect(resumeAt(withJoints, "disclaimer", preset)).toBe("disclaimer");
   });
 });
 

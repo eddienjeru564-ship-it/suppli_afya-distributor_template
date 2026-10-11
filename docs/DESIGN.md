@@ -10,8 +10,8 @@ with one thumb, on a weak signal.
 
 1. **Whose page this is comes first.** The distributor's name and face are in the top bar on every
    screen, and in the first thing you read. Suppli Afya is a small "Powered by" in the footer.
-2. **Two ways in, of equal weight.** "Help me choose" and "Browse products" are the same size, side by
-   side. Neither is the lesser option.
+2. **One main way in, and a quiet second.** Recommendations are the main action ("Find My
+   Recommendations", then "What would you like help with?"); browsing is always one text link away.
 3. **Prices are never behind a message.** They're on the first screen, on every card, in every result.
 4. **Say why.** Every suggestion shows the reason it came up, in the engine's words ("because you
    said…"), what to expect and when, and what was left out and why.
@@ -57,8 +57,12 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
   units of the stage's shorter side, so one component works as a thumbnail, a card and a banner.
 - **Pack size next to the price.** What one pack holds ("60 capsules", "20 sachets") sits under every
   price, from the catalogue's `pack`, read off the pack photos. A price means little without it.
-- **The distributor's face.** A real photo when there is one. Until then, a monogram in their colour,
-  and the About section becomes a letter rather than an empty picture frame.
+- **The distributor's face.** A real photo when there is one. In a preview without one, "Meet your
+  distributor" shows a quiet sage frame where it will go; a live page without one simply has no
+  picture. The small monogram stays only where a name needs a mark (top bar, calling card).
+- **Sage.** Cream and neutrals carry the page; sage (`sage-soft`, with `moss` for numbers and icons) marks
+  the calm, personal parts: choosing what you'd like help with, how it works, meeting the distributor.
+  The distributor's own colour stays for actions and selection.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when
   something is added, the "+" becomes a quantity stepper. Everything honours "reduce motion".
 
@@ -68,10 +72,11 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
 |---|---|
 | Top bar | Name and face always visible; message and order one tap away |
 | Hero | One promise ("Find the right wellness products for your goals"), one main action (Find My Recommendations) with what it takes underneath (about 3 minutes, no account), and a quiet text link straight to the products for people who already know. On the right, three real packs on white cards with their names and prices, on a softly tinted panel, with the distributor's calling card ("Your distributor", name, area, Chat) in front. Calm on purpose: the packs and prices are the point. The link preview shows the same three |
-| Help me choose | Goal tiles: tapping one starts the selector with that goal already chosen. After a result, this section shows the suggestions with prices |
+| What would you like help with? | The first step of the recommendations, on the page. Six broad interests, "View all interests" opens the rest in place. Pick up to three (numbered: the first counts most) or none, then one filled Continue. Picks become the selector's goals answer, so the goals question is stepped over, the opening screen says what came with them, and the goals part opens with "You picked … Change". With none, the selector asks about goals as usual. Picks stay when you come back. After a result, this section shows the suggestions with prices |
+| How it works | Three steps: answer a few questions, see what may suit you (with reasons and prices, and what's left out), order from the distributor or ask first |
 | Products | Search by name or ingredient, filter by what it's for, six most-asked-about first, the rest one tap away. A goal filter offers "Not sure which? Help me choose" |
 | How ordering works | Four steps, then delivery, payment and prices, answered plainly |
-| Who you're buying from | Name, role, their own words, where they are, how to reach them, and that the page is theirs, not BF Suma's |
+| Meet your distributor | Their photo (or, in a preview, where it will go) beside their name, role, own words, where they are and the languages they chat in, how to reach them, and that the page is theirs, not BF Suma's |
 | Still deciding? | A low-pressure last ask |
 
 ## Overlays
@@ -96,7 +101,12 @@ The engine decides; the interface renders. Presentation choices:
 - Progress is four named parts, not a question count.
 - On larger screens, "What you've told us" builds up as you answer: exactly what the suggestions will
   be based on, including anything we'll take care around ("Takes blood pressure medicine").
-- Closing keeps your answers. "Help me choose" on the page then offers "Continue where I left off".
+- Closing keeps your answers. The interests on the page show what was picked, and say how far through
+  you are, with "Start again" beside it.
+- Interests picked on the page are the goals answer (`SelectorSession.preset` names it): the flow steps
+  over the goals question while that answer stands (`storefront/progress.ts`), so nothing is asked twice.
+  If a pick stops applying (a men's or women's interest once sex is known), the question is asked as
+  usual. Every safety question is still asked.
 
 ## Results
 

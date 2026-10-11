@@ -4,10 +4,10 @@ import clsx from "clsx";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  GOALS_BY_ID,
   QUESTIONS_BY_ID,
   SECTIONS,
   isAnswered,
-  previousQuestionId,
   resolveText,
   toggleOption,
   visibleOptions,
@@ -20,7 +20,7 @@ import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
 import { Bag, ChevronLeft, Close, Lock, Shield } from "@/components/ui/icons";
 import { Sheet } from "@/components/ui/Sheet";
-import { isFolded, nextShown, partProgress, previousShown } from "@/storefront/progress";
+import { nextShown, partProgress, previousShown, sectionLead } from "@/storefront/progress";
 import { MultiChoice, Scale, SingleChoice, TextField } from "./inputs";
 import { Results } from "./Results";
 import { SoFar } from "./SoFar";
@@ -71,6 +71,8 @@ function Selector() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const answers = useMemo(() => session?.answers ?? {}, [session]);
+  // Questions answered on the page (the interests): stepped over, never asked twice.
+  const preset = useMemo(() => session?.preset ?? [], [session]);
   const currentId = session?.currentId && QUESTIONS_BY_ID[session.currentId] ? session.currentId : FIRST;
   const q = QUESTIONS_BY_ID[currentId];
   const ctx: EngineContext = useMemo(
@@ -86,14 +88,14 @@ function Selector() {
   const toTop = () => scrollRef.current?.scrollTo({ top: 0 });
 
   const goTo = useCallback(
-    (id: string, direction: 1 | -1, a: Answers) => {
+    (id: string, direction: 1 | -1, a: Answers, keep: string[] = preset) => {
       setDir(direction);
       setError(null);
       setTouched(true);
-      setSession({ answers: a, currentId: id });
+      setSession({ answers: a, currentId: id, ...(keep.length ? { preset: keep } : {}) });
       toTop();
     },
-    [setSession],
+    [preset, setSession],
   );
 
   const finish = useCallback(
@@ -113,11 +115,11 @@ function Selector() {
         if (q.kind === "text") setError("Please enter a name, even a nickname.");
         return;
       }
-      const n = nextShown(currentId, a);
+      const n = nextShown(currentId, a, preset);
       if (!n || currentId === LAST) finish(a);
       else goTo(n, 1, a);
     },
-    [answers, currentId, finish, goTo, q],
+    [answers, currentId, finish, goTo, preset, q],
   );
 
   const back = useCallback(() => {
@@ -128,33 +130,37 @@ function Selector() {
       goTo(LAST, -1, outcome.answers);
       return;
     }
-    const p = previousShown(currentId, answers);
+    const p = previousShown(currentId, answers, preset);
     if (p) goTo(p, -1, answers);
     else close("selector");
-  }, [answers, close, currentId, goTo, outcome, setOutcome, showingResult]);
+  }, [answers, close, currentId, goTo, outcome, preset, setOutcome, showingResult]);
 
   const restart = useCallback(() => {
     setOutcome(null);
-    goTo(FIRST, -1, {});
+    goTo(FIRST, -1, {}, []);
   }, [goTo, setOutcome]);
 
+  /** Change the interests picked on the page: the goals question, asked like any other from here on. */
+  const editGoals = useCallback(() => goTo("goals", -1, answers, preset.filter((x) => x !== "goals")), [answers, goTo, preset]);
+
+  const keep = preset.length ? { preset } : {};
   const setValue = (id: string, value: Answers[string]) => {
     setError(null);
-    setSession({ answers: tidy({ ...answers, [id]: value }), currentId });
+    setSession({ answers: tidy({ ...answers, [id]: value }), currentId, ...keep });
   };
 
   const selectAndAdvance = (id: string, value: string | number) => {
     const updated = tidy({ ...answers, [id]: value });
-    setSession({ answers: updated, currentId });
+    setSession({ answers: updated, currentId, ...keep });
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => next(updated), reduce ? 0 : 260);
   };
 
   const sectionProgress = useMemo(() => {
-    const fills = partProgress(answers, currentId, showingResult);
+    const fills = partProgress(answers, currentId, showingResult, preset);
     const currentSection = SECTIONS.findIndex((x) => x.id === q?.section);
     return SECTIONS.map((s, i) => ({ ...s, fill: fills[i], current: !showingResult && i === currentSection }));
-  }, [answers, currentId, q?.section, showingResult]);
+  }, [answers, currentId, preset, q?.section, showingResult]);
 
   const intro = !showingResult && q?.section === "intro";
   const opening = !showingResult && currentId === FIRST;
@@ -276,6 +282,8 @@ function Selector() {
                   <QuestionView
                     q={q}
                     answers={answers}
+                    preset={preset}
+                    onEditGoals={editGoals}
                     ctx={ctx}
                     touched={touched}
                     error={error}
@@ -296,6 +304,8 @@ function Selector() {
 function QuestionView({
   q,
   answers,
+  preset,
+  onEditGoals,
   ctx,
   touched,
   error,
@@ -305,6 +315,8 @@ function QuestionView({
 }: {
   q: Question;
   answers: Answers;
+  preset: string[];
+  onEditGoals: () => void;
   ctx: EngineContext;
   touched: boolean;
   error: string | null;
@@ -320,9 +332,11 @@ function QuestionView({
   const answered = isAnswered(q, answers);
 
   // The section screen just before this question becomes its header.
-  const prevId = previousQuestionId(q.id, answers);
-  const lead = prevId && isFolded(QUESTIONS_BY_ID[prevId]) ? QUESTIONS_BY_ID[prevId] : null;
+  const lead = sectionLead(q.id, answers, preset);
   const part = SECTIONS.findIndex((s) => s.id === q.section) + 1;
+  const goals = (Array.isArray(answers.goals) ? answers.goals : []).map((g) => GOALS_BY_ID[g as keyof typeof GOALS_BY_ID]?.label).filter(Boolean);
+  // The goals were picked on the page: say so where the goals part opens, with a way to change them.
+  const pickedOnPage = lead?.id === "goals_intro" && preset.includes("goals") && goals.length > 0;
 
   if (q.kind === "section") {
     // Only the privacy and "not medical advice" screen is shown on its own.
@@ -330,6 +344,17 @@ function QuestionView({
       <div className="flex flex-1 flex-col sm:justify-center">
         <div className="my-auto py-6 sm:my-0">
           <span className="kicker">Help me choose</span>
+          {/* What they picked on the page, so it's clear it came with them. */}
+          {goals.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-[0.86rem] text-ink-3">You&apos;d like help with</span>
+              {goals.map((g) => (
+                <span key={g} className="rounded-full bg-accent-soft px-3 py-1 text-[0.84rem] font-semibold text-accent">
+                  {g}
+                </span>
+              ))}
+            </div>
+          )}
           <h2 className="display-section mt-4 text-ink">{prompt}</h2>
           {helper && (
             <div className="mt-4 grid gap-3 text-[1rem] leading-relaxed text-ink-2">
@@ -365,7 +390,20 @@ function QuestionView({
             Part {part} of {SECTIONS.length}
           </span>
           <p className="mt-2.5 font-display text-[1.3rem] italic leading-snug text-accent">{resolveText(lead.prompt, answers, ctx)}</p>
-          {lead.helper && <p className="mt-1 text-[0.92rem] leading-relaxed text-ink-2">{resolveText(lead.helper, answers, ctx)}</p>}
+          {pickedOnPage ? (
+            <p className="mt-1 text-[0.92rem] leading-relaxed text-ink-2">
+              You picked {joinAnd(goals)}. One or two short questions about each.{" "}
+              <button
+                type="button"
+                onClick={onEditGoals}
+                className="font-semibold text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+              >
+                Change
+              </button>
+            </p>
+          ) : (
+            lead.helper && <p className="mt-1 text-[0.92rem] leading-relaxed text-ink-2">{resolveText(lead.helper, answers, ctx)}</p>
+          )}
         </div>
       ) : null}
 
@@ -426,4 +464,9 @@ function QuestionView({
       )}
     </div>
   );
+}
+
+/** "Energy", "Energy and Digestion", "Energy, Digestion and Weight". */
+function joinAnd(items: string[]) {
+  return items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}` : (items[0] ?? "");
 }

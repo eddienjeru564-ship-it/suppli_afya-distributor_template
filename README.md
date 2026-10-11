@@ -7,8 +7,9 @@ A customer arriving from WhatsApp, Instagram or a QR card should know within sec
 is, that they can get help choosing, that they can simply browse, what things cost, and how to order.
 
 ```
-Kate's identity  →  two ways in: "Help me choose" or "Browse products"
-                 →  the selector (the Suppli Afya recommendation engine) → suggestions, with the reason and the price
+Kate's identity  →  "What would you like help with?" (up to three interests, or none)
+                 →  the selector (the Suppli Afya recommendation engine), starting from those interests
+                 →  suggestions, with the reason and the price
                  →  the catalogue → product details → order
                  →  the order, placed with Kate or written into WhatsApp for her to confirm
 ```
@@ -35,7 +36,7 @@ SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts   # review screenshots
 | `src/storefronts/` | One file per distributor (`kate.ts`) and the registry (`index.ts`) |
 | `src/storefront/` | Pure logic: types, prices and order, product facts, messages, config validation. Tested |
 | `src/components/StorefrontPage.tsx` | The page, in story order |
-| `src/components/sections/` | Top bar, hero, "Help me choose", catalogue, ordering, about, closing, mobile bar |
+| `src/components/sections/` | Top bar, hero, "What would you like help with?", how it works, catalogue, ordering, meet your distributor, closing, mobile bar |
 | `src/components/selector/` | The selector overlay (drives the engine), the live "What you've told us" panel, results |
 | `src/components/product/` | Product photos and pack illustrations (`PackArt`), product card, product sheet, quantity controls |
 | `src/components/order/` | The order sheet: review → your details → send |

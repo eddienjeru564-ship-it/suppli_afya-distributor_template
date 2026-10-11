@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { GOALS_BY_ID, recommend, type Answers, type EngineResult, type GoalId } from "@/engine";
 import { cartReducer, priceCart, sanitiseCart, type CartItem, type PricedCart } from "@/storefront/cart";
 import { findListing } from "@/storefront/products";
+import { resumeAt } from "@/storefront/progress";
 import type { Storefront } from "@/storefront/types";
 
 /**
@@ -20,6 +21,8 @@ import type { Storefront } from "@/storefront/types";
 export interface SelectorSession {
   answers: Answers;
   currentId: string;
+  /** Questions answered on the page before the selector opened, which it steps over (see storefront/progress). */
+  preset?: string[];
 }
 export interface SelectorOutcome {
   answers: Answers;
@@ -75,7 +78,13 @@ interface StorefrontState {
 
   overlays: Overlays;
   openProduct: (id: string) => void;
-  openSelector: (opts?: { goal?: GoalId; fresh?: boolean }) => void;
+  /**
+   * Open the selector. `interests`: what the visitor picked on the page, up to three, most
+   * important first; they become the goals answer and the goals question is stepped over.
+   * `goal`: one goal suggested by context (a product, a link), added to the goals answer,
+   * which is still shown so it can be adjusted.
+   */
+  openSelector: (opts?: { goal?: GoalId; interests?: GoalId[]; fresh?: boolean }) => void;
   openOrder: () => void;
   close: (layer: Layer) => void;
   /** Close whatever is open and bring a section of the page into view. */
@@ -174,7 +183,10 @@ export function StorefrontProvider({ sf, children }: { sf: Storefront; children:
     /* eslint-disable react-hooks/set-state-in-effect -- one-time restore from storage and the URL */
     dispatch({ type: "replace", items: sanitiseCart(store.get("local", keys.cart)) });
     const s = store.get<SelectorSession>("session", keys.session);
-    if (s?.answers && typeof s.currentId === "string") setSessionState(s);
+    if (s?.answers && typeof s.currentId === "string") {
+      const preset = Array.isArray(s.preset) ? s.preset.filter((x): x is string => typeof x === "string") : undefined;
+      setSessionState({ answers: s.answers, currentId: s.currentId, ...(preset?.length ? { preset } : {}) });
+    }
     const o = store.get<SelectorOutcome>("session", keys.outcome);
     if (o?.answers && typeof o.salt === "string") setOutcomeState(o);
     setSentOrderState(store.get<SentOrder>("local", keys.sent));
@@ -289,16 +301,27 @@ export function StorefrontProvider({ sf, children }: { sf: Storefront; children:
   );
 
   const openSelector = useCallback(
-    (opts: { goal?: GoalId; fresh?: boolean } = {}) => {
+    (opts: { goal?: GoalId; interests?: GoalId[]; fresh?: boolean } = {}) => {
       if (opts.fresh) {
         setOutcome(null);
         setSession(opts.goal ? { answers: { goals: [opts.goal] }, currentId: "disclaimer" } : null);
+      } else if (opts.interests) {
+        // The interests picked on the page are the goals answer. With none, the goals question is asked as usual.
+        const interests = opts.interests.slice(0, 3);
+        const answers: Answers = { ...(session?.answers ?? {}) };
+        const before = Array.isArray(answers.goals) ? answers.goals : [];
+        if (interests.length) answers.goals = interests;
+        else delete answers.goals;
+        const preset = interests.length ? ["goals"] : [];
+        const same = before.length === interests.length && before.every((g, i) => g === interests[i]);
+        const currentId = !session ? "disclaimer" : same ? session.currentId : resumeAt(answers, session.currentId, preset);
+        setSession({ answers, currentId, preset });
       } else if (opts.goal) {
-        // Picking a goal on the page starts the selector with it chosen, or adds it to one in progress.
+        // A goal suggested by context starts the selector with it chosen, or adds it to one in progress.
         const answers = session?.answers ?? {};
         const goals = Array.isArray(answers.goals) ? answers.goals : [];
         const next = goals.includes(opts.goal) ? goals : [opts.goal, ...goals].slice(0, 3);
-        setSession({ answers: { ...answers, goals: next }, currentId: session?.currentId ?? "disclaimer" });
+        setSession({ answers: { ...answers, goals: next }, currentId: session?.currentId ?? "disclaimer", preset: session?.preset });
       }
       open("selector");
     },

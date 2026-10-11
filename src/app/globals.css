@@ -17,6 +17,11 @@
   --color-ink-3: #6b655c;
   --color-night: #171614;
   --color-night-2: #23211e;
+  /* Sage: the calm, personal surfaces (choosing what you'd like help with, how it works, meeting the
+     distributor). Shared with the Suppli Afya app's palette. Moss is its text and number colour (5:1). */
+  --color-sage: #b9c8ae;
+  --color-sage-soft: #e7ecdf;
+  --color-moss: #4e6a48;
   --color-caution: #8f4418;
   --color-caution-soft: #f7e8da;
   --color-wa: #25d366;
@@ -202,6 +207,10 @@
    * Entrances are CSS, not JavaScript: the first screen must be readable the moment the
    * HTML arrives, on a slow connection, before any script has loaded.
    */
+  /* Interests revealed by "View all interests". */
+  .interest-in {
+    animation: rise 0.45s var(--ease-out) both;
+  }
   .rise {
     animation: rise 0.8s var(--ease-out) both;
     animation-delay: calc(var(--i, 0) * 70ms);
@@ -216,7 +225,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .rise,
-    .reveal {
+    .reveal,
+    .interest-in {
       animation: none;
     }
   }

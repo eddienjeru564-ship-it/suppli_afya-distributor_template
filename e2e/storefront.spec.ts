@@ -136,11 +136,67 @@ test("pregnancy: clinic first, and nothing is offered for sale", async ({ page }
   await expect(results.getByRole("button", { name: "Add to order" })).toHaveCount(0);
 });
 
-test("a goal picked on the page is already chosen when the questions reach it", async ({ page }) => {
+test("interests picked on the page carry into the questions, and are never asked twice", async ({ page }) => {
   await page.goto("/");
-  await page.locator("#choose").getByRole("button", { name: /^Joints & bones/ }).click();
+  const choose = page.locator("#choose");
+  await choose.getByRole("button", { name: /^Energy/ }).click();
+  await choose.getByRole("button", { name: /^Digestion/ }).click();
+  await expect(choose.getByRole("button", { name: /^Energy/ })).toHaveAttribute("aria-pressed", "true");
+  await choose.getByRole("button", { name: "Continue", exact: true }).click();
+
+  // The opening screen says what came with them; the safety and privacy screen is still there.
+  await expect(sheet(page).getByText("You'd like help with")).toBeVisible();
+  await expect(sheet(page).getByRole("heading", { name: "Before we start" })).toBeVisible();
+  await basics(page, { name: "Wanjiru" });
+
+  // Straight from the basics to the first follow-up: no goals question.
+  await expect(sheet(page).getByText(/You picked Energy and Digestion/)).toBeVisible();
+  await expect(sheet(page).getByRole("heading", { name: "How would you rate your energy on most days?" })).toBeVisible();
+  await sheet(page).getByRole("button", { name: "Back" }).click();
+  await expect(sheet(page).getByRole("heading", { name: "Do you take any supplements at the moment?" })).toBeVisible();
+  await pick(page, /Never/);
+
+  await pick(page, "2 of 5");
+  await tick(page, "Mid-afternoon");
+  await tick(page, "Constipation", "Bloating or gas");
+  await pick(page, "Most weeks");
+  await dailyLife(page);
+  await safety(page);
+  await expect(sheet(page).getByText("Your main goal is energy, followed by digestion.")).toBeVisible();
+});
+
+test("interests stay picked when you come back, up to three, and can be changed in the questions", async ({ page }) => {
+  await page.goto("/");
+  const choose = page.locator("#choose");
+  await choose.getByRole("button", { name: /View all interests/ }).click();
+  await choose.getByRole("button", { name: /^Joints & bones/ }).click();
+  await choose.getByRole("button", { name: /^Focus & memory/ }).click();
+  await choose.getByRole("button", { name: /^Energy/ }).click();
+  // A fourth is refused, with a way out.
+  await choose.getByRole("button", { name: /^Immunity/ }).click({ force: true });
+  await expect(choose.getByText(/Tap one you've chosen to swap it/)).toBeVisible();
+  await expect(choose.getByRole("button", { name: /^Immunity/ })).toHaveAttribute("aria-pressed", "false");
+
+  await choose.getByRole("button", { name: "Continue", exact: true }).click();
+  await sheet(page).getByRole("button", { name: /^Close/ }).click();
+  await page.reload();
+  // Still picked after leaving and reloading, including one from the longer list.
+  await expect(choose.getByRole("button", { name: /^Focus & memory/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(choose.getByRole("button", { name: /^Joints & bones/ })).toHaveAttribute("aria-pressed", "true");
+
+  await choose.getByRole("button", { name: "Continue", exact: true }).click();
   await basics(page, { name: "Otieno", sex: "Male", age: 50 });
+  await expect(sheet(page).getByRole("heading", { name: "What's going on with your joints or bones?" })).toBeVisible();
+  await sheet(page).getByRole("button", { name: "Change", exact: true }).click();
   await expect(sheet(page).getByRole("checkbox", { name: /Joints & bones/ })).toHaveAttribute("aria-checked", "true");
+  await expect(sheet(page).getByRole("checkbox", { name: /Focus & memory/ })).toHaveAttribute("aria-checked", "true");
+});
+
+test("continuing without picking an interest asks about goals in the questions, as usual", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#choose").getByRole("button", { name: "Continue", exact: true }).click();
+  await basics(page, { name: "Amani" });
+  await expect(sheet(page).getByRole("heading", { name: "What would you most like to improve?" })).toBeVisible();
 });
 
 test("products have their own links, and the back button closes a sheet instead of leaving", async ({ page }) => {
