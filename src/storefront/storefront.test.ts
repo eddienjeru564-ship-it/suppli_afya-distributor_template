@@ -19,6 +19,8 @@ import {
   normalisePhone,
   orderMessage,
   orderRecord,
+  parseDetails,
+  portalOrder,
   placeProblem,
   priceOrder,
   type OrderDetails,
@@ -240,7 +242,7 @@ describe("orders", () => {
     expect(detailsProblem(live, { ...details, areaId: null })).toMatch(/delivered/);
     expect(detailsProblem(live, { ...details, payment: null })).toMatch(/pay/);
     expect(detailsProblem(live, { ...details, receive: "pickup", areaId: null })).toBeNull();
-    expect(detailsProblem(kate, { ...emptyDetails(kate), name: "Wanjiru", receive: "pickup" })).toMatch(/how you'd like to get/);
+    expect(detailsProblem(kate, { ...emptyDetails(kate), name: "Wanjiru", phone: "0712345678", receive: "pickup" })).toMatch(/how you'd like to get/);
     expect(detailsProblem(live, details)).toBeNull();
   });
 
@@ -300,6 +302,30 @@ describe("orders", () => {
     expect(ref).toMatch(ORDER_REF);
     expect(ref.startsWith("KC-")).toBe(true);
     for (let n = 0; n < 200; n++) expect(newOrderRef("Kate Cromuel")).toMatch(ORDER_REF);
+  });
+
+  it("files in the portal exactly what the Suppli Afya app takes", () => {
+    const d = parseDetails({ ...details, phone: "+254 712 345 678", note: "Evenings\nare best" });
+    const record = orderRecord(live, priceOrder(live, cart, d), d, { order: "AO-7QX2", selector: "SA-AB12" });
+    const body = portalOrder(record, "amani");
+    // The fields suppli_afya's (the app's) /api/storefront/orders reads, and nothing else.
+    expect(body).toEqual({
+      suppliSlug: "amani",
+      ref: "AO-7QX2",
+      selectorRef: "SA-AB12",
+      customer: { name: "Wanjiru", phone: "254712345678" },
+      receive: "delivery",
+      deliverTo: { area: "Nairobi CBD", address: "Kilimani, near Yaya" },
+      payment: "mpesa",
+      note: "Evenings are best",
+      lines: [
+        { id: "probio3", name: "Probio3", qty: 1, unitPrice: 3900, total: 3900 },
+        { id: "veggie-veggie", name: "Veggie Veggie", qty: 2, unitPrice: 4100, total: 8200 },
+      ],
+      total: 12300,
+      totalConfirmed: true,
+    });
+    expect(JSON.stringify(body)).not.toContain("Hi Amani");
   });
 });
 

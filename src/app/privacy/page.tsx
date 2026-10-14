@@ -41,12 +41,13 @@ export default function PrivacyPage() {
             You can place an order on the page or send it on WhatsApp. When you place it on the page, the products, your name,
             phone number, delivery choice and any note you add go to the distributor&apos;s Suppli Afya workspace, so they can
             confirm the order with you. When you send it on WhatsApp, it opens with the same details written, and the
-            distributor receives it when you press send.
+            distributor receives it when you press send; if they use a Suppli Afya workspace, it&apos;s saved there too.
           </p>
           <p className="mt-3">
-            The distributor may keep a record of your order to deliver it and to follow up. This page remembers what&apos;s in
-            your order, your name, phone number and delivery choice on this device, so you don&apos;t have to type them again.
-            Clearing your browser&apos;s data removes them.
+            If the workspace can&apos;t take an order straight away, it waits on this page&apos;s server and is tried again for up
+            to seven days, then deleted. The distributor may keep a record of your order to deliver it and to follow up. This
+            page remembers what&apos;s in your order, your name, phone number and delivery choice on this device, so you
+            don&apos;t have to type them again. Clearing your browser&apos;s data removes them.
           </p>
         </section>
         <section>

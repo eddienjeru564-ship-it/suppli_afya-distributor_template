@@ -47,9 +47,9 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
 
 ## Deploying
 
-A standard Next.js app (Vercel or any Node host). Set `NEXT_PUBLIC_SITE_URL` to the public address so
-link previews work in WhatsApp (on Vercel it defaults to the deploy's own address until there's a
-domain), and `NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` if `/` should be Kate's page.
+A standard Next.js app on Vercel (see the README, "Deploying"). `NEXT_PUBLIC_SITE_URL` defaults to the deploy's
+own address; set it once Kate's page has its own domain. Set `NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` if `/` should
+be Kate's page.
 
 To file orders and sent results in the portal, set `SUPPLI_AFYA_URL` to the Suppli Afya app's production
 address and the same `STOREFRONT_SECRET` in both deploys. This server calls that address, so on Vercel

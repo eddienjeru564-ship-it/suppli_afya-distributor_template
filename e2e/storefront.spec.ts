@@ -98,7 +98,7 @@ test("help me choose: suggestions come with the reason, the price and a way to o
   // The engine's own handoff message goes to the distributor.
   await order.getByRole("button", { name: "Close" }).click();
   await sheet(page).getByRole("button", { name: /Send to Kate on WhatsApp/ }).click();
-  await expect(sheet(page).getByText("Hi Kate, I've just done the health check.")).toBeVisible();
+  await expect(sheet(page).getByText("Hi Kate, I've just done the assessment on your page.")).toBeVisible();
   await sheet(page).getByRole("button", { name: "Done" }).click();
 
   // Back on the page, the result stays with the customer.
@@ -334,7 +334,7 @@ test.describe("order API", () => {
       data: { slug: "kate", ref: "KC-AB23", items: [{ id: "probio3", qty: 2, price: 1 }], details },
     });
     expect(res.ok()).toBe(true);
-    expect(await res.json()).toMatchObject({ ok: true, ref: "KC-AB23", total: 7800, totalConfirmed: false, forwarded: false });
+    expect(await res.json()).toMatchObject({ ok: true, ref: "KC-AB23", total: 7800, totalConfirmed: false, filed: false, forwarded: false });
   });
 
   test("turns away orders that can't be right", async ({ request }) => {
