@@ -92,7 +92,7 @@ export function Ordering() {
 
 function InfoCard({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="rounded-card bg-canvas p-5 text-[0.95rem] leading-relaxed text-ink-2 ring-1 ring-ink/[0.07] md:p-6">
+    <div className="reveal-card rounded-card bg-canvas p-5 text-[0.95rem] leading-relaxed text-ink-2 ring-1 ring-ink/[0.07] md:p-6">
       <div className="mb-3 flex items-center gap-2.5 text-ink">
         <span className="grid h-9 w-9 place-items-center rounded-full bg-sage-soft text-moss">{icon}</span>
         <h3 className="text-[1.02rem] font-semibold">{title}</h3>

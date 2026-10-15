@@ -23,7 +23,7 @@ export function ProductCard({ listing, className }: { listing: Listing; classNam
     <article
       className={clsx(
         // Phones: picture and words side by side, then price and Add across the full width below.
-        "group relative grid grid-cols-[5.75rem_minmax(0,1fr)] gap-x-4 rounded-card bg-surface p-3 ring-1 ring-ink/[0.07] transition-[box-shadow,transform] duration-300 ease-[var(--ease-out)] hover:shadow-lift md:flex md:flex-col md:gap-0 md:p-0",
+        "reveal-card group relative grid grid-cols-[5.75rem_minmax(0,1fr)] gap-x-4 rounded-card bg-surface p-3 ring-1 ring-ink/[0.07] transition-[box-shadow,translate] duration-300 ease-[var(--ease-out)] hover:shadow-lift md:flex md:flex-col md:gap-0 md:p-0 md:hover:-translate-y-0.5",
         className,
       )}
     >

@@ -138,7 +138,7 @@ function Interests() {
                     aria-hidden
                     className={clsx(
                       "absolute right-3 top-3 grid h-[1.3rem] w-[1.3rem] place-items-center rounded-full text-[0.7rem] font-bold transition-colors sm:right-3.5 sm:top-3.5",
-                      on ? "bg-accent text-on-accent" : "ring-1 ring-inset ring-ink/20",
+                      on ? "pop bg-accent text-on-accent" : "ring-1 ring-inset ring-ink/20",
                     )}
                   >
                     {on && (picked.length > 1 ? rank + 1 : <Check className="h-3 w-3" />)}

@@ -17,7 +17,7 @@ test("the first screen says whose page it is, and offers both ways in", async ({
 test("browsing: find a product, read about it and send the order to the distributor", async ({ page }) => {
   await page.goto("/");
   await page.locator("#top").getByRole("link", { name: /Browse all \d+ products/ }).click();
-  await page.getByPlaceholder("Search by name or ingredient").fill("probio");
+  await page.getByPlaceholder("Search products").fill("probio");
   await page.locator("#products").getByRole("button", { name: /^Probio3, KES 3,900/ }).click();
 
   const detail = sheet(page);
