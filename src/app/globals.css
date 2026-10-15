@@ -71,6 +71,27 @@
       scroll-behavior: auto;
     }
   }
+  /*
+   * Fit the screen it's on. Text, spacing and components are sized in rem, so the root size scales
+   * the whole page together: a touch smaller on very narrow phones, and on short laptop screens
+   * (1366×768, or any laptop at 125% display scaling) where the first screen would otherwise
+   * overflow. Percentages keep the reader's own browser text size setting.
+   */
+  @media (max-width: 359px) {
+    html {
+      font-size: 93.75%;
+    }
+  }
+  @media (min-width: 1024px) and (max-height: 820px) {
+    html {
+      font-size: 93.75%;
+    }
+  }
+  @media (min-width: 1024px) and (max-height: 680px) {
+    html {
+      font-size: 87.5%;
+    }
+  }
   body {
     background: var(--color-canvas);
     color: var(--color-ink);
