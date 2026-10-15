@@ -105,14 +105,16 @@ function StillLife() {
             className={clsx("group absolute", cls)}
           >
             <span className="rise block" style={{ "--i": i } as CSSProperties}>
-              <span className="block overflow-hidden rounded-[1rem] bg-white shadow-[0_1px_2px_rgb(28_26_23/0.05),0_12px_28px_-18px_rgb(28_26_23/0.32)] ring-1 ring-ink/[0.05] transition-[translate,box-shadow] duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1 group-hover:shadow-[0_1px_2px_rgb(28_26_23/0.05),0_18px_36px_-18px_rgb(28_26_23/0.36)]">
-                <PackArt product={l!.product} className="aspect-[4/5] w-full" sizes="(min-width: 1024px) 14rem, 40vw" eager={l === center} />
-                <span className="flex flex-col items-center border-t border-ink/[0.05] px-2 pb-2.5 pt-2 text-center leading-tight sm:pb-3 sm:pt-2.5">
-                  <span className="line-clamp-2 max-w-full text-balance text-[0.75rem] font-medium text-ink-3 sm:text-[0.8rem]">
-                    {shortName(l!.product)}
-                  </span>
-                  <span className="price mt-0.5 whitespace-nowrap text-[0.8rem] font-semibold text-ink sm:text-[0.9rem]">
-                    {kes(l!.offer.price)}
+              <span className="float block" style={{ "--i": i } as CSSProperties}>
+                <span className="block overflow-hidden rounded-[1rem] bg-white shadow-[0_1px_2px_rgb(28_26_23/0.05),0_12px_28px_-18px_rgb(28_26_23/0.32)] ring-1 ring-ink/[0.05] transition-[translate,box-shadow] duration-500 ease-[var(--ease-out)] group-hover:-translate-y-1 group-hover:shadow-[0_1px_2px_rgb(28_26_23/0.05),0_18px_36px_-18px_rgb(28_26_23/0.36)]">
+                  <PackArt product={l!.product} className="aspect-[4/5] w-full" sizes="(min-width: 1024px) 14rem, 40vw" eager={l === center} />
+                  <span className="flex flex-col items-center border-t border-ink/[0.05] px-2 pb-2.5 pt-2 text-center leading-tight sm:pb-3 sm:pt-2.5">
+                    <span className="line-clamp-2 max-w-full text-balance text-[0.75rem] font-medium text-ink-3 sm:text-[0.8rem]">
+                      {shortName(l!.product)}
+                    </span>
+                    <span className="price mt-0.5 whitespace-nowrap text-[0.8rem] font-semibold text-ink sm:text-[0.9rem]">
+                      {kes(l!.offer.price)}
+                    </span>
                   </span>
                 </span>
               </span>
