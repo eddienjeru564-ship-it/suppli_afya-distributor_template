@@ -47,10 +47,11 @@ These are launch blockers in `suppli_afya/docs/DECISIONS.md` and apply here too:
 
 ## Deploying
 
-A standard Next.js app on Vercel (see the README, "Deploying"). `NEXT_PUBLIC_SITE_URL` defaults to the deploy's
-own address; set it once Kate's page has its own domain. Set `NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` if `/` should
-be Kate's page.
+A standard Next.js app on Vercel (see the README, "Deploying"). Kate's page is `https://kate.suppliafya.co.ke`
+(DNS on Vercel), set as `NEXT_PUBLIC_SITE_URL` in production so link previews and share links use it, with
+`NEXT_PUBLIC_DEFAULT_STOREFRONT=kate` so `/` is her page. Vercel Authentication covers only the `.vercel.app`
+addresses, so the custom domain is public.
 
 To file orders and sent results in the portal, set `SUPPLI_AFYA_URL` to the Suppli Afya app's production
-address and the same `STOREFRONT_SECRET` in both deploys. This server calls that address, so on Vercel
+address (`https://suppliafya.co.ke`) and the same `STOREFRONT_SECRET` in both deploys. This server calls that address, so on Vercel
 the app's Vercel Authentication (Deployment Protection) must be limited to previews.
