@@ -173,8 +173,10 @@ function ProductDetail({ listing }: { listing: Listing }) {
           <WhatsAppIcon /> Ask {first} about it
         </ContactAction>
       ) : (
-        <Button variant="primary" size="lg" className="flex-1" onClick={add}>
-          Add to order · <span className="price">{kes(offer.price * qty)}</span>
+        <Button variant="primary" size="lg" className="min-w-0 flex-1 px-4 max-[379px]:text-[0.95rem]" onClick={add}>
+          {/* Small phones: the short label, so the price always fits beside the quantity. */}
+          <span className="max-[379px]:hidden">Add to order ·</span>
+          <span className="min-[380px]:hidden">Add ·</span> <span className="price">{kes(offer.price * qty)}</span>
         </Button>
       )}
     </div>
