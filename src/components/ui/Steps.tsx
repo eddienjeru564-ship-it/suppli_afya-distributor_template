@@ -12,7 +12,7 @@ export function Steps({ steps, className }: { steps: { title: ReactNode; body: s
   return (
     <ol className={clsx("grid grid-cols-1 gap-y-7 md:gap-x-8 md:gap-y-10", cols, className)}>
       {steps.map((s, i) => (
-        <li key={i} className="relative grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 md:block">
+        <li key={i} className="reveal-card relative grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 md:block">
           {i < steps.length - 1 && (
             <span
               aria-hidden

@@ -71,6 +71,27 @@
       scroll-behavior: auto;
     }
   }
+  /*
+   * Fit the screen it's on. Text, spacing and components are sized in rem, so the root size scales
+   * the whole page together: a touch smaller on very narrow phones, and on short laptop screens
+   * (1366×768, or any laptop at 125% display scaling) where the first screen would otherwise
+   * overflow. Percentages keep the reader's own browser text size setting.
+   */
+  @media (max-width: 359px) {
+    html {
+      font-size: 93.75%;
+    }
+  }
+  @media (min-width: 1024px) and (max-height: 820px) {
+    html {
+      font-size: 93.75%;
+    }
+  }
+  @media (min-width: 1024px) and (max-height: 680px) {
+    html {
+      font-size: 87.5%;
+    }
+  }
   body {
     background: var(--color-canvas);
     color: var(--color-ink);
@@ -191,10 +212,6 @@
     scrollbar-width: thin;
     scrollbar-color: rgb(28 26 23 / 0.2) transparent;
   }
-  /* Soft fade at the edges of a horizontal scroller, so it reads as "more this way". */
-  .fade-x {
-    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent 100%);
-  }
   /* Fine paper grain for dark panels and monograms. Static, so it costs nothing to scroll. */
   .grain {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
@@ -229,6 +246,23 @@
       animation-range: entry 0% entry 55%;
     }
   }
+  /* Cards drift into place as they scroll into view. Movement only, so text keeps full contrast. */
+  @supports (animation-timeline: view()) {
+    .reveal-card {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+  /* The products on the first screen float, slowly and out of step, once they've risen in. */
+  .float {
+    animation: float 7s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -2.3s);
+  }
+  /* A choice made: its marker pops in. */
+  .pop {
+    animation: tick 0.32s var(--ease-out) both;
+  }
   /* "Putting your recommendations together": a turning ring, and each step ticked in turn. */
   .prep-ring {
     animation: spin 0.9s linear infinite;
@@ -246,6 +280,9 @@
     .settle,
     .reveal,
     .interest-in,
+    .reveal-card,
+    .float,
+    .pop,
     .prep-step,
     .prep-tick {
       animation: none;
@@ -270,6 +307,25 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 

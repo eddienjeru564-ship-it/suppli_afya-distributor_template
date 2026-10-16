@@ -1,8 +1,8 @@
 {
   "upstream": "github.com/eddienjeru564-ship-it/suppli_afya",
   "path": "src/engine",
-  "commit": "404d25eb9c489fdc4210edb30f29a6f716f0d993",
-  "syncedAt": "2026-10-11",
+  "commit": "88c06e1d6abf0b21338fc7e1000282c2b1a50e42",
+  "syncedAt": "2026-10-14",
   "note": "Exact copy of the Suppli Afya engine. Do not edit here; change it upstream and run npm run engine:sync.",
   "files": {
     "advice.ts": "ea5fa3e7bdfc607dc95727f1aa9f3018a9a1462652169305ced2e8d0c0532c4e",
@@ -11,10 +11,10 @@
     "engine.test.ts": "2d9f6bf857efc5e1bcecf74faa5b9ab614fd77f2814ffe17615588276cf5a21e",
     "flow.ts": "696574fe89ad422249c97ae43d8d29a794d1b86c36fde7ac4c22abb4db6c5c71",
     "goals.ts": "9360991a81616f7f15d87fd75fa7a4ba97a633a18334477f412c7da78a335824",
-    "handoff.ts": "b144990eadda95f475e8ea2a2d4f01f60ae866cc37ce1b5e1a6588cd679ff86b",
+    "handoff.ts": "8e26f258273c6b0c58c68ef38b70c2648cc5d1ec79d916e4590006d5182ce71a",
     "index.ts": "c576927cc5bd89221e8c95a6b36e97deff30ebbcd97259d8e8e5b9788c0235a9",
     "profile.ts": "18204db2c59f99987af65beebbfb9ccbf73169c612bd31f974df7cad7fe8f1a6",
-    "questions.ts": "a253fd1cdfbd16f1d1f404baa654c5ad90cbca7da68d58cf09c83668d4ee9f50",
+    "questions.ts": "903242792bf8e682cc9361e402afd48b8f92c4458f4996057ff19df3e535ba84",
     "recommend.ts": "086f279286917442f4116bcff4b3b2dd466fb573bffa25c035fff44236d19ab6",
     "safety.ts": "7f2aed47ea796715f010d297f04a6c53dbe74d937eb06e073f6ba0f30e8aa188",
     "types.ts": "837b30a8a2c11100ef3528c240f75475ab2cff578d42bed9d858f0fafcf3f5aa"

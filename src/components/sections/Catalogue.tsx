@@ -3,12 +3,12 @@
 import clsx from "clsx";
 import { AnimatePresence, useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useId, useMemo, useState } from "react";
 import { GOALS, GOALS_BY_ID, type GoalId } from "@/engine";
 import { ProductCard } from "@/components/product/ProductCard";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Close, Search, WhatsAppIcon } from "@/components/ui/icons";
+import { ArrowRight, Check, ChevronDown, Close, Search, WhatsAppIcon } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
 import { dateLabel } from "@/storefront/dates";
@@ -30,11 +30,21 @@ export function Catalogue() {
   const [query, setQuery] = useState("");
   const [goal, setGoal] = useState<GoalId | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [areasOpen, setAreasOpen] = useState(false);
+  const areasId = useId();
   const q = useDeferredValue(query);
   const first = sf.distributor.firstName;
 
-  // Only offer filters that have something behind them.
-  const goals = useMemo(() => GOALS.filter((g) => all.some((l) => servesGoal(l.product, g.id))), [all]);
+  // Only offer health areas that have something behind them, each with how many products it has.
+  const goals = useMemo(
+    () =>
+      GOALS.map((g) => ({ ...g, count: all.filter((l) => servesGoal(l.product, g.id)).length })).filter((g) => g.count > 0),
+    [all],
+  );
+  const pickArea = (id: GoalId | null) => {
+    setGoal(id);
+    setAreasOpen(false);
+  };
 
   const matches = all.filter((l) => (!goal || servesGoal(l.product, goal)) && matchesQuery(l.product, q));
   const narrowing = Boolean(goal || q.trim());
@@ -57,45 +67,94 @@ export function Catalogue() {
         </Reveal>
       </div>
 
-      {/* Toolbar stays under the top bar while you browse. */}
+      {/* Toolbar stays under the top bar while you browse: search, and the health areas behind one button. */}
       <div className="sticky top-16 z-20 mt-8 bg-canvas/95 py-3 backdrop-blur-md">
-        <div className="container-x grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] md:items-center md:gap-5">
-          <label className="relative block">
-            <span className="sr-only">Search products</span>
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-[1.1rem] w-[1.1rem] -translate-y-1/2 text-ink-3" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name or ingredient"
-              enterKeyHint="search"
-              autoComplete="off"
-              className="h-12 w-full rounded-control bg-surface pl-11 pr-11 text-[1rem] text-ink outline-none ring-1 ring-ink/12 transition-shadow placeholder:text-ink-3 focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:hidden"
-            />
-            {query && (
+        <div className="container-x">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 md:max-w-[44rem] md:gap-3">
+            <label className="relative block">
+              <span className="sr-only">Search products</span>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-[1.1rem] w-[1.1rem] -translate-y-1/2 text-ink-3" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products"
+                enterKeyHint="search"
+                autoComplete="off"
+                className="h-12 w-full rounded-control bg-surface pl-11 pr-11 text-[1rem] text-ink outline-none ring-1 ring-ink/12 transition-shadow placeholder:text-ink-3 placeholder:text-ellipsis focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:hidden"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-ink-3 hover:text-ink"
+                >
+                  <Close />
+                </button>
+              )}
+            </label>
+            <div className="flex items-center">
               <button
                 type="button"
-                onClick={() => setQuery("")}
-                aria-label="Clear search"
-                className="absolute right-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-ink-3 hover:text-ink"
+                aria-expanded={areasOpen}
+                aria-controls={areasId}
+                onClick={() => setAreasOpen((o) => !o)}
+                className={clsx(
+                  "inline-flex h-12 max-w-[11rem] items-center gap-2 rounded-control px-4 text-[0.92rem] font-semibold transition-colors sm:max-w-[16rem]",
+                  goal ? "bg-ink text-canvas" : "bg-surface text-ink ring-1 ring-ink/12 hover:ring-ink/30",
+                  goal && "rounded-r-none pr-3",
+                )}
               >
-                <Close />
+                <span className="truncate">
+                  <span className={clsx(goal && "sr-only sm:not-sr-only")}>Health area{goal ? ": " : ""}</span>
+                  {goal && GOALS_BY_ID[goal].label}
+                </span>
+                <ChevronDown className={clsx("h-4 w-4 shrink-0 transition-transform duration-200", areasOpen && "rotate-180")} />
               </button>
-            )}
-          </label>
-          <div className="fade-x -mx-5 overflow-x-auto px-5 no-scrollbar md:mx-0 md:px-0" role="group" aria-label="What it's for">
-            <div className="flex w-max gap-2 pr-6">
-              <FilterChip active={goal === null} onClick={() => setGoal(null)}>
-                All
-              </FilterChip>
-              {goals.map((g) => (
-                <FilterChip key={g.id} active={goal === g.id} onClick={() => setGoal(goal === g.id ? null : g.id)}>
-                  {g.label}
-                </FilterChip>
-              ))}
+              {goal && (
+                <button
+                  type="button"
+                  onClick={() => pickArea(null)}
+                  aria-label={`Show all health areas, not just ${GOALS_BY_ID[goal].label.toLowerCase()}`}
+                  className="grid h-12 w-10 place-items-center rounded-r-control border-l border-canvas/20 bg-ink text-canvas"
+                >
+                  <Close className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>
+
+        <AnimatePresence initial={false}>
+          {areasOpen && (
+            <m.div
+              id={areasId}
+              key="areas"
+              initial={reduce ? false : { height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setAreasOpen(false);
+              }}
+            >
+              <div className="container-x pt-3">
+                <div role="group" aria-label="Health areas" className="flex flex-wrap gap-2">
+                  <FilterChip active={goal === null} onClick={() => pickArea(null)} count={all.length}>
+                    All products
+                  </FilterChip>
+                  {goals.map((g) => (
+                    <FilterChip key={g.id} active={goal === g.id} onClick={() => pickArea(goal === g.id ? null : g.id)} count={g.count}>
+                      {g.label}
+                    </FilterChip>
+                  ))}
+                </div>
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="container-x">
@@ -171,18 +230,20 @@ export function Catalogue() {
   );
 }
 
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function FilterChip({ active, onClick, count, children }: { active: boolean; onClick: () => void; count: number; children: React.ReactNode }) {
   return (
     <button
       type="button"
       aria-pressed={active}
       onClick={onClick}
       className={clsx(
-        "h-10 shrink-0 rounded-full px-4 text-[0.88rem] font-medium transition-colors duration-200",
+        "inline-flex h-10 items-center gap-1.5 rounded-full pl-3.5 pr-3 text-[0.88rem] font-medium transition-colors duration-200",
         active ? "bg-ink text-canvas" : "bg-surface text-ink-2 ring-1 ring-ink/12 hover:text-ink hover:ring-ink/30",
       )}
     >
+      {active && <Check className="h-3.5 w-3.5" />}
       {children}
+      <span className={clsx("text-[0.78rem] tabular-nums", active ? "text-canvas/70" : "text-ink-3")}>{count}</span>
     </button>
   );
 }

@@ -208,3 +208,26 @@ export function orderRecord(sf: Storefront, order: PricedOrder, d: OrderDetails,
     message: orderMessage(sf, order, d, refs),
   };
 }
+
+type OrderRecord = ReturnType<typeof orderRecord>;
+
+/**
+ * What the Suppli Afya app's /api/storefront/orders takes: the order, re-priced here, filed in
+ * the distributor's portal under their link name. Only what the portal uses; the WhatsApp text stays out.
+ */
+export function portalOrder(record: OrderRecord, suppliSlug: string) {
+  return {
+    suppliSlug,
+    ref: record.ref,
+    selectorRef: record.selectorRef,
+    customer: record.customer,
+    receive: record.receive,
+    deliverTo: record.deliverTo,
+    payment: record.payment,
+    note: record.note,
+    lines: record.lines,
+    total: record.total,
+    totalConfirmed: record.totalConfirmed,
+  };
+}
+export type PortalOrder = ReturnType<typeof portalOrder>;

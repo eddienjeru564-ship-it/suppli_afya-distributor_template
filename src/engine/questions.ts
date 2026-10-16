@@ -27,7 +27,7 @@ export const QUESTIONS: Question[] = [
     section: "intro",
     prompt: "Let's find what actually suits you.",
     helper: (_a, ctx) =>
-      `${ctx.distributorFirstName} uses this short health check to understand your goals, routine and health before recommending anything. At the end you'll get a plan that explains what could help and why.`,
+      `${ctx.distributorFirstName} uses this short assessment to understand what you're looking for, your routine and your health before suggesting anything. At the end you'll see which products could help, and why.`,
     badge: "About 3 minutes",
     cta: "Start",
   },
@@ -37,7 +37,7 @@ export const QUESTIONS: Question[] = [
     section: "intro",
     prompt: "Before we start",
     helper: (_a, ctx) =>
-      `Your answers stay private. They're only shared with ${ctx.distributorFirstName} if you choose to send them at the end.\n\nThis check gives general wellness guidance. It isn't medical advice and it doesn't replace your doctor. If you're pregnant, taking medicine or managing a health condition, we'll point out anything you should confirm with a health professional first.`,
+      `Your answers stay private. They're only shared with ${ctx.distributorFirstName} if you choose to send them at the end.\n\nThis assessment gives general wellness guidance. It isn't medical advice and it doesn't replace your doctor. If you're pregnant, taking medicine or managing a health condition, we'll point out anything you should confirm with a health professional first.`,
     cta: "I understand",
   },
   {
