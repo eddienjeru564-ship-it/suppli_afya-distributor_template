@@ -1,4 +1,4 @@
-import { GOALS_BY_ID, type EngineResult, type GoalId, type Product } from "@/engine";
+import { GOALS_BY_ID, QUESTIONS, QUESTIONS_BY_ID, pruneAnswers, type Answers, type EngineResult, type GoalId, type Product } from "@/engine";
 import type { PricedSuggestions, Suggestion } from "./suggestions";
 
 /**
@@ -101,31 +101,44 @@ export function planView(result: EngineResult, priced: PricedSuggestions): PlanV
   };
 }
 
-const COUNT = ["No products", "One product", "Two products", "Three products", "Four products", "Five products"];
-
-/** "a", "a and b", "a, b and c". */
-export function listOf(items: string[]): string {
-  if (items.length <= 1) return items[0] ?? "";
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
-}
+/** Scales read on their own only with their subject. Others are left out rather than guessed. */
+const SCALE_SAID: Record<string, string> = { energy_level: "Energy", stress_level: "Stress" };
+/** Answers that mean nothing without their question. */
+const CONTEXTLESS = /^(yes|no|not sure)$/i;
 
 /**
- * The whole result in a sentence or two, under the title: what's in the plan, what it costs,
- * and anything that didn't get a product. Plain and specific, never a promise.
+ * What the customer told us about one goal, in their own words (the options they picked), for
+ * showing beside that goal's answer. A question belongs to a goal when choosing that goal is what
+ * makes it appear.
  */
-export function planSentence(view: PlanView, priced: PricedSuggestions, opts: { firstName: string; price: (n: number) => string }): string {
-  const n = priced.core.length;
-  const lower = (gs: GoalId[]) => listOf(gs.map((g) => goalLabel(g).toLowerCase()));
-  const parts: string[] = [];
-  if (n === 0) {
-    parts.push(`Nothing in ${opts.firstName}'s range suits your answers yet. Below is why, and what helps in the meantime.`);
-    return parts.join(" ");
+export function youSaid(goal: GoalId, answers: Answers): string[] {
+  const only = { ...answers, goals: [goal] };
+  const without = { ...answers, goals: [] };
+  const out: string[] = [];
+  for (const q of QUESTIONS) {
+    if (q.section !== "goals" || !q.showIf || q.kind === "section" || q.kind === "ranked") continue;
+    if (!q.showIf(answers) || !q.showIf(only) || q.showIf(without)) continue;
+    const v = answers[q.id];
+    if (v === undefined || v === null) continue;
+    if (q.kind === "scale") {
+      if (typeof v === "number" && SCALE_SAID[q.id]) out.push(`${SCALE_SAID[q.id]} ${v} of 5`);
+      continue;
+    }
+    for (const id of Array.isArray(v) ? v : [v]) {
+      const o = q.options?.find((x) => x.id === id);
+      if (o && !o.exclusive && !CONTEXTLESS.test(o.label)) out.push(o.label);
+    }
   }
-  parts.push(`${COUNT[n] ?? `${n} products`}${view.covered.length ? ` for ${lower(view.covered)}` : ""}.`);
-  const orderable = priced.orderableCore.length;
-  if (orderable === n) parts.push(n === 1 ? `${opts.price(priced.coreTotal)} for one pack.` : `${opts.price(priced.coreTotal)} for a pack of each.`);
-  else if (orderable > 0) parts.push(`${opts.price(priced.coreTotal)} for the ${orderable === 1 ? "one" : orderable} on ${opts.firstName}'s price list.`);
-  if (view.unmet.length) parts.push(`Nothing suits you for ${lower(view.unmet)} yet, and we explain why.`);
-  if (view.waiting.length) parts.push(`${listOf(view.waiting.map(goalLabel))} can wait until you're ready.`);
-  return parts.join(" ");
+  return out;
+}
+
+/** How many questions the customer answered (only the ones that still apply). */
+export function answeredCount(answers: Answers): number {
+  return Object.keys(pruneAnswers(answers)).filter((id) => QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].kind !== "section").length;
+}
+
+/** Roughly what a pack costs per day at the usual dose, to the nearest 10. Null when the pack's length isn't known. */
+export function perDay(price: number, supplyDays: number): number | null {
+  if (!supplyDays || supplyDays < 5) return null;
+  return Math.max(10, Math.round(price / supplyDays / 10) * 10);
 }

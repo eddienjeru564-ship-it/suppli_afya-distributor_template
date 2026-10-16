@@ -1,13 +1,12 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, type ReactNode } from "react";
-import { paymentPhrase } from "@/components/sections/Ordering";
+import { useState } from "react";
+import { TrustList } from "@/components/order/TrustList";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
 import { Disclosure } from "@/components/ui/Disclosure";
-import { Alert, Check, Share, Shield, Truck, Wallet, WhatsAppIcon } from "@/components/ui/icons";
-import { keepTogether } from "@/components/ui/KeepTogether";
+import { Alert, Check, Share, WhatsAppIcon } from "@/components/ui/icons";
 import { Sheet, SheetBody, SheetFooter, SheetHandle, SheetHeader, useSheet } from "@/components/ui/Sheet";
 import { useIsDesktop } from "@/components/ui/useMediaQuery";
 import { ContactAction } from "@/components/whatsapp/ContactAction";
@@ -67,28 +66,8 @@ function ProductDetail({ listing }: { listing: Listing }) {
     close("product");
   };
 
-  const payBy = paymentPhrase(sf);
-  const { delivery, pickup } = sf.fulfilment;
   // Reassurance where the decision is made: nothing is paid now, how you pay, how it reaches you.
-  const trust = [
-    { icon: <Shield className="h-4 w-4" />, text: `${first} confirms stock and the total before you pay` },
-    payBy && { icon: <Wallet className="h-4 w-4" />, text: `Pay by ${payBy}` },
-    (delivery || pickup) && {
-      icon: <Truck className="h-4 w-4" />,
-      text: delivery && pickup ? "Delivery or collection, agreed with you first" : delivery ? "Delivered to you, cost agreed first" : `Collect: ${pickup!.label}`,
-    },
-  ].filter(Boolean) as { icon: ReactNode; text: string }[];
-
-  const reassurance = (
-    <ul className="grid gap-2 rounded-card bg-sage-soft px-4 py-3.5 text-[0.88rem] leading-snug text-ink">
-      {trust.map((t) => (
-        <li key={t.text} className="flex items-start gap-2.5">
-          <span className="mt-px text-moss">{t.icon}</span>
-          <span>{keepTogether(t.text)}</span>
-        </li>
-      ))}
-    </ul>
-  );
+  const reassurance = <TrustList />;
 
   const facts = (
     <div>

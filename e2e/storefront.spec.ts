@@ -80,8 +80,10 @@ test("help me choose: suggestions come with the reason, the price and a way to o
   await energyAndDigestion(page);
   const results = sheet(page);
   await expect(results.getByRole("heading", { name: "Wanjiru, here's what fits." })).toBeVisible();
-  // The whole plan in a sentence, then one goal at a time, in the order they were ranked.
-  await expect(results.getByText(/^Two products for energy and digestion\. KES/)).toBeVisible();
+  // The plan as one offer with their name on it, the proof it's theirs, then one goal at a time.
+  await expect(results.getByRole("heading", { name: "Wanjiru's plan" })).toBeVisible();
+  await expect(results.getByText(/^Built from your \d+ answers/)).toBeVisible();
+  await expect(results.getByText("All 29 products checked")).toBeVisible();
   const goals = results.locator("section[aria-labelledby^='goal-'] h2");
   await expect(goals).toHaveText(["Energy", "Digestion"]);
   // Each product says why it came up, with its price and its own add.
@@ -166,6 +168,19 @@ test("the order keeps count: add from a card, change it, and the whole plan neve
   // Survives a reload.
   await page.goto("/");
   await expect(page.getByRole("button", { name: "Your order: 2 items" })).toBeVisible();
+});
+
+test("unsure about the whole plan: start with just the main product", async ({ page }) => {
+  await page.goto("/");
+  await energyAndDigestion(page);
+  await sheet(page).getByRole("button", { name: /^Or start with just / }).click();
+  const order = sheet(page);
+  await expect(order.getByRole("heading", { name: "Your order" })).toBeVisible();
+  await expect(order.getByText("Suggested for you")).toHaveCount(1);
+  await order.getByRole("button", { name: "Close" }).click();
+  // The rest of the plan is still one tap away, and the smaller option has done its job.
+  await expect(sheet(page).getByRole("button", { name: "Add the whole plan" })).toBeVisible();
+  await expect(sheet(page).getByRole("button", { name: /^Or start with just / })).toHaveCount(0);
 });
 
 test("safety: a product that doesn't suit is left out, and the reason is given", async ({ page }) => {

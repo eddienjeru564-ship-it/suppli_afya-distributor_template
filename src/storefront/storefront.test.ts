@@ -26,7 +26,7 @@ import {
 import photos from "./product-photos.json";
 import { checkNotes, listings, matchesQuery, oneLiner, packOf, shortName, supplyLabel, supplyShort } from "./products";
 import { nextShown, partProgress, previousShown, resumeAt, sectionLead } from "./progress";
-import { listOf, planSentence, planView } from "./plan";
+import { answeredCount, perDay, planView, youSaid } from "./plan";
 import { priceSuggestions } from "./suggestions";
 import type { Storefront } from "./types";
 import { contrast, validateStorefront } from "./validate";
@@ -482,14 +482,20 @@ describe("results, goal by goal", () => {
     expect(v.waiting).toEqual(["digestion"]);
   });
 
-  it("sums it up in plain words", () => {
-    const price = (n: number) => kes(n);
-    const a = view(base);
-    expect(planSentence(a.view, a.priced, { firstName: "Kate", price })).toBe(`Two products for energy and digestion. ${kes(a.priced.coreTotal)} for a pack of each.`);
-    const one = view({ ...base, plan_size: "one" });
-    expect(planSentence(one.view, one.priced, { firstName: "Kate", price })).toBe(
-      `One product for energy. ${kes(one.priced.coreTotal)} for one pack. Digestion can wait until you're ready.`,
-    );
-    expect(listOf(["a", "b", "c"])).toBe("a, b and c");
+  it("shows each goal in the customer's own words, and never a bare yes or no", () => {
+    expect(youSaid("energy", base)).toEqual(["Energy 2 of 5", "Mid-afternoon"]);
+    expect(youSaid("digestion", base)).toEqual(["Constipation", "Bloating or gas", "Most weeks"]);
+    const joints: Answers = { ...base, goals: ["joints"], joint_issues: ["pain"], joint_duration: "years", bone_risk: "no" };
+    expect(youSaid("joints", joints)).toEqual(["Pain when I walk, climb stairs or kneel", "More than a year"]);
+    // Only questions that belong to that goal.
+    expect(youSaid("energy", base).some((x) => /Constipation/.test(x))).toBe(false);
+  });
+
+  it("counts only the answers that still apply, and prices a pack by the day", () => {
+    expect(answeredCount(base)).toBe(Object.keys(base).length);
+    expect(answeredCount({ ...base, loose_freq: "weekly" })).toBe(Object.keys(base).length);
+    expect(perDay(3200, 21)).toBe(150);
+    expect(perDay(4100, 14)).toBe(290);
+    expect(perDay(5000, 0)).toBeNull();
   });
 });
