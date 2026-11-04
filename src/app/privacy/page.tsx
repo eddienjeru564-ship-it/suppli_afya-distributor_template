@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SuppliMark } from "@/components/brand/SuppliMark";
+import { PoweredBy } from "@/components/brand/PoweredBy";
 
 export const metadata: Metadata = { title: "Privacy", robots: { index: false } };
 
@@ -66,8 +66,8 @@ export default function PrivacyPage() {
         </section>
         <p className="text-[0.85rem] text-ink-3">Last updated September 2026.</p>
       </div>
-      <div className="mt-16 flex items-center gap-2 text-[0.8rem] text-ink-3">
-        Powered by <SuppliMark />
+      <div className="mt-16 flex items-center text-ink-2">
+        <PoweredBy className="h-10" />
       </div>
     </main>
   );

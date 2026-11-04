@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SuppliMark } from "@/components/brand/SuppliMark";
+import { PoweredBy } from "@/components/brand/PoweredBy";
 import { useStorefront } from "@/components/store/StorefrontProvider";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/ui/icons";
@@ -66,9 +66,8 @@ export function Footer() {
             Privacy
           </Link>
         </span>
-        <a href={process.env.NEXT_PUBLIC_SUPPLI_AFYA_SITE || "https://suppliafya.co.ke"} className="inline-flex min-h-11 items-center gap-2 hover:text-ink" rel="noopener">
-          <span>Powered by</span>
-          <SuppliMark />
+        <a href={process.env.NEXT_PUBLIC_SUPPLI_AFYA_SITE || "https://suppliafya.co.ke"} className="inline-flex min-h-11 items-center text-ink-2 transition-colors hover:text-ink" rel="noopener">
+          <PoweredBy className="h-11" />
         </a>
       </div>
     </footer>
