@@ -1,4 +1,4 @@
-import { GOALS_BY_ID, QUESTIONS, QUESTIONS_BY_ID, pruneAnswers, type Answers, type EngineResult, type GoalId, type Product } from "@/engine";
+import { GOALS_BY_ID, QUESTIONS, QUESTIONS_BY_ID, pruneAnswers, unmetNote, type Answers, type EngineResult, type GoalId, type Product } from "@/engine";
 import type { PricedSuggestions, Suggestion } from "./suggestions";
 
 /**
@@ -55,9 +55,9 @@ export interface PlanView {
 
 export const goalLabel = (g: GoalId) => GOALS_BY_ID[g]?.label ?? g;
 
-/** The engine's own words for a goal with nothing suitable. */
+/** The engine's own words for a goal with nothing suitable, matched exactly. */
 function isUnmetNote(note: string, goal: GoalId): boolean {
-  return note.startsWith("We couldn't find a") && note.includes(` ${goalLabel(goal).toLowerCase()} product`);
+  return note === unmetNote(goal, true) || note === unmetNote(goal, false);
 }
 
 export function planView(result: EngineResult, priced: PricedSuggestions): PlanView {

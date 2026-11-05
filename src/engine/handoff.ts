@@ -66,7 +66,7 @@ export function whatsappMessage(r: EngineResult, ctx: EngineContext): string {
   lines.push("");
   const about = [p.name || "Me", p.age ? String(p.age) : null].filter(Boolean).join(", ");
   lines.push(`*About me:* ${about}`);
-  if (p.goals.length) lines.push(`*My goals:* ${p.goals.map((g, i) => `${i + 1}. ${GOALS_BY_ID[g].short}`).join("  ")}`);
+  if (p.goals.length) lines.push(`*My goals:* ${p.goals.map((g, i) => `${i + 1}. ${GOALS_BY_ID[g].short}`).join(", ")}`);
 
   if (r.status === "clinic-first") {
     lines.push(`*Note:* I'm ${p.pregnancy === "trying" ? "trying for a baby" : p.pregnancy}, so the assessment suggested I speak to my clinic first.`);
