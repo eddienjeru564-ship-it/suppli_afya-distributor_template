@@ -86,6 +86,18 @@ function reasonsFor(s: Scored): string[] {
   return out;
 }
 
+/**
+ * What we say when no product suits a goal. Sleep and stress has no headline product on purpose
+ * (docs/DECISIONS.md, #3), so it says so plainly; other goals usually miss because a safety rule
+ * left the only suitable product out, which the "left out" list explains.
+ */
+export function unmetNote(goal: GoalId, hasHabits: boolean): string {
+  const next = hasHabits ? "Start with the small changes below, and your distributor can talk you through anything else." : "Your distributor can talk you through other options.";
+  if (goal === "sleep_stress")
+    return `For sleep and stress, we'd start with daily habits rather than a product. ${hasHabits ? "The small changes below are the usual first step, and your distributor can talk it through with you." : "Your distributor can talk it through with you."}`;
+  return `We haven't suggested a ${goalLabel(goal).toLowerCase()} product, because none suits your answers well enough. ${next}`;
+}
+
 /** People working on sugar, weight or post-meal crashes. */
 function watchingSugar(p: Profile) {
   return (
@@ -218,11 +230,9 @@ export function recommend(rawAnswers: Answers, opts: { salt?: string } = {}): En
       take(s, "addon", covers);
     }
 
-    for (const goal of unmet) {
-      planNotes.push(
-        `We couldn't find a ${goalLabel(goal).toLowerCase()} product that suits your answers. Your distributor can talk you through other options.`,
-      );
-    }
+    // A goal with no suitable product still gets a clear next step, never a dead end.
+    const habits = pickHabits(profile);
+    for (const goal of unmet) planNotes.push(unmetNote(goal, habits.length > 0));
   } else if (profile.sex !== "male") {
     planNotes.push(
       "If your clinic agrees, FemiCalcium D3 is BF Suma's calcium and vitamin D product for pregnancy and breastfeeding. It's worth asking about at your next visit.",

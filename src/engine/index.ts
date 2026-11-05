@@ -14,5 +14,5 @@ export {
   progress,
 } from "./flow";
 export { deriveProfile } from "./profile";
-export { recommend, referenceFor } from "./recommend";
+export { recommend, referenceFor, unmetNote } from "./recommend";
 export { whatsappMessage, whatsappLink, distributorBrief, safetyFlags, profileFlags } from "./handoff";

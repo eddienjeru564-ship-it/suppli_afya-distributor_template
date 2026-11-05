@@ -494,9 +494,9 @@ describe("results, goal by goal", () => {
     expect(joints.picks).toEqual([]);
     expect(joints.leftOut.length).toBeGreaterThan(0);
     expect(joints.leftOut.every((e) => /shellfish/.test(e.reason))).toBe(true);
-    // The engine's "couldn't find" note moves into the goal instead of repeating at the top.
-    expect(result.planNotes.some((n) => n.startsWith("We couldn't find a joints & bones product"))).toBe(true);
-    expect(v.notes.some((n) => n.startsWith("We couldn't find"))).toBe(false);
+    // The engine's "nothing suits" note moves into the goal instead of repeating at the top.
+    expect(result.planNotes.some((n) => n.startsWith("We haven't suggested a joints & bones product"))).toBe(true);
+    expect(v.notes.some((n) => n.startsWith("We haven't suggested"))).toBe(false);
     expect(v.unmet).toEqual(["joints"]);
     expect(v.otherLeftOut.length + v.goals.reduce((n, g) => n + g.leftOut.length, 0)).toBe(result.excluded.length);
   });
