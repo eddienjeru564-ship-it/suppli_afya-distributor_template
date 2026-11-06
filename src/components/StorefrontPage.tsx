@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { About } from "@/components/sections/About";
 import { Catalogue } from "@/components/sections/Catalogue";
 import { ChooseSection } from "@/components/sections/ChooseSection";
@@ -36,18 +37,40 @@ export function StorefrontPage({ sf }: { sf: Storefront }) {
           <TopBar />
           <main>
             <Hero />
-            <ChooseSection />
-            <HowItWorks />
-            <Catalogue />
-            <Ordering />
-            <About />
-            <Closing />
+            {/* Each boundary hydrates on its own, so a phone gets breaks between sections instead of
+                one long freeze, and a tap on the first screen is answered sooner. */}
+            <Suspense>
+              <ChooseSection />
+            </Suspense>
+            <Suspense>
+              <HowItWorks />
+            </Suspense>
+            <Suspense>
+              <Catalogue />
+            </Suspense>
+            <Suspense>
+              <Ordering />
+            </Suspense>
+            <Suspense>
+              <About />
+            </Suspense>
+            <Suspense>
+              <Closing />
+            </Suspense>
           </main>
-          <Footer />
-          <MobileBar />
+          <Suspense>
+            <Footer />
+          </Suspense>
+          <Suspense>
+            <MobileBar />
+          </Suspense>
         </PageShell>
-        <Toaster />
-        <Overlays />
+        <Suspense>
+          <Toaster />
+        </Suspense>
+        <Suspense>
+          <Overlays />
+        </Suspense>
       </StorefrontProvider>
     </>
   );

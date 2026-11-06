@@ -338,9 +338,11 @@
   }
 }
 
+/* Starts a hair above zero, not zero: the eye can't tell, but the browser counts the text as
+   painted on the first frame, so the page is "ready" as soon as the words arrive. */
 @keyframes rise {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(14px);
   }
   to {
