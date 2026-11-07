@@ -14,7 +14,7 @@ export type Variant = "primary" | "accent" | "outline" | "ghost" | "whatsapp" | 
 export type Size = "sm" | "md" | "lg";
 
 const base =
-  "group relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-control font-semibold transition-[background-color,color,border-color,box-shadow,transform] duration-200 ease-[var(--ease-out)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40";
+  "group relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-control font-semibold transition-[background-color,color,border-color,box-shadow,transform] duration-200 ease-[var(--ease-out)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 [&>svg]:shrink-0";
 
 const variants: Record<Variant, string> = {
   primary: "bg-ink text-canvas hover:bg-black",

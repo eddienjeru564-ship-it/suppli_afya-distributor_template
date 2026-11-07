@@ -22,7 +22,8 @@ export function QtyStepper({
 }) {
   const btn = clsx(
     "grid place-items-center rounded-full text-ink transition-colors hover:bg-ink/[0.07] disabled:opacity-30",
-    size === "sm" ? "h-9 w-9" : "h-11 w-11",
+    // The small stepper keeps its compact look, but its tap area reaches 44px, a thumb's width.
+    size === "sm" ? "relative h-9 w-9 after:absolute after:-inset-1 after:content-['']" : "h-11 w-11",
   );
   const canDecrease = value > 1 || Boolean(onRemove);
   return (

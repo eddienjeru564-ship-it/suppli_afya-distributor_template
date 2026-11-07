@@ -73,7 +73,7 @@ export function Catalogue() {
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 md:max-w-[44rem] md:gap-3">
             <label className="relative block">
               <span className="sr-only">Search products</span>
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-[1.1rem] w-[1.1rem] -translate-y-1/2 text-ink-3" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[1.1rem] w-[1.1rem] -translate-y-1/2 text-ink-3" />
               <input
                 type="search"
                 value={query}
@@ -81,7 +81,7 @@ export function Catalogue() {
                 placeholder="Search products"
                 enterKeyHint="search"
                 autoComplete="off"
-                className="h-12 w-full rounded-control bg-surface pl-11 pr-11 text-[1rem] text-ink outline-none ring-1 ring-ink/12 transition-shadow placeholder:text-ink-3 placeholder:text-ellipsis focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:hidden"
+                className={clsx("h-12 w-full rounded-control bg-surface pl-10 text-[1rem]", query ? "pr-11" : "pr-3", "text-ink outline-none ring-1 ring-ink/12 transition-shadow placeholder:text-ink-3 placeholder:text-ellipsis focus:ring-2 focus:ring-accent [&::-webkit-search-cancel-button]:hidden")}
               />
               {query && (
                 <button

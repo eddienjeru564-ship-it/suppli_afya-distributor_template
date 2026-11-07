@@ -41,7 +41,18 @@ export function TopBar() {
           <Portrait distributor={d} size="sm" />
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[0.98rem] font-semibold text-ink">{d.name}</span>
-            <span className="block truncate text-[0.75rem] text-ink-3">{d.role}</span>
+            <span className="block truncate text-[0.75rem] text-ink-3">
+              {/* On the smallest phones "Independent" goes, so the role reads whole instead of
+                  "Independent BF Suma distribu…". It stays in the footer and "Meet your distributor". */}
+              {d.role.startsWith("Independent ") ? (
+                <>
+                  <span className="max-[389px]:hidden">Independent </span>
+                  {d.role.slice("Independent ".length)}
+                </>
+              ) : (
+                d.role
+              )}
+            </span>
           </span>
         </a>
 

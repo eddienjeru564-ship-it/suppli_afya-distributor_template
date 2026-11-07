@@ -330,6 +330,20 @@ function Details({
   const set = (patch: Partial<OrderDetails>) => setDetails((d) => ({ ...d, ...patch }));
   const id = useId();
   const areas = sf.fulfilment.delivery?.areas ?? [];
+  // After a failed try, the field that's still empty is outlined, not just named in the message.
+  const nameMissing = Boolean(problem) && !details.name.trim();
+  const phoneMissing = Boolean(problem) && direct && !details.phone.trim();
+  const flagged = (missing: boolean) => clsx(inputClass, missing && "ring-2 ring-caution");
+  // ...and it's brought into view and focused, so a thumb can fix it at once.
+  useEffect(() => {
+    if (!problem) return;
+    const field = document.getElementById(nameMissing ? `${id}-name` : phoneMissing ? `${id}-phone` : "");
+    if (!field) return;
+    field.scrollIntoView({ block: "center", behavior: "smooth" });
+    field.focus({ preventScroll: true });
+    // Only when a new try fails, not as the customer types.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problem]);
 
   return (
     <>
@@ -350,7 +364,8 @@ function Details({
               autoComplete="name"
               maxLength={LIMITS.name}
               placeholder="A first name is fine"
-              className={inputClass}
+              aria-invalid={nameMissing || undefined}
+              className={flagged(nameMissing)}
             />
           </Field>
 
@@ -365,7 +380,8 @@ function Details({
                 autoComplete="tel"
                 maxLength={LIMITS.phone}
                 placeholder="07XX XXX XXX"
-                className={inputClass}
+                aria-invalid={phoneMissing || undefined}
+                className={flagged(phoneMissing)}
               />
               <p className="mt-1.5 text-[0.8rem] text-ink-3">{first} calls or messages you on this number to confirm.</p>
             </Field>
@@ -528,7 +544,14 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
         <>
           <h2 className="display-card mt-5 text-ink">{first} has your order.</h2>
           <p className="mt-3 text-[0.98rem] leading-relaxed text-ink-2">
-            {first} will call or message you{order.phone ? ` on ${order.phone}` : ""} to confirm stock, delivery and the
+            {first} will call or message you
+            {order.phone ? (
+              <>
+                {" "}
+                on <span className="whitespace-nowrap">{order.phone}</span>
+              </>
+            ) : null}{" "}
+            to confirm stock, delivery and the
             total. Then you pay. You don&apos;t need to do anything else.
           </p>
           {order.preview && (
@@ -566,7 +589,7 @@ function Sent({ order, onAgain }: { order: SentOrder; onAgain: () => void }) {
           </Button>
           <div className="grid grid-cols-2 gap-2.5">
             <Button variant="outline" onClick={onAgain}>
-              <WhatsAppIcon className="h-4 w-4 text-[#1faa59]" /> Message {first}
+              <WhatsAppIcon className="text-[#1faa59]" /> Message {first}
             </Button>
             <Button variant="outline" onClick={copy}>
               {copied ? <Check /> : <Copy />} {copied ? "Copied" : "Copy order"}
