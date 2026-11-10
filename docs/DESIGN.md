@@ -77,6 +77,12 @@ The wellness default (green leaves, beige, spa) was avoided on purpose.
   headings that already say what they are ("Kate's products", "How ordering works") stand alone.
 - **Motion.** Short and causal: sheets rise from where the thumb is, the order count bumps when
   something is added, the "+" becomes a quantity stepper. Everything honours "reduce motion".
+- **Scroll reveals.** Section heads (`<Reveal>`) and cards (`.reveal-card`) fade and rise into place
+  the first time they reach the screen, and stay; cards that arrive together follow each other 70ms
+  apart. Two-column sections slide in from their side on tablets and up (never sideways on phones,
+  where it could nudge the page), photos and the closing panel settle in from a slight scale. One
+  observer runs it all (`ui/ScrollReveal`), in every browser. Nothing is hidden until script is
+  running, whatever is already on screen is simply shown, and with "reduce motion" nothing moves.
 
 ## Speed and reach
 

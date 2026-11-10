@@ -36,12 +36,12 @@ export function About() {
         )}
       >
         {framed && (
-          <Reveal className="hidden md:block">
+          <Reveal from="scale" className="hidden md:block">
             <Photo distributor={d} className="mx-auto aspect-[4/5] w-full max-w-[24rem] rounded-panel" />
           </Reveal>
         )}
 
-        <Reveal className="min-w-0">
+        <Reveal from="right" className="min-w-0">
           {/* Phones: a smaller photo beside the name, so the words start on the first screen. */}
           <div className="flex items-center gap-4">
             {framed && <Photo distributor={d} small className="aspect-[4/5] w-[5.5rem] shrink-0 rounded-card md:hidden" />}

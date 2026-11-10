@@ -11,6 +11,7 @@ import { Overlays } from "@/components/Overlays";
 import { Ordering } from "@/components/sections/Ordering";
 import { TopBar } from "@/components/sections/TopBar";
 import { PageShell } from "@/components/store/PageShell";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { StorefrontProvider } from "@/components/store/StorefrontProvider";
 import { canPlaceOrders } from "@/storefront/order";
 import { themeCss } from "@/storefront/theme";
@@ -71,6 +72,7 @@ export function StorefrontPage({ sf }: { sf: Storefront }) {
         <Suspense>
           <Overlays />
         </Suspense>
+        <ScrollReveal />
       </StorefrontProvider>
     </>
   );

@@ -237,23 +237,6 @@
     animation: settle 0.7s var(--ease-out) both;
     animation-delay: calc(var(--i, 0) * 60ms);
   }
-  /* Section heads drift up as they scroll into view, where the browser can do it without script.
-     Movement only, never transparency: text is always at full contrast. */
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation: settle linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
-    }
-  }
-  /* Cards drift into place as they scroll into view. Movement only, so text keeps full contrast. */
-  @supports (animation-timeline: view()) {
-    .reveal-card {
-      animation: drift linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 45%;
-    }
-  }
   /* The products on the first screen float, slowly and out of step, once they've risen in. */
   .float {
     animation: float 7s ease-in-out infinite;
@@ -278,9 +261,7 @@
   @media (prefers-reduced-motion: reduce) {
     .rise,
     .settle,
-    .reveal,
     .interest-in,
-    .reveal-card,
     .float,
     .pop,
     .prep-step,
@@ -344,6 +325,53 @@
   from {
     opacity: 0.01;
     transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Scroll reveals (run by components/ui/ScrollReveal). Hidden only once script has marked the page
+ * `js-reveal`, so content never depends on JavaScript. Opacity and transform only: nothing reflows.
+ * A keyframe animation rather than a transition, so cards keep their own hover transitions.
+ */
+html.js-reveal :is([data-reveal], .reveal-card):not([data-shown]) {
+  opacity: 0;
+}
+html.js-reveal :is([data-reveal], .reveal-card)[data-shown="rise"] {
+  animation: reveal 0.75s var(--ease-out) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+:is([data-reveal="up"], [data-reveal=""]) {
+  --reveal-from: translate3d(0, 28px, 0);
+}
+.reveal-card {
+  --reveal-from: translate3d(0, 22px, 0) scale(0.985);
+}
+/* Sideways only where there's room beside it; on phones a slide could nudge the page sideways. */
+:is([data-reveal="left"], [data-reveal="right"]) {
+  --reveal-from: translate3d(0, 28px, 0);
+}
+@media (min-width: 768px) {
+  [data-reveal="left"] {
+    --reveal-from: translate3d(-36px, 0, 0);
+  }
+  [data-reveal="right"] {
+    --reveal-from: translate3d(36px, 0, 0);
+  }
+}
+[data-reveal="scale"] {
+  --reveal-from: scale(0.94);
+}
+[data-reveal="fade"] {
+  --reveal-from: none;
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: var(--reveal-from, translate3d(0, 28px, 0));
   }
   to {
     opacity: 1;

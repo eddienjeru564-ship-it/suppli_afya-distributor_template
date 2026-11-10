@@ -374,3 +374,34 @@ test.describe("order API", () => {
     expect(await ok.json()).toEqual({ ok: true, forwarded: false });
   });
 });
+
+test("scroll reveals: below the fold rises in once seen, nothing stays hidden, reduce motion shows all", async ({ page, browser }) => {
+  await page.goto("/");
+  const card = page.locator("#products .reveal-card").first();
+  // Below the fold: waiting to be seen.
+  await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains("js-reveal"))).toBe(true);
+  await expect(card).not.toHaveAttribute("data-shown");
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toHaveAttribute("data-shown", "rise");
+  // Scroll the whole page: every reveal that's displayed ends up shown, at full opacity.
+  for (let y = 0; y < 12000; y += 500) {
+    await page.mouse.wheel(0, 500);
+    await page.waitForTimeout(60);
+  }
+  await page.waitForTimeout(1500);
+  const left = await page.evaluate(() =>
+    [...document.querySelectorAll("[data-reveal], .reveal-card")].filter((e) => {
+      const r = e.getBoundingClientRect();
+      return r.height > 0 && (!e.hasAttribute("data-shown") || getComputedStyle(e).opacity !== "1");
+    }).length,
+  );
+  expect(left).toBe(0);
+
+  const calm = await browser.newContext({ reducedMotion: "reduce" });
+  const still = await calm.newPage();
+  await still.goto(page.url().replace(/#.*$/, ""));
+  await still.waitForTimeout(800);
+  expect(await still.evaluate(() => document.documentElement.classList.contains("js-reveal"))).toBe(false);
+  expect(await still.locator("#products .reveal-card").first().evaluate((e) => getComputedStyle(e).opacity)).toBe("1");
+  await calm.close();
+});
