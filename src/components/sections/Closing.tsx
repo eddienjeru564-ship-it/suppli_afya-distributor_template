@@ -14,7 +14,7 @@ export function Closing() {
   return (
     <section id="closing" aria-labelledby="closing-title" className="container-x pb-8">
       {/* Calm and personal, like the rest of the page: the one strong colour is the WhatsApp button. */}
-      <div className="relative overflow-hidden rounded-panel bg-sage-soft px-6 py-12 text-ink ring-1 ring-moss/10 md:px-14 md:py-16">
+      <div data-reveal="scale" className="relative overflow-hidden rounded-panel bg-sage-soft px-6 py-12 text-ink ring-1 ring-moss/10 md:px-14 md:py-16">
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-moss/15" aria-hidden />
         <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full border border-moss/10" aria-hidden />
         <div className="relative grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
